@@ -120,4 +120,7 @@ To preserve the reasoning capabilities of our base model (e.g., `gpt-oss-120b`),
     -   **Why**: This is effectively the same model as our target base model. Using it allows us to mimic "on-policy" data generation (the model teaching itself) without the cost/complexity of running local inference for the entire dataset.
     -   **Input**: The FIM prompt context + the *known correct* Gold Code.
     -   **Task**: "Explain the reasoning behind this solution in a `<think>` block."
-3.  **Final Training Target**: `<think> ... reasoning ... </think>\n<GOLD_CODE>`
+3.  **Final Training Target Assembly**:
+    -   **Action**: Extract *only* the `<think>...</think>` block from the API response.
+    -   **Assembly**: Concatenate `<think>...extracted thoughts...</think>` + `\n` + `Gold_Code`.
+    -   **Robustness Note**: We do *not* rely on the API to output the code correctly. The API model might be chatty or make small syntax errors. By discarding its code output and re-attaching our guaranteed-correct Gold Code, we ensure the training data is 100% syntax-valid while capturing the high-level reasoning.
