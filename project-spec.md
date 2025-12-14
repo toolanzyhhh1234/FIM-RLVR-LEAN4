@@ -6,7 +6,7 @@ LeanDojo will be used as the primary infrastructure for data extraction (proof s
 
 ### Scope decisions (recommended defaults)
 - Target language: Lean4 `by`-style tactic proofs (mask and generate whole tactic blocks, not arbitrary token spans).  
-- Hole definition: a *contiguous sequence of tactic lines* (or syntactic tactic blocks), with hole size measured in “number of tactics/lines,” not tokens.  
+- Hole definition: a *syntactic tactic block* (AST-aware), not just lines. Masking respects tactic boundaries (e.g., `by ...`, `have ... := ...`) to ensure holes are meaningful logical units.[6]  
 - Verification: compile/check the reconstructed proof with Lean; success is binary (verified / not verified).[2]
 - Optional “process signal”: parse Lean feedback to find the earliest failing step and use it for partial credit, following “Lean as a symbolic process oracle” framing.[4][5]
 
@@ -23,9 +23,9 @@ For each theorem proof script:
 - Parse into a sequence of tactic lines / blocks.
 - Sample a hole location and a hole ratio \(r\) (e.g., 0.10 means 10% of tactic lines removed).
 - Produce a single training instance:
-  - `prompt = <PFX> prefix <K=n> <SFX> suffix <MID>`  
+  - `prompt = <PFX> prefix <CTX> retrieved_context <K=n> <SFX> suffix <MID>` (Context is optional but recommended)
   - `target = middle` (the exact removed block)
-- Use *structure-aware masking*: only cut on tactic boundaries so the prompt remains syntactically sane and the hole corresponds to a meaningful unit, inspired by structure-aware FIM for code.[6]
+- Use *structure-aware masking*: parse tactic blocks (using LeanDojo or AST tools) to valid boundaries. Avoid masking "closure" tokens (`end`, `qed`) or trivial punctuation solely.
 
 ### Suggested JSONL schema
 - `theorem_id`: stable identifier (file + theorem name).
@@ -50,7 +50,9 @@ Include a mix of:
 Core loop for each training episode:
 1. Sample a theorem \(T\) and a hole ratio \(r\), generate a hole `(prefix, suffix)` as in the FIM transformation.
 2. Sample a *group* of \(G\) candidate `middle` completions from the policy (group sampling is compatible with GRPO-style updates).[2][5]
-3. For each candidate, reconstruct full proof and run Lean verification.
+3. For each candidate:
+   - **Fast-Fail Check:** Check syntax/elaboration. If invalid, reward = 0 immediately (saves compute).
+   - **Full Verification:** If valid, reconstruct full proof and run Lean verification.
 4. Reward:
    - Outcome reward: \(R=1\) if Lean verifies, else \(0\).[2]
    - Optional process reward: partial credit based on locally valid tactics and earliest failing step, using first-error propagation ideas described in process-verified RL for Lean.[4][5]
@@ -88,8 +90,9 @@ If performance at the new ratio collapses (e.g., 0 successes in last \(W\)), eit
 
 ## Experimentation plan (what to run and what to report)
 
-### Metrics
-- **Pass@N** on held-out theorems for FIM: probability at least one of \(N\) samples yields Lean-verified reconstruction.
+### Metrics (Standard Benchmarks)
+- **Primary Eval:** Use established Lean4 benchmarks (e.g., **MiniF2F**, **ProofNet**, or **LeanDojo Benchmark**) to ensure comparability and avoid custom-split leakage issues.
+- **Pass@N**: Probability at least one of \(N\) samples yields Lean-verified reconstruction on these benchmarks.
 - Breakdown by hole ratio: pass@N for 10%, 20%, … (shows curriculum impact).
 - Sample efficiency: verifier calls per additional % pass@1 improvement.
 
