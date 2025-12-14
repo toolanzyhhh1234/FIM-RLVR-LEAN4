@@ -19,6 +19,16 @@ def join_lines(lines: List[str], trailing_newline: bool) -> str:
     return s
 
 
+def concat_with_newline(a: str, b: str) -> str:
+    if not a:
+        return b
+    if not b:
+        return a
+    if a.endswith("\n") or b.startswith("\n"):
+        return a + b
+    return a + "\n" + b
+
+
 def generate_fim_sample(full_proof: str, ratio: float = 0.2) -> Tuple[str, str, str]:
     """Generate Prefix, Middle, Suffix from proof."""
     blocks = get_tactic_blocks(full_proof)
@@ -74,7 +84,7 @@ def main():
             if not middle.strip():
                 continue
                 
-            full_prefix = header + "\n" + prefix_body
+            full_prefix = concat_with_newline(header, prefix_body)
             full_suffix = suffix_body
             
             sample = {

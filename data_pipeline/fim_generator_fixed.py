@@ -47,6 +47,16 @@ def join_lines(lines: List[str], trailing_newline: bool) -> str:
     return s
 
 
+def concat_with_newline(a: str, b: str) -> str:
+    if not a:
+        return b
+    if not b:
+        return a
+    if a.endswith("\n") or b.startswith("\n"):
+        return a + b
+    return a + "\n" + b
+
+
 def generate_fim_sample(full_proof: str, ratio: float = 0.2) -> Tuple[str, str, str]:
     """Generate FIM sample with safe line-level splits."""
     lines = get_proof_lines(full_proof)
@@ -111,7 +121,7 @@ def main():
             if not middle.strip() or len(middle.split('\n')) < 2:
                 continue
                 
-            full_prefix = header + "\n" + prefix_body
+            full_prefix = concat_with_newline(header, prefix_body)
             full_suffix = suffix_body
             
             sample = {
