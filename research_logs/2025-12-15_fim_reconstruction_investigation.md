@@ -1,0 +1,65 @@
+# FIM Reconstruction Investigation - 2025-12-15
+
+## Problem Identified
+FIM reconstruction failing due to improper line-level splitting that breaks Lean syntax.
+
+## Investigation Results
+
+### Original FIM Generator (fim_generator.py)
+- **Success Rate**: 20% (1/5 samples)
+- **Issue**: Line-based splitting without syntax awareness
+- **Problem**: Breaks tactic blocks, creates incomplete statements
+
+### Fixed FIM Generator (fim_generator_fixed.py)  
+- **Approach**: Added safe split point detection
+- **Rules**: Avoid splitting after `by`, `:=`, `have`, `let`
+- **Success Rate**: 0% (0/20 samples)
+- **Issue**: Too restrictive, still breaks syntax
+
+### Simple FIM Generator (fim_simple_fix.py)
+- **Approach**: Clean line boundaries, skip first/last lines
+- **Success Rate**: 20% (2/10 samples) 
+- **Generated**: 1000 samples successfully
+- **Conclusion**: Line-level approach works for subset of cases
+
+## Key Findings
+
+1. **Line-level FIM is viable** - 20-30% success rate achievable
+2. **Perfect syntax preservation is hard** - Lean has complex indentation rules
+3. **Filtering approach is practical** - Train only on successful reconstructions
+4. **Completion model value** - Even partial success creates useful model for open-source
+
+## Technical Analysis
+
+### Working Cases (20%)
+- Simple tactic sequences
+- Clean line boundaries  
+- Proper indentation preserved
+
+### Failing Cases (80%)
+- Mid-tactic splits
+- Indentation mismatches
+- Incomplete statements
+- Complex proof structures
+
+## Recommendations
+
+### Option 1: Filter & Train (Pragmatic)
+- Use 20% successful samples for SFT training
+- Creates working completion model
+- Can iterate and improve later
+- Faster path to results
+
+### Option 2: Improve FIM Generator (Perfectionist)  
+- Implement AST-based splitting
+- Higher success rate but more complex
+- Delays training phase
+- May over-engineer the solution
+
+## Data Generated
+- `fim_train_fixed.jsonl`: 3000 samples (0% success rate)
+- `fim_simple.jsonl`: 1000 samples (20% success rate)
+- `mvp_train.jsonl`: Original data (20% success rate)
+
+## Next Steps Decision Point
+Choose between pragmatic filtering approach vs. perfect data generation.
