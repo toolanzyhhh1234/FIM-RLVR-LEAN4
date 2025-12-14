@@ -99,4 +99,25 @@ We have successfully implemented an "exact line splitting" strategy (`splitlines
   - `glued_boundary`: 0
   - No newlines lost, no whitespace limits needed.
   
-This approach (`proof_only_exact`) is now robust enough to generate the full training dataset without the previous 80% data loss from failing reconstructions.
+
+## Future Data Strategy (Reminder)
+We have decided to mix different data formats for the upcoming SFT phase:
+1.  **Instruction-FIM**: 
+    - **Prompt**: Context (Prefix + Suffix) + `[MISSING_BLOCK: N lines]`
+    - **Gold Label**: The exact `middle` block extracted from the original valid proof. (Model predicts *only* the missing lines).
+2.  **Standard SFT**: Full generation (Prompt: Theorem Statement, Answer: Full Proof).
+
+
+**Note**: The "Standard SFT" data can also be easily generated using our new **exact byte-by-byte reconstruction** pipeline. We simply treat the entire proof body as the "middle" block, ensuring perfect syntax preservation for full-proof samples just as we do for partial ones.
+
+## Thought-Augmented Data Strategy (Rationalization)
+To preserve the reasoning capabilities of our base model (e.g., `gpt-oss-120b`), we **must** include `<think>` traces in the training data. Training on raw code without thought traces risks "lobotomizing" the reasoning model.
+
+**Plan:**
+1.  **Generate Raw Pairs**: Use `fim_generator.py` to create `(Prompt, Gold_Code)` samples.
+2.  **Generate Thoughts (Rationalization)**:
+    -   **API**: Use OpenRouter's free endpoint `openai/gpt-oss-120b:free`.
+    -   **Why**: This is effectively the same model as our target base model. Using it allows us to mimic "on-policy" data generation (the model teaching itself) without the cost/complexity of running local inference for the entire dataset.
+    -   **Input**: The FIM prompt context + the *known correct* Gold Code.
+    -   **Task**: "Explain the reasoning behind this solution in a `<think>` block."
+3.  **Final Training Target**: `<think> ... reasoning ... </think>\n<GOLD_CODE>`
