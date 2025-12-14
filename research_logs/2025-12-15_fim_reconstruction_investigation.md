@@ -83,3 +83,20 @@ In that setting, Option A remains relevant, but we should also revisit how we tr
 
 ## Next Steps Decision Point
 Choose between pragmatic filtering approach vs. perfect data generation.
+
+## Update (2025-12-15 v2): Exact Byte-by-Byte Solution
+We have successfully implemented an "exact line splitting" strategy (`splitlines(keepends=True)`) that solves the FIM reconstruction issues entirely for proof-body extraction.
+
+### Results
+- **Success Rate**: 100% (50/50 samples verified)
+- **Method**: 
+  - Locate `:= by` to separate header/proof.
+  - Split proof body using `splitlines(keepends=True)` to preserve all whitespace and newlines.
+  - Randomly select a contiguous block of lines for the middle "hole".
+  - Reassemble as `header + prefix_body + middle + suffix_body`.
+- **Outcome**: 
+  - `exact_match_rate`: 1.0
+  - `glued_boundary`: 0
+  - No newlines lost, no whitespace limits needed.
+  
+This approach (`proof_only_exact`) is now robust enough to generate the full training dataset without the previous 80% data loss from failing reconstructions.

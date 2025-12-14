@@ -6,6 +6,7 @@ from datasets import load_dataset
 
 from data_pipeline import fim_generator
 from data_pipeline import fim_generator_fixed
+from data_pipeline import fim_exact_line
 from data_pipeline import fim_simple_fix
 
 
@@ -50,6 +51,12 @@ def build_fim_pieces(code: str, mode: str, ratio: float) -> Optional[Tuple[str, 
         suffix = suffix_body
         return prefix, middle, suffix
 
+    if mode == "proof_only_exact":
+        prefix, middle, suffix = fim_exact_line.generate_proof_only_exact_fim(code, ratio=ratio)
+        if not middle:
+            return None
+        return prefix, middle, suffix
+
     if mode == "proof_only_fixed":
         splitter = ":= by"
         if splitter not in code:
@@ -85,7 +92,11 @@ def has_glued_boundary(prefix: str, middle: str, suffix: str) -> bool:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--mode", choices=["proof_only_original", "proof_only_fixed", "file_simple"], default="proof_only_fixed")
+    parser.add_argument(
+        "--mode",
+        choices=["proof_only_original", "proof_only_fixed", "proof_only_exact", "file_simple"],
+        default="proof_only_exact",
+    )
     parser.add_argument("--n", type=int, default=200)
     parser.add_argument("--ratio", type=float, default=0.15)
     parser.add_argument("--min_len", type=int, default=200)
