@@ -4,10 +4,7 @@ from typing import Optional, Tuple
 
 from datasets import load_dataset
 
-from data_pipeline import fim_generator
-from data_pipeline import fim_generator_fixed
 from data_pipeline import fim_exact_line
-from data_pipeline import fim_simple_fix
 
 
 def first_diff(a: str, b: str) -> Optional[int]:
@@ -26,53 +23,13 @@ def diff_context(a: str, b: str, idx: int, window: int = 60) -> Tuple[str, str]:
     return a[start:end], b[start:end]
 
 
-def concat_with_newline(a: str, b: str) -> str:
-    if not a:
-        return b
-    if not b:
-        return a
-    if a.endswith("\n") or b.startswith("\n"):
-        return a + b
-    return a + "\n" + b
-
-
-def build_fim_pieces(code: str, mode: str, ratio: float) -> Optional[Tuple[str, str, str]]:
-    if mode == "proof_only_original":
-        splitter = ":= by"
-        if splitter not in code:
-            return None
-        parts = code.split(splitter, 1)
-        header = parts[0] + splitter
-        proof_body = parts[1]
-        prefix_body, middle, suffix_body = fim_generator.generate_fim_sample(proof_body, ratio=ratio)
-        if not middle:
-            return None
-        prefix = concat_with_newline(header, prefix_body)
-        suffix = suffix_body
-        return prefix, middle, suffix
-
+def build_fim_pieces(
+    code: str, mode: str, ratio: float
+) -> Optional[Tuple[str, str, str]]:
     if mode == "proof_only_exact":
-        prefix, middle, suffix = fim_exact_line.generate_proof_only_exact_fim(code, ratio=ratio)
-        if not middle:
-            return None
-        return prefix, middle, suffix
-
-    if mode == "proof_only_fixed":
-        splitter = ":= by"
-        if splitter not in code:
-            return None
-        parts = code.split(splitter, 1)
-        header = parts[0] + splitter
-        proof_body = parts[1]
-        prefix_body, middle, suffix_body = fim_generator_fixed.generate_fim_sample(proof_body, ratio=ratio)
-        if not middle:
-            return None
-        prefix = concat_with_newline(header, prefix_body)
-        suffix = suffix_body
-        return prefix, middle, suffix
-
-    if mode == "file_simple":
-        prefix, middle, suffix = fim_simple_fix.generate_simple_fim(code, ratio=ratio)
+        prefix, middle, suffix = fim_exact_line.generate_proof_only_exact_fim(
+            code, ratio=ratio
+        )
         if not middle:
             return None
         return prefix, middle, suffix
@@ -81,6 +38,10 @@ def build_fim_pieces(code: str, mode: str, ratio: float) -> Optional[Tuple[str, 
 
 
 def has_glued_boundary(prefix: str, middle: str, suffix: str) -> bool:
+    # Heuristic to detect if we lost a newline at the boundary
+    # In exact mode, this might trigger if the original split point didn't have a newline,
+    # but that's mathematically correct for reconstruction.
+    # We log it just in case, but rely on exact match for verification.
     if prefix and middle:
         if not prefix.endswith("\n") and not middle.startswith("\n"):
             return True
@@ -94,7 +55,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--mode",
-        choices=["proof_only_original", "proof_only_fixed", "proof_only_exact", "file_simple"],
+        choices=["proof_only_exact"],
         default="proof_only_exact",
     )
     parser.add_argument("--n", type=int, default=200)

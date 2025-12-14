@@ -1,129 +1,49 @@
-import pandas as pd
 import json
-import random
-from typing import List, Tuple
+from datasets import load_dataset
+
+from data_pipeline.fim_exact_line import generate_proof_only_exact_fim
 
 
-def get_tactic_blocks(proof_str: str) -> List[str]:
-    """
-    Heuristic splitter to approximate tactic blocks from a text proof.
-    Splits on newlines but tries to keep 'by ...' or structured blocks together?
+def main() -> None:
+    output_path = "data/fim_proof_only_exact.jsonl"
+    target_samples = 5000
 
-    MVP: Split by newline, but group indented lines with parent.
-    Actually, Lean code is whitespace sensitive.
-    Simple MVP: Split by line.
-    """
-    lines = proof_str.split("\n")
-    # Filter empty lines
-    return [line for line in lines if line.strip()]
+    print("Generating exact line-by-line proof-only FIM data (no trimming)...")
+    ds = load_dataset("AI-MO/NuminaMath-LEAN", split="train", streaming=True)
 
+    samples_written = 0
 
-def join_lines(lines: List[str], trailing_newline: bool) -> str:
-    if not lines:
-        return ""
-    s = "\n".join(lines)
-    if trailing_newline:
-        return s + "\n"
-    return s
-
-
-def concat_with_newline(a: str, b: str) -> str:
-    if not a:
-        return b
-    if not b:
-        return a
-    if a.endswith("\n") or b.startswith("\n"):
-        return a + b
-    return a + "\n" + b
-
-
-def generate_fim_sample(full_proof: str, ratio: float = 0.2) -> Tuple[str, str, str]:
-    """
-    Generates Prefix, Middle, Suffix.
-    middle is a contiguous block of lines.
-    """
-    blocks = get_tactic_blocks(full_proof)
-    if not blocks:
-        return "", "", ""
-
-    n_lines = len(blocks)
-    k = max(1, int(n_lines * ratio))
-
-    # Pick start index
-    # Don't pick 0 if possible (keep some prefix)
-    max_start = max(0, n_lines - k)
-    start_idx = random.randint(0, max_start)
-    end_idx = start_idx + k
-
-    prefix = join_lines(blocks[:start_idx], trailing_newline=bool(blocks[:start_idx]))
-    middle = join_lines(blocks[start_idx:end_idx], trailing_newline=bool(blocks[start_idx:end_idx]))
-    suffix = join_lines(blocks[end_idx:], trailing_newline=False)
-
-    return prefix, middle, suffix
-
-
-def main():
-    input_path = "data/NuminaMath-LEAN/data/train-00000-of-00001.parquet"
-    output_path = "data/mvp_train.jsonl"
-
-    print(f"Reading {input_path}...")
-    df = pd.read_parquet(input_path)
-
-    # Filter valid
-    df = df[df["formal_ground_truth"].notna() & (df["formal_ground_truth"] != "")]
-
-    print(f"Processing {len(df)} theorems...")
-
-    samples = []
-
-    for _, row in df.iterrows():
-        # Source code
-        code = row["formal_ground_truth"]
-
-        # We need to extract the PROOF part for masking.
-        # But for FIM, we mask the file.
-        # Masking imports or theorem stmt is bad.
-        # We should find ':= by' and only mask AFTER that.
-
-        splitter = ":= by"
-        if splitter not in code:
-            continue
-
-        parts = code.split(splitter, 1)
-        header = parts[0] + splitter
-        proof_body = parts[1]
-
-        # Generate FIM on proof_body
-        prefix_body, middle, suffix_body = generate_fim_sample(proof_body, ratio=0.15)
-
-        if not middle.strip():
-            continue
-
-        full_prefix = concat_with_newline(header, prefix_body)
-        full_suffix = suffix_body
-
-        # Format for SFT
-        # Prompt: <PFX>{prefix}<SFX>{suffix}<MID>
-        # Completion: {middle}
-
-        samples.append(
-            {
-                "prompt": f"<PFX>{full_prefix}<SFX>{full_suffix}<MID>",
-                "completion": middle,
-                "theorem_name": "unknown",  # Todo: extract from header regex
-            }
-        )
-
-    # Shuffle and save
-    random.shuffle(samples)
-
-    # Save a subset for MVP (e.g. 10k)
-    subset = samples[:10000]
-
-    print(f"Saving {len(subset)} samples to {output_path}...")
     with open(output_path, "w") as f:
-        for s in subset:
-            f.write(json.dumps(s) + "\n")
+        for example in ds:
+            if samples_written >= target_samples:
+                break
+
+            if (
+                example.get("ground_truth_type") != "complete"
+                or not example.get("formal_ground_truth")
+                or len(example["formal_ground_truth"].strip()) < 100
+            ):
+                continue
+
+            code = example["formal_ground_truth"]
+
+            prefix, middle, suffix = generate_proof_only_exact_fim(code, ratio=0.15)
+            if not middle:
+                continue
+
+            sample = {
+                "prompt": f"<PFX>{prefix}<SFX>{suffix}<MID>",
+                "completion": middle,
+                "theorem_name": "unknown",
+            }
+
+            f.write(json.dumps(sample, ensure_ascii=False) + "\n")
+            samples_written += 1
+
+            if samples_written % 500 == 0:
+                print(f"Generated {samples_written} samples...")
+
+    print(f"Saved {samples_written} samples to {output_path}")
 
 
 if __name__ == "__main__":
