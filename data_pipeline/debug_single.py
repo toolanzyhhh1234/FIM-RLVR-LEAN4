@@ -1,5 +1,4 @@
 import json
-import random
 import sys
 import os
 
@@ -8,21 +7,15 @@ from fim_rlvr_lean4.lean_verifier import LeanVerifier
 
 
 def parse_prompt(prompt, completion):
-    # Prompt: <PFX>{prefix}<SFX>{suffix}<MID>
-    # Reconstruct: prefix + completion + suffix
-    
     try:
-        # Extract prefix (between <PFX> and <SFX>)
         pfx_start = prompt.find('<PFX>') + 5
         sfx_start = prompt.find('<SFX>')
         prefix = prompt[pfx_start:sfx_start]
         
-        # Extract suffix (between <SFX> and <MID>)
         sfx_content_start = sfx_start + 5
         mid_start = prompt.find('<MID>')
         suffix = prompt[sfx_content_start:mid_start]
         
-        # Reconstruct: prefix + completion + suffix
         return prefix + completion + suffix
     except:
         return ""
@@ -30,32 +23,32 @@ def parse_prompt(prompt, completion):
 
 def main():
     verifier = LeanVerifier("./verification_env")
-
+    
     with open("data/mvp_train.jsonl", "r") as f:
         lines = f.readlines()
-
-    sample = random.sample(lines, 20)
-
-    print(f"Sanity checking {len(sample)} SFT samples...")
-
-    passed = 0
-    for line in sample:
+    
+    # Test first failing case
+    for i, line in enumerate(lines[:5]):
         data = json.loads(line)
         full_code = parse_prompt(data["prompt"], data["completion"])
-
-        # Numina clean up (ensure import mathlib if lost)
+        
         if "import Mathlib" not in full_code:
             full_code = "import Mathlib\n" + full_code
-
-        success, _ = verifier.verify(full_code)
-        if success:
-            passed += 1
+        
+        print(f"\n=== SAMPLE {i+1} ===")
+        print("RECONSTRUCTED CODE:")
+        print(full_code[:800])
+        print("\n" + "="*50)
+        
+        success, output = verifier.verify(full_code)
+        print(f"SUCCESS: {success}")
+        
+        if not success:
+            print("ERROR OUTPUT:")
+            print(output[:600])
+            break  # Stop at first failure to debug
         else:
-            print("Failed reconstruction!")
-
-    print(
-        f"Sanity Pass Rate: {passed}/{len(sample)} ({passed / len(sample) * 100:.1f}%)"
-    )
+            print("✅ This one passed")
 
 
 if __name__ == "__main__":
