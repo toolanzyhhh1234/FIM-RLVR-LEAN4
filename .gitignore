@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+
+# Lean 4 / Lake
+verification_env/.lake/
+verification_env/build/
+verification_env/lake-packages/
+
+# Data
+data/
+!data/.keep
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
