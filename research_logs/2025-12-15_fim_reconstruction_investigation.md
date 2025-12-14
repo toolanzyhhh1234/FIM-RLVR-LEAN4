@@ -3,6 +3,18 @@
 ## Problem Identified
 FIM reconstruction failing due to improper line-level splitting that breaks Lean syntax.
 
+## Update (2025-12-15): Additional Root Cause Found
+Even when the split point is “reasonable”, reconstruction was often invalid due to *string concatenation* issues:
+
+- **Glued-line bug**: `header + prefix_body` (and `prefix + middle + suffix`) were frequently concatenated without a separating newline, producing invalid Lean like `:= by  have ...` on one line.
+- **Fixed generator still ends holes unsafely**: `fim_generator_fixed.py` selected a “safe” start split point but computed the hole end via `end_line = start_line + k`, which can still cut mid-block even if the start was safe.
+
+### Code Changes Made
+- `data_pipeline/fim_generator.py`: preserve boundary newlines between prefix/middle/suffix and ensure `header` is followed by a newline.
+- `data_pipeline/fim_generator_streaming.py`: same newline-preserving fix.
+- `data_pipeline/fim_generator_fixed.py`: choose both start/end from safe split points and preserve boundary newlines.
+- `data_pipeline/test_fim_reconstruction.py`: add a quick “boundary glue” regression check.
+
 ## Investigation Results
 
 ### Original FIM Generator (fim_generator.py)

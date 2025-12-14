@@ -24,8 +24,27 @@ def is_safe_split_point(lines: List[str], idx: int) -> bool:
     # Don't split on empty lines or comments
     if not current_line or current_line.startswith('--'):
         return False
+
+    # Heuristic: avoid splitting where indentation level changes abruptly.
+    # This reduces odds of cutting between a tactic header and its sub-block.
+    def indent(s: str) -> int:
+        return len(s) - len(s.lstrip(' '))
+
+    prev_raw = lines[idx - 1]
+    cur_raw = lines[idx]
+    if indent(cur_raw) > indent(prev_raw) and prev_line.endswith((':', '=>', 'do', 'by')):
+        return False
         
     return True
+
+
+def join_lines(lines: List[str], trailing_newline: bool) -> str:
+    if not lines:
+        return ""
+    s = "\n".join(lines)
+    if trailing_newline:
+        return s + "\n"
+    return s
 
 
 def generate_fim_sample(full_proof: str, ratio: float = 0.2) -> Tuple[str, str, str]:
@@ -41,18 +60,18 @@ def generate_fim_sample(full_proof: str, ratio: float = 0.2) -> Tuple[str, str, 
     
     # Calculate hole size
     k = max(1, int(len(lines) * ratio))
-    k = min(k, len(safe_points) - 1)
     
-    # Pick random start point
-    max_start_idx = len(safe_points) - k
-    start_point_idx = random.randint(0, max_start_idx)
+    # Choose both start/end from safe split points so we don't end the hole mid-block.
+    start_idx = random.randint(0, len(safe_points) - 2)
+    max_end_idx = min(len(safe_points) - 1, start_idx + max(1, k))
+    end_idx = random.randint(start_idx + 1, max_end_idx)
     
-    start_line = safe_points[start_point_idx]
-    end_line = min(start_line + k, len(lines))
-    
-    prefix = "\n".join(lines[:start_line])
-    middle = "\n".join(lines[start_line:end_line])
-    suffix = "\n".join(lines[end_line:])
+    start_line = safe_points[start_idx]
+    end_line = safe_points[end_idx]
+
+    prefix = join_lines(lines[:start_line], trailing_newline=bool(lines[:start_line]))
+    middle = join_lines(lines[start_line:end_line], trailing_newline=bool(lines[start_line:end_line]))
+    suffix = join_lines(lines[end_line:], trailing_newline=False)
     
     return prefix, middle, suffix
 
@@ -92,7 +111,7 @@ def main():
             if not middle.strip() or len(middle.split('\n')) < 2:
                 continue
                 
-            full_prefix = header + prefix_body
+            full_prefix = header + "\n" + prefix_body
             full_suffix = suffix_body
             
             sample = {

@@ -7,7 +7,16 @@ from datasets import load_dataset
 def get_tactic_blocks(proof_str: str) -> List[str]:
     """Split proof into lines, keeping non-empty ones."""
     lines = proof_str.split("\n")
-    return [l for l in lines if l.strip()]
+    return [line for line in lines if line.strip()]
+
+
+def join_lines(lines: List[str], trailing_newline: bool) -> str:
+    if not lines:
+        return ""
+    s = "\n".join(lines)
+    if trailing_newline:
+        return s + "\n"
+    return s
 
 
 def generate_fim_sample(full_proof: str, ratio: float = 0.2) -> Tuple[str, str, str]:
@@ -22,9 +31,9 @@ def generate_fim_sample(full_proof: str, ratio: float = 0.2) -> Tuple[str, str, 
     start_idx = random.randint(0, max_start)
     end_idx = start_idx + k
 
-    prefix = "\n".join(blocks[:start_idx])
-    middle = "\n".join(blocks[start_idx:end_idx])
-    suffix = "\n".join(blocks[end_idx:])
+    prefix = join_lines(blocks[:start_idx], trailing_newline=bool(blocks[:start_idx]))
+    middle = join_lines(blocks[start_idx:end_idx], trailing_newline=bool(blocks[start_idx:end_idx]))
+    suffix = join_lines(blocks[end_idx:], trailing_newline=False)
 
     return prefix, middle, suffix
 
@@ -65,7 +74,7 @@ def main():
             if not middle.strip():
                 continue
                 
-            full_prefix = header + prefix_body
+            full_prefix = header + "\n" + prefix_body
             full_suffix = suffix_body
             
             sample = {

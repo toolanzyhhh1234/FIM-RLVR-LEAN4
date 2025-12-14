@@ -21,6 +21,17 @@ def parse_prompt(prompt, completion):
         return ""
 
 
+def has_glued_boundary(prefix: str, completion: str, suffix: str) -> bool:
+    """Detect likely line-gluing when concatenating prefix + completion + suffix."""
+    if prefix and completion:
+        if not prefix.endswith("\n") and not completion.startswith("\n"):
+            return True
+    if completion and suffix:
+        if not completion.endswith("\n") and not suffix.startswith("\n"):
+            return True
+    return False
+
+
 def main():
     print("Testing FIM reconstruction on existing data...")
     
@@ -33,7 +44,21 @@ def main():
     
     for i, line in enumerate(lines):
         data = json.loads(line)
-        reconstructed = parse_prompt(data["prompt"], data["completion"])
+        prompt = data["prompt"]
+        completion = data["completion"]
+        reconstructed = parse_prompt(prompt, completion)
+
+        # Quick regression check: ensure we aren't accidentally gluing two Lean lines.
+        pfx_start = prompt.find('<PFX>') + 5
+        sfx_start = prompt.find('<SFX>')
+        prefix = prompt[pfx_start:sfx_start]
+        sfx_content_start = sfx_start + 5
+        mid_start = prompt.find('<MID>')
+        suffix = prompt[sfx_content_start:mid_start]
+        if has_glued_boundary(prefix, completion, suffix):
+            print(f"\n=== FIM SAMPLE {i+1} ===")
+            print("❌ Boundary glue detected between prefix/completion/suffix")
+            continue
         
         if "import Mathlib" not in reconstructed:
             reconstructed = "import Mathlib\n" + reconstructed
