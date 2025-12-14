@@ -66,7 +66,7 @@ Core loop for each training episode:
 
 ### State tracked per theorem
 Maintain per theorem \(T\):
-- Current ratio level `r[T]` in a discrete ladder (e.g., 0.10, 0.20, …, 0.50).
+- Current ratio level `r[T]` in a discrete ladder (e.g., 0.10, 0.20, …, 0.50 up to fully blank).
 - A rolling window of recent verifier outcomes at each ratio (e.g., last \(W=8\) attempts).  
 - A “mastered” flag per ratio if successes in window \(\ge m\) (e.g., \(m=5\)).
 
