@@ -20,7 +20,7 @@ However, we are currently operating on **limited compute resources** (running ve
 **We are seeking support to scale this research.**
 
 This project is currently running on a small personal budget. To fully validate the FIM-RLVR hypothesis—that verifiable feedback can significantly boost formal reasoning capabilities—we need to scale up to:
-- Larger models (e.g., Llama-3-70B, DeepSeek-Prover).
+- Larger models (e.g., GPT-OSS-20B, GPT-OSS-120B, or any other model supported by sponsors).
 - Massive datasets (e.g., full Mathlib, millions of synthetic samples).
 - Extensive H100 GPU compute for full training runs.
 
