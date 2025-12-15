@@ -2,6 +2,11 @@ import json
 import sys
 import os
 
+# NOTE: This script is kept only as a small Lean smoke test on a handful of
+# samples. Byte-for-byte reconstruction integrity is enforced elsewhere by
+# data_pipeline/byte_reconstruction_check.py and the training loop uses the same
+# prefix + middle + suffix recomposition (middle comes from the model at runtime).
+
 sys.path.append(os.getcwd())
 from fim_rlvr_lean4.lean_verifier import LeanVerifier
 

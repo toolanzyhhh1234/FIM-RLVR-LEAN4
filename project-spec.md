@@ -5,8 +5,8 @@ Build a Lean4-capable model that can **infill a missing proof segment** given `p
 LeanDojo will be used as the primary infrastructure for data extraction (proof states/tactics/premises) and programmatic interaction with Lean4.[3][1]
 
 ### Scope decisions (recommended defaults)
-- Target language: Lean4 `by`-style tactic proofs (mask and generate whole tactic blocks, not arbitrary token spans).  
-- Hole definition: a *syntactic tactic block* (AST-aware), not just lines. Masking respects tactic boundaries (e.g., `by ...`, `have ... := ...`) to ensure holes are meaningful logical units.[6]  
+- Target language: Lean4 `by`-style tactic proofs.  
+- Hole definition: line-based spans (no AST parsing); masking is based on exact-line splits so recomposition is byte-for-byte.[6]  
 - Verification: compile/check the reconstructed proof with Lean; success is binary (verified / not verified).[2]
 - Optional “process signal”: parse Lean feedback to find the earliest failing step and use it for partial credit, following “Lean as a symbolic process oracle” framing.[4][5]
 
@@ -20,12 +20,13 @@ LeanDojo will be used as the primary infrastructure for data extraction (proof s
 
 ### FIM transformation (offline)
 For each theorem proof script:
-- Parse into a sequence of tactic lines / blocks.
+- Parse into a sequence of tactic lines (exact-line splits).
 - Sample a hole location and a hole ratio \(r\) (e.g., 0.10 means 10% of tactic lines removed).
 - Produce a single training instance:
   - `prompt = <PFX> prefix <CTX> retrieved_context <K=n> <SFX> suffix <MID>` (Context is optional but recommended)
   - `target = middle` (the exact removed block)
-- Use *structure-aware masking*: parse tactic blocks (using LeanDojo or AST tools) to valid boundaries. Avoid masking "closure" tokens (`end`, `qed`) or trivial punctuation solely.
+- Use exact line-based masking (no AST parsing) to keep recomposition byte-aligned.
+- **Reconstruction integrity:** The pipeline enforces byte-for-byte equality `prefix + middle + suffix == original` via `data_pipeline/byte_reconstruction_check.py` (and the same concatenation is used in the training loop, with `middle` coming from the model at runtime). Older Lean-only smoke tests (e.g., `data_pipeline/test_fim_reconstruction.py`) are deprecated and should not be treated as the integrity gate.
 
 ### Suggested JSONL schema
 - `theorem_id`: stable identifier (file + theorem name).
@@ -104,7 +105,7 @@ If performance at the new ratio collapses (e.g., 0 successes in last \(W\)), eit
 - Log Lean error locations for failed attempts; this is needed if process rewards are implemented.[4][5]
 - Add per-theorem sampling caps so a few “easy” theorems don’t dominate training updates.[5]
 
-If the coding agent needs one crisp “MVP target,” implement: (SFT on structure-aware FIM) → (outcome-only GRPO RLVR) → (mastery-based hole-size curriculum), and leave process rewards as the stretch goal.[2][5]
+If the coding agent needs one crisp “MVP target,” implement: (SFT on exact-line FIM) → (outcome-only GRPO RLVR) → (mastery-based hole-size curriculum), and leave process rewards as the stretch goal.[2][5]
 
 [1](https://github.com/lean-dojo/LeanDojo)
 [2](https://openreview.net/forum?id=I4YAIwrsXa)
