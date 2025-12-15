@@ -40,23 +40,20 @@ For each theorem proof script:
 
 ## Training algorithm
 
-### Phase 1: Supervised pretraining / SFT
-Train on FIM instances to maximize likelihood of `middle` given `(prefix, suffix, k_lines, theorem_stmt)`.  
-Include a mix of:
-- Standard left-to-right proof completion examples (no suffix) to preserve general proof-writing ability.
-- FIM examples (with suffix) to teach bidirectional constraint satisfaction.
+### Phase 1: RLVR (Reinforcement Learning with Verification Rewards) - **Current Focus**
+Skipping traditional SFT based on recent findings that clever prompt engineering (Chat Templates) with `prefix + [MISSING] + suffix` is sufficient to elicit good FIM behavior from base models (like `gpt-oss-20b`).
 
-### Phase 2: RLVR fine-tuning (verifiable Lean reward)
 Core loop for each training episode:
 1. Sample a theorem \(T\) and a hole ratio \(r\), generate a hole `(prefix, suffix)` as in the FIM transformation.
 2. Sample a *group* of \(G\) candidate `middle` completions from the policy (group sampling is compatible with GRPO-style updates).[2][5]
 3. For each candidate:
    - **Fast-Fail Check:** Check syntax/elaboration. If invalid, reward = 0 immediately (saves compute).
-   - **Full Verification:** If valid, reconstruct full proof and run Lean verification.
+   - **Full Verification:** Reconstruct full proof and run Lean verification.
 4. Reward:
    - Outcome reward: \(R=1\) if Lean verifies, else \(0\).[2]
-   - Optional process reward: partial credit based on locally valid tactics and earliest failing step, using first-error propagation ideas described in process-verified RL for Lean.[4][5]
-5. Update with a group-relative objective (e.g., GRPO-style), advantage-normalized within the group for stability.[5]
+   - Optional process reward: partial credit based on locally valid tactics.
+5. Update with a group-relative objective (e.g., GRPO-style).
+
 
 **Key point on hole-size reward:** do not scale terminal reward as \(1+\text{mask\_frac}\) by default; instead push difficulty through curriculum and sampling, and reserve reward shaping for the process-reward variant.[4][5]
 

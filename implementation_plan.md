@@ -14,15 +14,9 @@
 - [x] **Dataset Export**: Generated `data/fim_fresh.jsonl`.
 
 
-## Phase 3: Model Training (SFT - MVP)
-- [ ] **Tokenizer**: Setup for Lean4 + Special Tokens.
-- [ ] **Baseline SFT**:
-    - Train a small model (e.g., DeepSeek-Coder-1.3B) on the `mvp_train.jsonl`.
-    - Eval: Check syntax validity of generated outputs (before full verification).
-
-## Phase 4: RLVR Loop (GRPO)
-- [ ] **Orchestrator**: Combine `LeanVerifier` + `SFT Model`.
-- [ ] **GrpoTrainer**:
+## Phase 3: RLVR Loop (GRPO)
+- [x] **Orchestrator**: Combine `LeanVerifier` + `SFT Model`.
+- [x] **GrpoTrainer**:
     - Implement the group sampling loop (Group Size G=4 initially).
     - **Async Verification**: (Stretch) Parallelize verifier calls if single-thread is too slow.
 - [ ] **Logging & Checkpointing**:
