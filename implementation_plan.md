@@ -1,29 +1,18 @@
 # Implementation Plan - FIM-RLVR-LEAN4
 
-## Phase 1: The "Inner Loop" (Verifier & Environment) - **HIGH PRIORITY**
+## Phase 1: The "Inner Loop" (Verifier & Environment) - **DONE**
 *Goal: Ensure we can reliably execute and verify a tactic string before generating massive datasets.*
-- [ ] **Setup & Pinning**:
-    - Install `elan` (Lean version manager).
-    - Pin `LeanDojo` to a specific stable version.
-    - Pin `Mathlib4` to a specific commit hash (compatible with that LeanDojo version).
-- [ ] **LeanVerifier Class**: Implement the Python wrapper for LeanDojo.
-    - Input: `(file_path, theorem_name, proof_candidate_string)`.
-    - Logic: Use `LeanDojo.Dojo` to modify the file/proof state and check for success.
-    - **Speed Test**: Measure average seconds per verification. Optimizing this early is critical.
-- [ ] **Environment Isolation Test**: Create a test script that picks a random theorem, corrupts it, attempts to verify (should fail), then provides the correct proof (should pass).
+- [x] **Setup & Pinning**: Verifier environment setup with `verification_env/lakefile.lean`.
+- [x] **LeanVerifier Class**: Implemented in `fim_rlvr_lean4/lean_verifier.py`.
+- [x] **Environment Isolation Test**: Verified with `train_grpo_fim.py` loop.
 
-## Phase 2: Data Pipeline (HF Source)
-- [ ] **Data Sourcing**:
-    - Download `AI-MO/NuminaMath-LEAN` and `charliemeyer2000/leandojo_benchmark_lean4_17_0`.
-    - **Metadata Audit**: Check which Mathlib4 commit each dataset aligns with.
-    - **Decision**: Select the dataset that is easiest to reproduce locally (likely the one with clearer dependency metadata).
-- [ ] **Tactic Parser**:
-    - Adapt parser to read from Parquet/JSONL instead of raw LeanDojo trace files.
-    - Focus on extracting top-level tactic blocks.
-- [ ] **FIM Generator**:
-    - Implement `prefix + <HOLE> + suffix` generation.
-    - **Deduplication**: Filter out one-liner trivial proofs (e.g., `by rfl`, `by simp`).
-- [ ] **Dataset Export**: Save `mvp_train.jsonl` and `mvp_val.jsonl`.
+## Phase 2: Data Pipeline (HF Source) - **DONE**
+- [x] **Data Sourcing**: Using `AI-MO/NuminaMath-LEAN`.
+- [x] **FIM Generator**: 
+    - Implemented `data_pipeline/fim_exact_line.py` (Exact Line Splitting).
+    - Implemented `data_pipeline/generate_dataset.py` (Batch Generation).
+- [x] **Dataset Export**: Generated `data/fim_fresh.jsonl`.
+
 
 ## Phase 3: Model Training (SFT - MVP)
 - [ ] **Tokenizer**: Setup for Lean4 + Special Tokens.

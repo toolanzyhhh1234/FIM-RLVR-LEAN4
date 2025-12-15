@@ -13,7 +13,7 @@ verification_env/lake-packages/
 # Data
 data/
 !data/.keep
-
+!
 # IDE
 .vscode/
 .idea/
@@ -22,3 +22,6 @@ data/
 # OS
 .DS_Store
 .env
+
+#unsloth compilation artifacts
+unsloth_compiled_cache
