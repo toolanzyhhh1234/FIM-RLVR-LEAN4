@@ -6,19 +6,25 @@
 
 ### 🚀 Project Summary
 
+### 🚀 Project Summary
+
 **The Big Idea:**
-Can we efficiently bootstrap formal mathematical reasoning in general-purpose models?
-This project hypothesizes that **Fill-in-the-Middle (FIM)** tasks combined with **Reinforcement Learning (RLVR)** are the most effective way to "warm up" models that have little prior Lean 4 knowledge. Instead of training from scratch, we aim to rapidly align weak models to formal systems, allowing us to finetune them into rigorous theorem provers. We are also investigating whether this formal grounding transfers back to natural language mathematics (e.g., IMO Bench).
+Can we efficiently bootstrap rigorous mathematical reasoning in AI models?
+This project hypothesizes that **Fill-in-the-Middle (FIM)** tasks combined with **Reinforcement Learning (RLVR)** are the most effective way to "warm up" models with little prior formal knowledge. By grounding them in a strict formal system, we aim to evolve standard LLMs into reasoning engines capable of **100% verified reliability**.
 
 **For the Non-Expert (The Potential):**
-Most AI models struggle with complex math because they don't "understand" the rules—they just memorize patterns. By training an AI to fill in missing gaps in a strict formal proof (FIM), we force it to understand the logic structure locally. If this works, it means we can take a standard AI and quickly teach it to be rigorous, potentially solving hard problems (like the Mathematical Olympiad) by checking its own work against a mathematical "truth machine."
+Most AI models today (like broad chatbots) guess answers based on likelihood, which often leads to convincing-sounding errors ("hallucinations").
+This project builds an AI that acts like a mathematician: it attempts a logical step, then checks if it works using a strict **"truth machine"** (the Lean 4 compiler—a computer system that automatically validates proofs).
+*   If the step is wrong, the AI learns immediately.
+*   If the step is right, the logic is mathematical fact.
+**The Goal:** Create AI systems that don't just guess, but solve complex problems (like logic puzzles or Math Olympiad questions) with **100% verified reliability**.
 
 **For the Expert (The Setup):**
-This repository implements a **FIM + GSPO** pipeline pipeline designed to bootstrap formal capabilities:
-*   **Hypothesis**: FIM is a superior objective for "warming up" models on formal languages compared to standard next-token prediction, especially for models with sparse pre-training on Lean.
-*   **Method**: **GSPO (Group Sequence Policy Optimization)**—a variant of GRPO optimized using MoE models like GPT-OSS—samples candidates for missing tactic blocks.
-*   **Feedback**: Verifiable reward signal from the Lean 4 compiler (Parallelized).
-*   **Goal**: Demonstrate that RLVR on FIM tasks allows models to generalize better and potentially transfer reasoning tokens to natural language domains.
+This repository implements a **FIM + GSPO** pipeline designed to bootstrap formal capabilities from weak priors:
+*   **Hypothesis**: FIM is a superior objective for "warming up" models on formal languages compared to next-token prediction, enabling rapid alignment to formal systems (Lean 4).
+*   **Method**: **GSPO (Group Sequence Policy Optimization)**—a variant of GRPO optimized for stability with MoE models like GPT-OSS—samples multiple solutions for missing proof blocks.
+*   **Feedback**: A binary reward signal derived from the **Lean 4 compiler**, verified in parallel.
+*   **Research Question**: Does this formal grounding transfer to natural language mathematics? (e.g., does being good at Lean make the model better at the **IMO Bench**?)
 
 **Explore the details:**
 *   [Technical Specification & Architecture](project-spec.md)
