@@ -5,6 +5,8 @@ from datasets import load_dataset
 import torch
 import os
 import sys
+from concurrent.futures import ThreadPoolExecutor
+
 
 # Ensure we can import from local modules
 sys.path.append(os.getcwd())
@@ -118,24 +120,37 @@ def main():
         """
         Verify the completed code using Lean compiler.
         Uses the 'fim_prefix' and 'fim_suffix' columns we added during preprocessing.
+        Run verifications in parallel to speed up the loop.
         """
-        scores = []
-        # fim_prefix and fim_suffix are lists corresponding to the batch
-
+        # Prepare inputs for parallel execution
+        verification_inputs = []
         for generated_text, prefix, suffix in zip(completions, fim_prefix, fim_suffix):
-            # generated_text is the string completion
-
-            # Reconstruct the full file content
-            # We simply glue them back together.
-            full_code = prefix + generated_text + suffix
-
             if not prefix or not suffix:
-                scores.append(0.0)
-                continue
+                verification_inputs.append(None)
+            else:
+                full_code = prefix + generated_text + suffix
+                verification_inputs.append(full_code)
 
-            # Verify
-            success, _ = verifier.verify(full_code)
-            scores.append(2.0 if success else -1.0)
+        # Helper for the executor
+        def verify_single(code):
+            if code is None:
+                return False
+            success, _ = verifier.verify(code)
+            return success
+
+        # Execute in parallel
+        # We use max_workers=len(completions) because usually num_generations is small (4-16)
+        # and we want maximum throughout.
+        with ThreadPoolExecutor(max_workers=len(completions)) as executor:
+            results = list(executor.map(verify_single, verification_inputs))
+
+        # Convert to scores
+        scores = []
+        for success, inp in zip(results, verification_inputs):
+            if inp is None:
+                scores.append(0.0)
+            else:
+                scores.append(2.0 if success else -1.0)
 
         return scores
 
