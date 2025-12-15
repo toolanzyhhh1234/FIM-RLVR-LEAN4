@@ -15,8 +15,8 @@ from fim_rlvr_lean4.lean_verifier import LeanVerifier
 # Configuration
 MAX_SEQ_LENGTH = 1024
 LORA_RANK = 4
-MODEL_NAME = "unsloth/gpt-oss-20b"
-# MODEL_NAME = "unsloth/Qwen2.5-0.5B-Instruct"  # Tiny model for local debug
+MODEL_NAME = "unsloth/Qwen2.5-0.5B-Instruct"
+# MODEL_NAME = "unsloth/gpt-oss-20b"
 OUTPUT_DIR = "outputs_fim_grpo"
 DATA_FILE = "data/fim_fresh.jsonl"
 
@@ -150,7 +150,9 @@ def main():
             if inp is None:
                 scores.append(0.0)
             else:
-                scores.append(2.0 if success else -1.0)
+                # Using 0.0 for failure instead of -1.0 to be less harsh initially.
+                # Future experiment: Try -1.0 if adherence is poor.
+                scores.append(2.0 if success else 0.0)
 
         return scores
 

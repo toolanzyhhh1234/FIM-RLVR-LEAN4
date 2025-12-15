@@ -51,7 +51,8 @@ Core loop for each training episode:
    - **Fast-Fail Check:** Check syntax/elaboration. If invalid, reward = 0 immediately (saves compute).
    - **Full Verification:** Reconstruct full proof and run Lean verification.
 4. Reward:
-   - Outcome reward: \(R=1\) if Lean verifies, else \(0\).[2]
+   - Outcome reward: \(R=1\) if Lean verifies, else \(0\).
+     - **Note**: We chose 0.0 for penalties initially, but may switch to -1.0 later if the model generates too much invalid code/gibberish.[2]
    - Optional process reward: partial credit based on locally valid tactics.
 5. Update with a group-relative objective (e.g., GRPO-style).
 
