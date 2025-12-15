@@ -17,7 +17,7 @@ This project builds an AI that acts like a mathematician: it attempts a logical 
 
 **For the Expert (The Setup):**
 This repository implements a **FIM + GSPO** pipeline designed to bootstrap formal capabilities from weak priors:
-*   **Hypothesis**: FIM is a superior objective for "warming up" models on formal languages compared to next-token prediction, enabling rapid alignment to formal systems (Lean 4).
+*   **Hypothesis**: FIM is the most cost-effective method to **rapidly adapt** emerging state-of-the-art base models into Lean 4 specialists. Since open-source models improve quickly, we need a way to bootstrap formal capabilities without expensive training from scratch—especially for models with limited initial Lean exposure.
 *   **Method**: **GSPO (Group Sequence Policy Optimization)**—a variant of GRPO optimized for stability with MoE models like GPT-OSS—samples multiple solutions for missing proof blocks.
 *   **Feedback**: A binary reward signal derived from the **Lean 4 compiler**, verified in parallel.
 *   **Research Questions**:
