@@ -4,10 +4,6 @@
 
 ### 🚀 Project Summary
 
-### 🚀 Project Summary
-
-### 🚀 Project Summary
-
 **The Big Idea:**
 Can we efficiently bootstrap rigorous mathematical reasoning in AI models?
 This project hypothesizes that **Fill-in-the-Middle (FIM)** tasks combined with **Reinforcement Learning (RLVR)** are the most effective way to "warm up" models with little prior formal knowledge. By grounding them in a strict formal system, we aim to evolve standard LLMs into reasoning engines capable of **100% verified reliability**.
@@ -24,7 +20,10 @@ This repository implements a **FIM + GSPO** pipeline designed to bootstrap forma
 *   **Hypothesis**: FIM is a superior objective for "warming up" models on formal languages compared to next-token prediction, enabling rapid alignment to formal systems (Lean 4).
 *   **Method**: **GSPO (Group Sequence Policy Optimization)**—a variant of GRPO optimized for stability with MoE models like GPT-OSS—samples multiple solutions for missing proof blocks.
 *   **Feedback**: A binary reward signal derived from the **Lean 4 compiler**, verified in parallel.
-*   **Research Question**: Does this formal grounding transfer to natural language mathematics? (e.g., does being good at Lean make the model better at the **IMO Bench**?)
+*   **Research Questions**:
+    *   **Curriculum efficacy**: Does starting with FIM and moving to independent proving allow the model to eventually outperform models trained on independent proving from the start?
+    *   **Efficiency**: Does FIM speed up the training process (convergence)?
+    *   **Transfer**: Does this formal grounding transfer to natural language mathematics (e.g., **IMO Bench**)?
 
 **Explore the details:**
 *   [Technical Specification & Architecture](project-spec.md)
