@@ -94,11 +94,10 @@ If performance at the new ratio collapses (e.g., 0 successes in last \(W\)), eit
 - Sample efficiency: verifier calls per additional % pass@1 improvement.
 
 ### Baselines / ablations
-1. SFT only (no RLVR).
-2. RLVR outcome-only (binary reward).[2]
-3. RLVR with process rewards (earliest failure / locally-valid tactics).[5][4]
-4. Curriculum vs no curriculum (fixed hole ratio distribution).
-5. Structure-aware masking (tactic-boundary holes) vs naive token-span masking (expected to be worse / noisier).[6]
+1. RLVR outcome-only (binary reward).
+2. RLVR with process rewards (earliest failure / locally-valid tactics).[5][4]
+3. Curriculum vs no curriculum (fixed hole ratio distribution).
+4. Structure-aware masking (tactic-boundary holes) vs naive token-span masking (expected to be worse / noisier).[6]
 
 ### Practical engineering checks
 - Ensure each reconstructed proof is checked in a clean Lean environment (consistent imports, same toolchain) to avoid false negatives.[1]
