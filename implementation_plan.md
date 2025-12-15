@@ -18,7 +18,10 @@
 - [x] **Orchestrator**: Combine `LeanVerifier` + `SFT Model`.
 - [x] **GrpoTrainer**:
     - Implement the group sampling loop (Group Size G=4 initially).
-    - **Async Verification**: (Stretch) Parallelize verifier calls if single-thread is too slow.
+  - [ ] **Async Verification**: 
+    - [ ] Update `LeanVerifier` to support concurrent calls (UUID filenames).
+    - [ ] Update `train_grpo_fim.py` to use `ThreadPoolExecutor` for parallelizing `lean_validity_reward`.
+    - [ ] Target parallelism: Matches GRPO generation count (e.g., 4-16 threads).
 - [ ] **Logging & Checkpointing**:
     - Log: `Verifier Pass Rate` (most important), `KL Divergence`, `Mean Reward`.
     - Save checkpoints every X steps (RL is unstable).
