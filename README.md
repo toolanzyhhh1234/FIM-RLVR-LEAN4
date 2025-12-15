@@ -27,7 +27,12 @@ This repository implements a **FIM + GSPO** pipeline designed to bootstrap forma
 
 **Explore the details:**
 *   [Technical Specification & Architecture](project-spec.md)
-*   [Parallel Verification Walkthrough](walkthrough.md)
+
+## Prerequisites
+
+- Python 3.10+
+- [Lean 4 toolchain](https://leanprover.github.io/lean4/doc/setup.html) (v4.15.0)
+- CUDA-compatible GPU (recommended for training)
 
 ## Status: Proof-of-Concept / Verification Mode
 
@@ -38,7 +43,7 @@ We have successfully implemented:
 - **Parallel Verification**: Optimized logic achieving >2x speedup by verifying multiple candidates simultaneously.
 - **GRPO Training Loop**: Integrated with Unsloth and TRL for efficient training.
 
-However, we are currently operating on **limited compute resources** (running verification loops on local hardware with small models like `Qwen2.5-0.5B` to ensure the pipeline logic is sound).
+However, we are currently operating on **limited compute resources** (running verification loops on local hardware with small models like `Qwen2.5-0.5B` to ensure the pipeline logic is sound). We are attempting to scale up to the `gpt-oss-20b` base model within our current budget, though the extent of training validation we can achieve remains uncertain.
 
 ## 🚀 Call for Sponsorship & Collaboration
 
@@ -50,6 +55,12 @@ This project is currently running on a small personal budget. To fully validate 
 - Extensive H100 GPU compute for full training runs.
 
 **If you are interested in the results of this research or would like to sponsor the compute required to push this project to the next level, please reach out!** Your support would be extremely helpful in allowing us to continue iterating and potentially finding strong evidence for the efficacy of verification-driven RL in formal mathematics.
+
+**Contact:** ifchou@student.unimelb.edu.au or open a GitHub issue.
+
+## Contributing
+
+Contributions and collaborators are welcome! If you share an interest in formal verification + RL, feel free to open a PR or reach out. I'm a student with other commitments, so responses may take a few days—but I genuinely appreciate the interest.
 
 ## Usage
 
