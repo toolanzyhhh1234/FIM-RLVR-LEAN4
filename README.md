@@ -2,7 +2,23 @@
 
 **Fill-in-the-Middle (FIM) + Reinforcement Learning with Verification Rewards (RLVR) for Lean 4.**
 
-This project explores using Reinforcement Learning with verifiable feedback from the Lean 4 compiler to improve the ability of Large Language Models (LLMs) to generate valid Lean proofs. specifically focusing on "Fill-in-the-Middle" tasks where the model must reconstruct missing tactic blocks.
+### 🚀 Project Summary
+
+**The Big Idea:**
+We are training AI to perform rigorous mathematical reasoning by forcing it to "fill in the blanks" of formal proofs and using a compiler (Lean 4) to verify the results. Instead of just predicting the next word, the AI learns from a feedback loop of absolute truth.
+
+**For the Non-Expert (The Potential):**
+Most AI models today are like students who guess the answer and hope it sounds right. This project builds an AI that acts like a mathematician: it attempts a logical step, checks if it works using a strict "truth machine" (the Lean 4 compiler), and learns from its successes. The goal is to create AI systems that don't just hallucinate convincing answers, but can solve complex problems with **100% verified reliability**.
+
+**For the Expert (The Setup):**
+This repository implements a **Fill-in-the-Middle (FIM)** training pipeline using **Reinforcement Learning with Verifiable Rewards (RLVR)**.
+*   **Method**: We use **GSPO (Group Sequence Policy Optimization)**—a variant of GRPO optimized for stability with MoE models like GPT-OSS—to sample multiple candidate solutions for missing tactic blocks.
+*   **Feedback**: These candidates are verified **in parallel** against the Lean 4 kernel.
+*   **Objective**: The agent optimizes for a binary reward signal derived purely from successful compilation, grounding the LLM in formal logic without needing human preference labels.
+
+**Explore the details:**
+*   [Technical Specification & Architecture](project-spec.md)
+*   [Parallel Verification Walkthrough](walkthrough.md)
 
 ## Status: Proof-of-Concept / Verification Mode
 
