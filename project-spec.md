@@ -104,6 +104,7 @@ If performance at the new ratio collapses (e.g., 0 successes in last \(W\)), eit
 - Ensure each reconstructed proof is checked in a clean Lean environment (consistent imports, same toolchain) to avoid false negatives.[1]
 - Log Lean error locations for failed attempts; this is needed if process rewards are implemented.[4][5]
 - Add per-theorem sampling caps so a few “easy” theorems don’t dominate training updates.[5]
+- Track duplicate exposure: optionally dedup identical `(theorem, hole_start, hole_len)` when generating data, or downweight repeats in the sampler. Low priority now, but keep in mind if we observe overfitting on a handful of holes.
 
 If the coding agent needs one crisp “MVP target,” implement: (SFT on exact-line FIM) → (outcome-only GRPO RLVR) → (mastery-based hole-size curriculum), and leave process rewards as the stretch goal.[2][5]
 
