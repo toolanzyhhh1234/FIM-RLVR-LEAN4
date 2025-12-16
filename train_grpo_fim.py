@@ -102,19 +102,6 @@ def main():
     dataset = dataset.map(process_fim_sample)
 
     # Reward Functions
-    def format_reward(completions, **kwargs):
-        """Reward if the completion is non-empty and looks like Lean code."""
-        scores = []
-        for completion in completions:
-            # completion is a string (the generated text)
-            c = completion.strip()
-            score = 0.0
-            if len(c) > 0:
-                score += 0.5
-            if ":=" in c or "by" in c or "rw" in c or "simp" in c:
-                score += 0.5
-            scores.append(score)
-        return scores
 
     def lean_validity_reward(completions, fim_prefix, fim_suffix, **kwargs):
         """
@@ -174,7 +161,7 @@ def main():
     trainer = GRPOTrainer(
         model=model,
         processing_class=tokenizer,
-        reward_funcs=[format_reward, lean_validity_reward],
+        reward_funcs=[lean_validity_reward],
         args=training_args,
         train_dataset=dataset,
     )
