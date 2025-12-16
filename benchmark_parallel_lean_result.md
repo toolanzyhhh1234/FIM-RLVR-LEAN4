@@ -1,0 +1,36 @@
+(base) root@ml-ai-ubuntu-gpu-h200x1-141gb-nyc2:~/FIM-RLVR-LEAN4# export PATH="$HOME/.elan/bin:$PATH" && python3 benchmark_parallel_lean.py
+Loading 50 samples from AI-MO/NuminaMath-LEAN...
+Loaded 50 samples.
+Warming up (verifying 2 proofs sequential)...
+
+Starting Benchmark...
+------------------------------------------------------------
+Workers    | Count  | Throughput (proofs/s)     | Speedup   
+------------------------------------------------------------
+Benchmarking with 1 workers (Target: 5 proofs)...
+  Done in 14.92s. Throughput: 0.34 proofs/sec. Success Rate: 5/5
+1          | 5      | 0.34                      | 1.00      
+Benchmarking with 4 workers (Target: 12 proofs)...
+  Done in 12.36s. Throughput: 0.97 proofs/sec. Success Rate: 12/12
+4          | 12     | 0.97                      | 2.90      
+Benchmarking with 8 workers (Target: 24 proofs)...
+  Done in 14.92s. Throughput: 1.61 proofs/sec. Success Rate: 24/24
+8          | 24     | 1.61                      | 4.80      
+Benchmarking with 12 workers (Target: 36 proofs)...
+  Done in 15.49s. Throughput: 2.32 proofs/sec. Success Rate: 36/36
+12         | 36     | 2.32                      | 6.93      
+Benchmarking with 16 workers (Target: 48 proofs)...
+  Done in 17.96s. Throughput: 2.67 proofs/sec. Success Rate: 48/48
+16         | 48     | 2.67                      | 7.97      
+Benchmarking with 20 workers (Target: 60 proofs)...
+  Done in 17.58s. Throughput: 3.41 proofs/sec. Success Rate: 60/60
+20         | 60     | 3.41                      | 10.18     
+Benchmarking with 24 workers (Target: 72 proofs)...
+  Done in 15.65s. Throughput: 4.60 proofs/sec. Success Rate: 72/72
+24         | 72     | 4.60                      | 13.73     
+Benchmarking with 32 workers (Target: 96 proofs)...
+  Done in 23.69s. Throughput: 4.05 proofs/sec. Success Rate: 96/96
+32         | 96     | 4.05                      | 12.09     
+------------------------------------------------------------
+
+Peak throughput observed at 24 workers.

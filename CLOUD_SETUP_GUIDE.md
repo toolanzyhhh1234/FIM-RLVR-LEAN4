@@ -11,19 +11,20 @@ Ensure you have a conda environment or venv set up (Python 3.10+ recommended).
 # Basic pip upgrades
 pip install --upgrade pip
 
-# Install PyTorch (ensure CUDA version matches your driver, typically 12.1 or 12.4 for H100s)
-# Example for CUDA 12.1:
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+# Install dependencies from requirements.txt
+pip install -r requirements.txt
+```
 
-# Install Unsloth (Optimized for RL/Fine-tuning)
-pip install "unsloth[colab-new] @ git+https://github.com/unslothai/unsloth.git"
+### Node.js Setup (Required for MCP Servers)
+Some tools require `npx`. Install `npm` to get it:
 
-# Install other RLVR dependencies
-pip install --no-deps trl peft asyc accelerate bitsandbytes datasets
+```bash
+apt-get update && apt-get install -y npm
+npm install -g npx  # Explicitly ensure npx is available
 ```
 
 ### Lean 4 Setup
-The project relies on Lean 4 for verifications. You must install `elan` (the Lean version manager).
+The project relies on Lean 4 for verifications. You must install `elan` (the Lean version manager) and the specific Lean version used in this project (v4.15.0).
 
 ```bash
 # Install elan (interactive by default, use -y for auto)
@@ -31,6 +32,10 @@ curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf 
 
 # Source the env to get 'lake' and 'lean' on PATH
 source $HOME/.elan/env
+
+# Install Lean v4.15.0 and set it as default
+elan toolchain install leanprover/lean4:v4.15.0
+elan default leanprover/lean4:v4.15.0
 ```
 
 ## 2. Repository Setup
