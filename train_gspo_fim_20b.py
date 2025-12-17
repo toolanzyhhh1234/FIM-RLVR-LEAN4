@@ -1,6 +1,7 @@
 # train_grpo_fim.py
 from unsloth import FastLanguageModel, PatchFastRL
 from trl import GRPOConfig, GRPOTrainer
+from transformers import TrainerCallback
 from datasets import Dataset
 import polars as pl
 import torch
@@ -289,6 +290,19 @@ def main():
         args=training_args,
         train_dataset=dataset,
     )
+
+    class CurriculumSaveCallback(TrainerCallback):
+        def on_save(self, args, state, control, **kwargs):
+            ckpt_dir = kwargs.get("checkpoint_folder") or args.output_dir
+            path = os.path.join(ckpt_dir, "curriculum_state.json")
+            print(f"Saving curriculum state to {path}")
+            curriculum.save(path)
+            # Adapter-only checkpoint to keep saves light; merge happens only at final save.
+            print(f"Saving LoRA adapters to {ckpt_dir}")
+            model.save_pretrained(ckpt_dir, safe_serialization=True)
+            return control
+
+    trainer.add_callback(CurriculumSaveCallback())
 
     print("Starting training with Curriculum...")
     trainer.train()
