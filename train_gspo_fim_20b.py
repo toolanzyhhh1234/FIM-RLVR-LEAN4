@@ -23,44 +23,17 @@ OUTPUT_DIR = "outputs_fim_grpo"
 DATA_FILE = "data/fim_fresh.jsonl"
 
 
-def main():
-    print(f"Loading model: {MODEL_NAME}")
-    model, tokenizer = FastLanguageModel.from_pretrained(
-        model_name=MODEL_NAME,
-        max_seq_length=MAX_SEQ_LENGTH,
-        load_in_4bit=True,
-        offload_embedding=True,
-    )
+def build_dynamic_transform(
+    tokenizer,
+    curriculum,
+    reconstruct_fn=reconstruct_full_code,
+    mask_fn=apply_dynamic_mask,
+):
+    """
+    Returns a Hugging Face transform function that applies dynamic FIM masking
+    based on curriculum ratios.
+    """
 
-    # ADD LoRA adapters
-    model = FastLanguageModel.get_peft_model(
-        model,
-        r=LORA_RANK,
-        target_modules=[
-            "q_proj",
-            "k_proj",
-            "v_proj",
-            "o_proj",
-            "gate_proj",
-            "up_proj",
-            "down_proj",
-        ],
-        lora_alpha=LORA_RANK * 2,
-        use_gradient_checkpointing="unsloth",
-        random_state=3407,
-    )
-
-    # Load Dataset
-    print(f"Loading dataset from {DATA_FILE}")
-    dataset = load_dataset("json", data_files=DATA_FILE, split="train")
-
-    # Initialize Verifier
-    verifier = LeanVerifier("./verification_env")
-
-    # Initialize Curriculum
-    curriculum = CurriculumManager()
-
-    # Dynamic Transform
     def dynamic_transform(batch):
         prompts = []
         fim_prefixes = []
@@ -73,7 +46,7 @@ def main():
             mid_truth = batch["completion"][i]  # The original middle from dataset
 
             # Reconstruct full code
-            p_pre, p_suf = reconstruct_full_code(raw_p)
+            p_pre, p_suf = reconstruct_fn(raw_p)
             if p_pre is None:
                 # Fallback: Just use as is (no dynamic masking possible easily without full code)
                 # But we need full code for dynamic.
@@ -102,7 +75,7 @@ def main():
 
             # Apply dynamic masking
             if full_code:
-                new_pre, new_suf, new_mid = apply_dynamic_mask(full_code, ratio)
+                new_pre, new_suf, new_mid = mask_fn(full_code, ratio)
             else:
                 # Fallback if reconstruction failed
                 new_pre, new_suf, new_mid = "", "", ""
@@ -133,11 +106,13 @@ def main():
             "theorem_id": theorem_ids,
         }
 
-    # Set transform instead of map
-    print("Setting up dynamic curriculum transform...")
-    dataset.set_transform(dynamic_transform)
+    return dynamic_transform
 
-    # Reward Functions
+
+def lean_validity_reward_factory(verifier, curriculum):
+    """
+    Creates a reward function closure that verifies Lean code and updates the curriculum.
+    """
 
     def lean_validity_reward(completions, fim_prefix, fim_suffix, theorem_id, **kwargs):
         """
@@ -173,6 +148,52 @@ def main():
 
         return scores
 
+    return lean_validity_reward
+
+
+def main():
+    print(f"Loading model: {MODEL_NAME}")
+    model, tokenizer = FastLanguageModel.from_pretrained(
+        model_name=MODEL_NAME,
+        max_seq_length=MAX_SEQ_LENGTH,
+        load_in_4bit=True,
+        offload_embedding=False,  # Do not load embedding in cpu(it will slow the process down)
+    )
+
+    # ADD LoRA adapters
+    model = FastLanguageModel.get_peft_model(
+        model,
+        r=LORA_RANK,
+        target_modules=[
+            "q_proj",
+            "k_proj",
+            "v_proj",
+            "o_proj",
+            "gate_proj",
+            "up_proj",
+            "down_proj",
+        ],
+        lora_alpha=LORA_RANK * 2,
+        use_gradient_checkpointing="unsloth",
+        random_state=3407,
+    )
+
+    # Load Dataset
+    print(f"Loading dataset from {DATA_FILE}")
+    dataset = load_dataset("json", data_files=DATA_FILE, split="train")
+
+    # Initialize Verifier
+    verifier = LeanVerifier("./verification_env")
+
+    # Initialize Curriculum
+    curriculum = CurriculumManager()
+
+    # Set transform instead of map
+    print("Setting up dynamic curriculum transform...")
+    dataset.set_transform(build_dynamic_transform(tokenizer, curriculum))
+
+    # Reward Functions
+
     # Training Arguments
     training_args = GRPOConfig(
         output_dir=OUTPUT_DIR,
@@ -181,10 +202,11 @@ def main():
         gradient_accumulation_steps=1,
         max_prompt_length=MAX_SEQ_LENGTH,
         max_completion_length=512,
+        loss_type="gspo",  # GSPO is compulsory for GPT-OSS(which is MOE model)
         max_steps=50,
         logging_steps=1,
         report_to="none",
-        num_generations=4,
+        num_generations=4,  # We can tune this depending our VRAM consumption, potentially speed up here
         temperature=0.8,
         dataloader_num_workers=0,  # IMPORTANT: Ensure main process for shared curriculum state
     )
@@ -192,7 +214,7 @@ def main():
     trainer = GRPOTrainer(
         model=model,
         processing_class=tokenizer,
-        reward_funcs=[lean_validity_reward],
+        reward_funcs=[lean_validity_reward_factory(verifier, curriculum)],
         args=training_args,
         train_dataset=dataset,
     )
