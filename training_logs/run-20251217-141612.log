@@ -1,0 +1,46 @@
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+Unsloth: UnslothBCOTrainer is already patched.
+Unsloth: UnslothCPOTrainer is already patched.
+Unsloth: UnslothDPOTrainer is already patched.
+Unsloth: UnslothGKDTrainer is already patched.
+Unsloth: UnslothGRPOTrainer is already patched.
+Unsloth: UnslothKTOTrainer is already patched.
+Unsloth: UnslothNashMDTrainer is already patched.
+Unsloth: UnslothOnlineDPOTrainer is already patched.
+Unsloth: UnslothORPOTrainer is already patched.
+Unsloth: UnslothPPOTrainer is already patched.
+Unsloth: UnslothPRMTrainer is already patched.
+Unsloth: UnslothRewardTrainer is already patched.
+Unsloth: UnslothRLOOTrainer is already patched.
+Unsloth: UnslothSFTTrainer is already patched.
+Unsloth: UnslothXPOTrainer is already patched.
+Loading model: unsloth/gpt-oss-20b
+==((====))==  Unsloth 2025.12.5: Fast Gpt_Oss patching. Transformers: 4.57.3.
+   \\   /|    GRID A100D-40C. Num GPUs = 1. Max memory: 39.996 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.6.0+cu124. CUDA: 8.0. CUDA Toolkit: 12.4. Triton: 3.2.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post3. FA2 = True]
+ "-____-"     Free license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:02<00:06,  2.21s/it]Loading checkpoint shards:  50%|█████     | 2/4 [00:04<00:04,  2.40s/it]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:06<00:02,  2.25s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:07<00:00,  1.54s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:07<00:00,  1.81s/it]
+Unsloth: Making `model.base_model.model.model` require gradients
+Loading dataset from data/data/train-00000-of-00001.parquet
+Dataset rows (no filtering applied): 104155
+Loading curriculum state from outputs_fim_grpo/curriculum_state.json
+Setting up dynamic curriculum transform...
+Unsloth: We now expect `per_device_train_batch_size` * `gradient_accumulation_steps` * `world_size` to be a multiple of `num_generations`.
+We will change the batch size of 1 to the `num_generations` of 4
+Starting training with Curriculum...
+The model is already on multiple devices. Skipping the move to device specified in `args`.
+==((====))==  Unsloth - 2x faster free finetuning | Num GPUs used = 1
+   \\   /|    Num examples = 104,155 | Num Epochs = 1 | Total steps = 50
+O^O/ \_/ \    Batch size per device = 4 | Gradient accumulation steps = 1
+\        /    Data Parallel GPUs = 1 | Total batch size (4 x 1 x 1) = 4
+ "-____-"     Trainable parameters = 7,962,624 of 20,922,719,808 (0.04% trained)
+  0%|          | 0/50 [00:00<?, ?it/s][prompt-log] th=e03f38f5-2efa-5932-893e-648c88b82a72 pre_len=0 suf_len=0
+[prompt-log] th=e03f38f5-2efa-5932-893e-648c88b82a72 pre_len=0 suf_len=0
+[prompt-log] th=e03f38f5-2efa-5932-893e-648c88b82a72 pre_len=0 suf_len=0
+[prompt-log] th=c7de1b79-feb2-5352-b93e-336d95641e5c pre_len=0 suf_len=0
+[prompt-log] th=c7de1b79-feb2-5352-b93e-336d95641e5c pre_len=0 suf_len=0
+[prompt-log] th=c7de1b79-feb2-5352-b93e-336d95641e5c pre_len=0 suf_len=0
+`generation_config` default values have been modified to match model-specific defaults: {'max_length': 131072}. If this is not desired, please set these values explicitly.

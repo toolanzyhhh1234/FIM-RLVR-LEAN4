@@ -1,0 +1,46 @@
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+Unsloth: UnslothBCOTrainer is already patched.
+Unsloth: UnslothCPOTrainer is already patched.
+Unsloth: UnslothDPOTrainer is already patched.
+Unsloth: UnslothGKDTrainer is already patched.
+Unsloth: UnslothGRPOTrainer is already patched.
+Unsloth: UnslothKTOTrainer is already patched.
+Unsloth: UnslothNashMDTrainer is already patched.
+Unsloth: UnslothOnlineDPOTrainer is already patched.
+Unsloth: UnslothORPOTrainer is already patched.
+Unsloth: UnslothPPOTrainer is already patched.
+Unsloth: UnslothPRMTrainer is already patched.
+Unsloth: UnslothRewardTrainer is already patched.
+Unsloth: UnslothRLOOTrainer is already patched.
+Unsloth: UnslothSFTTrainer is already patched.
+Unsloth: UnslothXPOTrainer is already patched.
+Loading model: unsloth/gpt-oss-20b
+==((====))==  Unsloth 2025.12.5: Fast Gpt_Oss patching. Transformers: 4.57.3.
+   \\   /|    GRID A100D-40C. Num GPUs = 1. Max memory: 39.996 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.6.0+cu124. CUDA: 8.0. CUDA Toolkit: 12.4. Triton: 3.2.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post3. FA2 = True]
+ "-____-"     Free license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Traceback (most recent call last):
+  File "/root/FIM-RLVR-LEAN4/train_gspo_fim_20b.py", line 352, in <module>
+    main()
+  File "/root/FIM-RLVR-LEAN4/train_gspo_fim_20b.py", line 248, in main
+    model, tokenizer = FastLanguageModel.from_pretrained(
+  File "/root/anaconda3/envs/unsloth-py310/lib/python3.10/site-packages/unsloth/models/loader.py", line 486, in from_pretrained
+    return FastModel.from_pretrained(
+  File "/root/anaconda3/envs/unsloth-py310/lib/python3.10/site-packages/unsloth/models/loader.py", line 1154, in from_pretrained
+    model, tokenizer = FastBaseModel.from_pretrained(
+  File "/root/anaconda3/envs/unsloth-py310/lib/python3.10/site-packages/unsloth/models/vision.py", line 661, in from_pretrained
+    model = auto_model.from_pretrained(
+  File "/root/anaconda3/envs/unsloth-py310/lib/python3.10/site-packages/transformers/models/auto/auto_factory.py", line 604, in from_pretrained
+    return model_class.from_pretrained(
+  File "/root/anaconda3/envs/unsloth-py310/lib/python3.10/site-packages/transformers/modeling_utils.py", line 277, in _wrapper
+    return func(*args, **kwargs)
+  File "/root/anaconda3/envs/unsloth-py310/lib/python3.10/site-packages/transformers/modeling_utils.py", line 5029, in from_pretrained
+    device_map = _get_device_map(model, device_map, max_memory, hf_quantizer, dtype, keep_in_fp32_regex)
+  File "/root/anaconda3/envs/unsloth-py310/lib/python3.10/site-packages/transformers/modeling_utils.py", line 1365, in _get_device_map
+    hf_quantizer.validate_environment(device_map=device_map)
+  File "/root/anaconda3/envs/unsloth-py310/lib/python3.10/site-packages/transformers/quantizers/quantizer_bnb_4bit.py", line 127, in validate_environment
+    raise ValueError(
+ValueError: Some modules are dispatched on the CPU or the disk. Make sure you have enough GPU RAM to fit the quantized model. If you want to dispatch the model on the CPU or the disk while keeping these modules in 32-bit, you need to set `llm_int8_enable_fp32_cpu_offload=True` and pass a custom `device_map` to `from_pretrained`. Check https://huggingface.co/docs/transformers/main/en/main_classes/quantization#offload-between-cpu-and-gpu for more details. 

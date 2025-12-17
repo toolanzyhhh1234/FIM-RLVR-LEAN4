@@ -1,0 +1,6 @@
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+Traceback (most recent call last):
+  File "/root/FIM-RLVR-LEAN4/train_gspo_fim_20b.py", line 30, in <module>
+    MAX_STEPS = int(os.environ.get("FIM_MAX_STEPS", "50"))
+ValueError: invalid literal for int() with base 10: ''
