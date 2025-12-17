@@ -137,6 +137,9 @@ The key insight: **`lake env lean` only needs the dependencies' `.olean` files t
 ### What Our Build Script Does Now
 
 ```bash
+# 0. Enter the directory containing lakefile.lean (CRITICAL)
+cd verification_env
+
 # 1. Update dependencies (downloads mathlib source if needed)
 lake update
 

@@ -6,6 +6,7 @@ This guide outlines the steps to set up a fresh GPU cloud instance (e.g., RunPod
 
 ### Python Environment
 Ensure you have a conda environment or venv set up (Python 3.10+ recommended).
+https://www.anaconda.com/docs/getting-started/anaconda/install#linux-installer
 
 ```bash
 # Basic pip upgrades
@@ -16,11 +17,15 @@ pip install -r requirements.txt
 ```
 
 ### Node.js Setup (Required for MCP Servers)
-Some tools require `npx`. Install `npm` to get it:
+Some tools (like `@openai/codex` or modern MCP servers) require Node.js v16+. Standard Ubuntu repositories often have v12, which is too old.
 
 ```bash
-apt-get update && apt-get install -y npm
-npm install -g npx  # Explicitly ensure npx is available
+# Check current version
+node -v
+
+# If version is < 16, install Node.js 20.x (LTS) via NodeSource:
+curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+apt-get install -y nodejs
 ```
 
 ### Lean 4 Setup
@@ -57,23 +62,35 @@ ls -lh data/fim_fresh.jsonl
 You must build the Lean environment so that `mathlib` is downloaded and compiled. If you skip this, the verifier will timeout or fail on imports.
 
 ```bash
+# CRITICAL: You must enter the directory containing lakefile.lean
 cd verification_env
 
-# 1. Download the correct Lean version (v4.15.0) automatically
-lake build
+# 1. Update dependencies (downloads mathlib source)
+lake update
 
 # 2. Download pre-built mathlib cache (Saves ~1 hour of compiling)
 lake exe cache get
 
-# 3. Build again to link everything
-lake build
+# Note: We SKIP 'lake build' as our verifier uses 'lake env lean', which only needs the cache.
+# (See docs/LEAN_BUILD_EXPLAINED.md for details)
 
 cd ..
 ```
 
+## 4. Benchmark Verification (New)
+
+Before starting training, ensure your CPU can handle the verification load. We have a benchmark script optimized for 6+ cores.
+
+```bash
+# Run the benchmark (default 6 cores)
+python3 test/test_lean_6cpu.py --cores 6
+```
+
+*Expected Output: At least 1.0 proofs/sec throughput with 6 workers.*
+
 *Note: The first time you run `lake build`, it might take a few minutes to fetch the toolchain.*
 
-## 4. Run Validity Check (Optional but Recommended)
+## 5. Run Validity Check (Optional but Recommended)
 Before starting the heavy training, run the miniF2F validity check to ensure the cloud environment correctly compiles valid proofs.
 
 ```bash
@@ -81,7 +98,7 @@ python check_minif2f_validity.py
 ```
 *Expected Output: `Validity Rate: 100.00%` on samples.*
 
-## 5. Start Training
+## 6. Start Training
 
 Launch the 120B model training.
 
