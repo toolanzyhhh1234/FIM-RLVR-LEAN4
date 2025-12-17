@@ -32,25 +32,20 @@ def apply_dynamic_mask(full_code, ratio):
     total_lines = len(lines)
 
     # Identify the proof block (simple heuristic: after := by)
-    # Ideally we'd parse, but for now we mask lines in the body.
-    # Finding " := by"
-    proof_start_idx = 0
-    found_proof = False
+    proof_start_idx = None
     for i, line in enumerate(lines):
         if ":= by" in line:
             proof_start_idx = i + 1
-            found_proof = True
             break
 
-    if not found_proof:
-        # Fallback for when ":= by" isn't found (e.g. non-tactic proof or malformed)
-        # We might just consider the whole thing or fail.
-        # Let's assume the whole file is the "body" if no marker,
-        # BUT for Lean proofs we really want the tactic block.
-        # If we can't find it, masking doesn't make much sense.
-        # Let's return the whole thing as prefix (no hole) or return empty hole.
-        # Returning NO hole means the model has nothing to do?
-        # Let's default to masking the END if we can't find structure.
+    if proof_start_idx is None:
+        # Fallback: start masking after theorem/lemma/def line if present
+        for i, line in enumerate(lines):
+            if any(tok in line for tok in ["theorem", "lemma", "def"]):
+                proof_start_idx = i + 1
+                break
+
+    if proof_start_idx is None:
         proof_start_idx = 0
 
     proof_lines = lines[proof_start_idx:]
@@ -81,6 +76,11 @@ def apply_dynamic_mask(full_code, ratio):
     prefix = "".join(lines[: proof_start_idx + start_offset])
     # suffix is the rest
     suffix = "".join(proof_lines[start_offset + num_to_mask :])
+
+    # Ensure we don't end up with both prefix and suffix empty (verifier needs code)
+    if not prefix and not suffix and lines:
+        prefix = lines[0]
+
     middle = "".join(masked_slice)
 
     return prefix, suffix, middle

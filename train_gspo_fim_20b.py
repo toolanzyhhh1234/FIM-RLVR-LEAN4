@@ -153,11 +153,9 @@ def lean_validity_reward_factory(verifier, curriculum):
         # Prepare inputs for parallel execution
         verification_inputs = []
         for generated_text, prefix, suffix in zip(completions, fim_prefix, fim_suffix):
-            if not prefix and not suffix:  # Handling empty/failure cases
-                verification_inputs.append(None)
-            else:
-                full_code = prefix + generated_text + suffix
-                verification_inputs.append(full_code)
+            # Always build a candidate code string; even if prefix/suffix empty, still verify
+            full_code = (prefix or "") + generated_text + (suffix or "")
+            verification_inputs.append(full_code if full_code.strip() else None)
 
         # Optional logging buffer
         logs = []
