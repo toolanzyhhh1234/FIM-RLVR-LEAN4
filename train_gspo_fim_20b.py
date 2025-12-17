@@ -27,7 +27,12 @@ DATA_PARQUET = os.environ.get(
 )
 MAX_STEPS = int(os.environ.get("FIM_MAX_STEPS", "50"))
 NUM_GENERATIONS = int(os.environ.get("FIM_NUM_GENERATIONS", "4"))
-MAX_COMPLETION_LENGTH = int(os.environ.get("FIM_MAX_COMPLETION_LENGTH", "512"))
+# Completion cap: bounds reasoning + code tokens; stay well below model's 128k ctx.
+# Default 65536 keeps long traces while preventing runaway generation.
+MAX_COMPLETION_LENGTH = int(os.environ.get("FIM_MAX_COMPLETION_LENGTH", "65536"))
+# Verifier workers: cap Lean checks; default = cores-1 to leave headroom for trainer/logging.
+DEFAULT_VERIFIERS = max(1, (os.cpu_count() or 4) - 1)
+MAX_VERIFIERS = int(os.environ.get("FIM_MAX_VERIFIERS", str(DEFAULT_VERIFIERS)))
 
 
 def load_training_dataset(parquet_path: str) -> Dataset:
@@ -99,7 +104,6 @@ def build_dynamic_transform(
         fim_prefixes = []
         fim_suffixes = []
         theorem_ids = []
-        skipped = 0
 
         # Batch is a dict of lists
         for i in range(len(batch["prompt"])):
@@ -108,11 +112,7 @@ def build_dynamic_transform(
 
             # Reconstruct full code
             p_pre, p_suf = reconstruct_fn(raw_p)
-            if p_pre is None:
-                skipped += 1
-                continue
-
-            full_code = p_pre + mid_truth + p_suf
+            full_code = None if p_pre is None else p_pre + mid_truth + p_suf
 
             # Get Theorem ID (using metadata name)
             # Check safely
@@ -129,7 +129,11 @@ def build_dynamic_transform(
             ratio = curriculum.get_mask_ratio(th_name)
 
             # Apply dynamic masking
-            new_pre, new_suf, new_mid = mask_fn(full_code, ratio)
+            if full_code is None:
+                # Should not happen because we filter beforehand; keep lengths aligned.
+                new_pre, new_suf, new_mid = "", "", ""
+            else:
+                new_pre, new_suf, new_mid = mask_fn(full_code, ratio)
 
             # Construct Chat Prompt
             user_content = f"{new_pre}[MISSING_BLOCK]\n{new_suf}"
@@ -149,10 +153,6 @@ def build_dynamic_transform(
             prompts.append(text_prompt)
             fim_prefixes.append(new_pre)
             fim_suffixes.append(new_suf)
-
-        if skipped:
-            # Only informational; upstream Dataset w/ set_transform tolerates length shrink.
-            print(f"[dynamic_transform] Skipped {skipped} rows in this batch due to reconstruct_full_code failure")
 
         return {
             "prompt": prompts,
@@ -190,7 +190,8 @@ def lean_validity_reward_factory(verifier, curriculum):
             success, _ = verifier.verify(code)
             return success
 
-        with ThreadPoolExecutor(max_workers=len(completions)) as executor:
+        max_workers = max(1, min(len(completions), MAX_VERIFIERS))
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
             results = list(executor.map(verify_single, verification_inputs))
 
         # Convert to scores and Update Curriculum
