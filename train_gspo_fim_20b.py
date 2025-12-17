@@ -35,6 +35,10 @@ MAX_COMPLETION_LENGTH = int(os.environ.get("FIM_MAX_COMPLETION_LENGTH", "32768")
 # Verifier workers: cap Lean checks; default = cores-1 to leave headroom for trainer/logging.
 DEFAULT_VERIFIERS = max(1, (os.cpu_count() or 4) - 1)
 MAX_VERIFIERS = int(os.environ.get("FIM_MAX_VERIFIERS", str(DEFAULT_VERIFIERS)))
+# Optional debug logging of verifier inputs/outputs
+LOG_VERIFICATION = bool(int(os.environ.get("FIM_LOG_VERIFICATION", "0")))
+LOG_VERIFICATION_LIMIT = int(os.environ.get("FIM_LOG_VERIFICATION_LIMIT", "5"))  # per step
+LOG_DIR = "training_logs"
 
 
 def load_training_dataset(parquet_path: str) -> Dataset:
@@ -155,6 +159,9 @@ def lean_validity_reward_factory(verifier, curriculum):
                 full_code = prefix + generated_text + suffix
                 verification_inputs.append(full_code)
 
+        # Optional logging buffer
+        logs = []
+
         # Helper for the executor
         def verify_single(code):
             if code is None:
@@ -168,11 +175,39 @@ def lean_validity_reward_factory(verifier, curriculum):
 
         # Convert to scores and Update Curriculum
         scores = []
-        for success, th_id in zip(results, theorem_id):
+        for idx, (success, th_id) in enumerate(zip(results, theorem_id)):
             # Update curriculum state for this theorem
             curriculum.update_outcome(th_id, success)
 
             scores.append(2.0 if success else 0.0)
+
+            if LOG_VERIFICATION and len(logs) < LOG_VERIFICATION_LIMIT:
+                preview = verification_inputs[idx]
+                if preview is None:
+                    preview = "<empty>"
+                # truncate to keep log light
+                if len(preview) > 800:
+                    preview = preview[:800] + "... [truncated]"
+                logs.append(
+                    {
+                        "theorem_id": th_id,
+                        "success": success,
+                        "prefix_len": len(fim_prefix[idx]),
+                        "suffix_len": len(fim_suffix[idx]),
+                        "gen_len": len(completions[idx]),
+                        "code_preview": preview,
+                    }
+                )
+
+        if LOG_VERIFICATION and logs:
+            os.makedirs(LOG_DIR, exist_ok=True)
+            with open(os.path.join(LOG_DIR, "verifier_samples.log"), "a", encoding="utf-8") as f:
+                for entry in logs:
+                    f.write(
+                        f"[step?] success={entry['success']} th={entry['theorem_id']} "
+                        f"gen_len={entry['gen_len']} p={entry['prefix_len']} s={entry['suffix_len']}\n"
+                        f"{entry['code_preview']}\n---\n"
+                    )
 
         return scores
 

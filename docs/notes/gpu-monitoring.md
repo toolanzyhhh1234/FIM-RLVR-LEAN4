@@ -8,3 +8,14 @@ Use these during training to confirm the A100 is busy and sized correctly.
 - One-shot check: `nvidia-smi` before/after a step to see memory reservation.
 
 Tip: run training in one tmux pane and `watch -n1 nvidia-smi` in another for realtime visibility.
+
+## Reading nvidia-smi columns
+- `utilization.memory [%]` is **memory controller (bandwidth) utilization**, not VRAM occupancy.
+- VRAM capacity is shown by `memory.used` / `memory.total`. In our logs, ~37.5 GiB used of 40 GiB (~91%) even when `utilization.memory` is 5–10%.
+- To get occupancy percentage, log `memory.used` and `memory.total` and compute `(used / total) * 100` in postprocessing.
+
+Example command (bandwidth + capacity):
+```
+nvidia-smi --query-gpu=timestamp,index,utilization.gpu,memory.used,memory.total,clocks.current.sm \
+  --format=csv -l 5
+```
