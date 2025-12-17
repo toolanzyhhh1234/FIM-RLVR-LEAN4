@@ -67,6 +67,22 @@ def load_training_dataset(parquet_path: str) -> Dataset:
     return Dataset.from_polars(df)
 
 
+def filter_valid_rows(dataset: Dataset, reconstruct_fn=reconstruct_full_code) -> Dataset:
+    """Drop samples whose prompt cannot be reconstructed into prefix/suffix."""
+
+    def _is_valid(example):
+        p_pre, p_suf = reconstruct_fn(example["prompt"])
+        return p_pre is not None and p_suf is not None
+
+    before = len(dataset)
+    filtered = dataset.filter(_is_valid)
+    after = len(filtered)
+    print(f"Filtered dataset for valid FIM structure: {before} -> {after}")
+    if after == 0:
+        raise ValueError("All samples were filtered out; check dataset format and reconstruct_full_code().")
+    return filtered
+
+
 def build_dynamic_transform(
     tokenizer,
     curriculum,
@@ -83,6 +99,7 @@ def build_dynamic_transform(
         fim_prefixes = []
         fim_suffixes = []
         theorem_ids = []
+        skipped = 0
 
         # Batch is a dict of lists
         for i in range(len(batch["prompt"])):
@@ -92,16 +109,10 @@ def build_dynamic_transform(
             # Reconstruct full code
             p_pre, p_suf = reconstruct_fn(raw_p)
             if p_pre is None:
-                # Fallback: Just use as is (no dynamic masking possible easily without full code)
-                # But we need full code for dynamic.
-                # If we assume 'prompt' + 'completion' ~ full code relative to the static split
-                full_code = (
-                    raw_p.replace("<MID>", "") + mid_truth
-                )  # Crude approximation if PFX/SFX wrappers exist
-                # Actually reconstruct_full_code returns the text strings.
-                full_code = ""  # Fail safe
-            else:
-                full_code = p_pre + mid_truth + p_suf
+                skipped += 1
+                continue
+
+            full_code = p_pre + mid_truth + p_suf
 
             # Get Theorem ID (using metadata name)
             # Check safely
@@ -118,11 +129,7 @@ def build_dynamic_transform(
             ratio = curriculum.get_mask_ratio(th_name)
 
             # Apply dynamic masking
-            if full_code:
-                new_pre, new_suf, new_mid = mask_fn(full_code, ratio)
-            else:
-                # Fallback if reconstruction failed
-                new_pre, new_suf, new_mid = "", "", ""
+            new_pre, new_suf, new_mid = mask_fn(full_code, ratio)
 
             # Construct Chat Prompt
             user_content = f"{new_pre}[MISSING_BLOCK]\n{new_suf}"
@@ -142,6 +149,10 @@ def build_dynamic_transform(
             prompts.append(text_prompt)
             fim_prefixes.append(new_pre)
             fim_suffixes.append(new_suf)
+
+        if skipped:
+            # Only informational; upstream Dataset w/ set_transform tolerates length shrink.
+            print(f"[dynamic_transform] Skipped {skipped} rows in this batch due to reconstruct_full_code failure")
 
         return {
             "prompt": prompts,
@@ -228,6 +239,9 @@ def main():
     # Load Dataset
     print(f"Loading dataset from {DATA_PARQUET}")
     dataset = load_training_dataset(DATA_PARQUET)
+
+    # Drop samples where reconstruct_full_code fails so we don't feed empty rewards
+    dataset = filter_valid_rows(dataset)
 
     # Initialize Verifier
     verifier = LeanVerifier("./verification_env")
