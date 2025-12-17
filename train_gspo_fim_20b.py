@@ -311,10 +311,11 @@ def main():
     print(f"Saving curriculum state to {CURRICULUM_STATE_PATH}")
     curriculum.save(CURRICULUM_STATE_PATH)
 
-    # Save model
-    model.save_pretrained_merged(
-        os.path.join(OUTPUT_DIR, "final_model"), tokenizer, save_method="lora"
-    )
+    # Final save: adapters only (lightweight). If a fully merged fp16 model is ever needed,
+    # call save_pretrained_merged to a separate path.
+    final_dir = os.path.join(OUTPUT_DIR, "final_adapters")
+    print(f"Saving final LoRA adapters to {final_dir}")
+    model.save_pretrained(final_dir, safe_serialization=True)
 
 
 if __name__ == "__main__":
