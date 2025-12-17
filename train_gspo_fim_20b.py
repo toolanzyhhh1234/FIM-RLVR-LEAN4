@@ -39,6 +39,9 @@ MAX_VERIFIERS = int(os.environ.get("FIM_MAX_VERIFIERS", str(DEFAULT_VERIFIERS)))
 LOG_VERIFICATION = bool(int(os.environ.get("FIM_LOG_VERIFICATION", "0")))
 LOG_VERIFICATION_LIMIT = int(os.environ.get("FIM_LOG_VERIFICATION_LIMIT", "5"))  # per step
 LOG_DIR = "training_logs"
+# Optional prompt logging (what is fed to the model). Keep limits to avoid huge logs.
+LOG_PROMPTS = bool(int(os.environ.get("FIM_LOG_PROMPTS", "0")))
+LOG_PROMPTS_LIMIT = int(os.environ.get("FIM_LOG_PROMPTS_LIMIT", "5"))
 
 
 def load_training_dataset(parquet_path: str) -> Dataset:
@@ -92,6 +95,7 @@ def build_dynamic_transform(
         fim_prefixes = []
         fim_suffixes = []
         theorem_ids = []
+        logged = 0
 
         # Batch is a dict of lists
         for i in range(len(batch["prompt"])):
@@ -129,6 +133,19 @@ def build_dynamic_transform(
             prompts.append(text_prompt)
             fim_prefixes.append(new_pre)
             fim_suffixes.append(new_suf)
+
+            if LOG_PROMPTS and logged < LOG_PROMPTS_LIMIT:
+                os.makedirs(LOG_DIR, exist_ok=True)
+                with open(
+                    os.path.join(LOG_DIR, "prompt_samples.log"), "a", encoding="utf-8"
+                ) as f:
+                    preview = text_prompt if len(text_prompt) < 1200 else text_prompt[:1200] + "... [truncated]"
+                    f.write(
+                        f"[prompt] th={theorem_ids[-1]} pre_len={len(new_pre)} suf_len={len(new_suf)} mid_len={len(new_mid)}\n"
+                        f"{preview}\n---\n"
+                    )
+                print(f"[prompt-log] th={theorem_ids[-1]} pre_len={len(new_pre)} suf_len={len(new_suf)}")
+                logged += 1
 
         return {
             "prompt": prompts,
