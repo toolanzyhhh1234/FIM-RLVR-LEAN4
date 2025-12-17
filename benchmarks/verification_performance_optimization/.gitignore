@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+*.pyc
+
+# Lean 4 / Lake
+verification_env/.lake/
+verification_env/build/
+verification_env/lake-packages/
+
+# Data
+data/
+!data/.keep
+!
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+.env
+
+#unsloth compilation artifacts
+unsloth_compiled_cache
+
+# Model Artifacts & Outputs
+outputs_fim_grpo/
+outputs/
+checkpoints/
+*.pt
+*.pth
+*.bin
+*.safetensors
+wandb/training_logs/
