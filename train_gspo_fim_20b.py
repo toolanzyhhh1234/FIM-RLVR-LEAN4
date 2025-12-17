@@ -21,6 +21,7 @@ MAX_SEQ_LENGTH = 1024
 LORA_RANK = 4
 MODEL_NAME = "unsloth/gpt-oss-20b"
 OUTPUT_DIR = "outputs_fim_grpo"
+CURRICULUM_STATE_PATH = os.path.join(OUTPUT_DIR, "curriculum_state.json")
 DATA_PARQUET = os.environ.get(
     "FIM_PARQUET_PATH",
     "hf://datasets/AI-MO/NuminaMath-LEAN/data/train-00000-of-00001.parquet",
@@ -208,6 +209,8 @@ def lean_validity_reward_factory(verifier, curriculum):
 
 
 def main():
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+
     # Apply Unsloth's TRL RL patches (enables GSPO and other RL fixes)
     PatchFastRL()
 
@@ -248,7 +251,11 @@ def main():
     verifier = LeanVerifier("./verification_env")
 
     # Initialize Curriculum
-    curriculum = CurriculumManager()
+    if os.path.exists(CURRICULUM_STATE_PATH):
+        print(f"Loading curriculum state from {CURRICULUM_STATE_PATH}")
+        curriculum = CurriculumManager.load(CURRICULUM_STATE_PATH)
+    else:
+        curriculum = CurriculumManager()
 
     # Set transform instead of map
     print("Setting up dynamic curriculum transform...")
@@ -286,6 +293,9 @@ def main():
     print("Starting training with Curriculum...")
     trainer.train()
     print("Training finished.")
+
+    print(f"Saving curriculum state to {CURRICULUM_STATE_PATH}")
+    curriculum.save(CURRICULUM_STATE_PATH)
 
     # Save model
     model.save_pretrained_merged(

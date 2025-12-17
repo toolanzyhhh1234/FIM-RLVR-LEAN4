@@ -1,3 +1,5 @@
+import json
+import os
 import random
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
@@ -21,6 +23,9 @@ class CurriculumManager:
         levels: List[float] = None,
         window_size: int = 8,
         promotion_threshold: int = 5,
+        prob_current: float = 0.70,
+        prob_review: float = 0.20,
+        prob_challenge: float = 0.10,
     ):
         """
         levels: List of mask ratios, e.g. [0.1, 0.2, 0.3, ... 1.0]
@@ -36,9 +41,9 @@ class CurriculumManager:
         self.states: Dict[str, TheoremState] = defaultdict(TheoremState)
 
         # Sampling probabilities
-        self.prob_current = 0.70
-        self.prob_review = 0.20
-        self.prob_challenge = 0.10
+        self.prob_current = prob_current
+        self.prob_review = prob_review
+        self.prob_challenge = prob_challenge
 
     def get_mask_ratio(self, theorem_id: str) -> float:
         """
@@ -92,3 +97,52 @@ class CurriculumManager:
 
     def get_current_level_index(self, theorem_id: str) -> int:
         return self.states[theorem_id].current_level
+
+    # --- Persistence helpers ---
+    def to_dict(self) -> Dict:
+        return {
+            "levels": self.levels,
+            "window_size": self.window_size,
+            "promotion_threshold": self.promotion_threshold,
+            "prob_current": self.prob_current,
+            "prob_review": self.prob_review,
+            "prob_challenge": self.prob_challenge,
+            "states": {
+                th: {
+                    "current_level": st.current_level,
+                    "history": list(st.history),
+                }
+                for th, st in self.states.items()
+            },
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict):
+        mgr = cls(
+            levels=data.get("levels"),
+            window_size=data.get("window_size", 8),
+            promotion_threshold=data.get("promotion_threshold", 5),
+            prob_current=data.get("prob_current", 0.70),
+            prob_review=data.get("prob_review", 0.20),
+            prob_challenge=data.get("prob_challenge", 0.10),
+        )
+        # Restore states
+        for th, st_data in data.get("states", {}).items():
+            ts = TheoremState(
+                current_level=st_data.get("current_level", 0),
+                history=deque(st_data.get("history", []), maxlen=mgr.window_size),
+                consecutive_successes=0,
+            )
+            mgr.states[th] = ts
+        return mgr
+
+    def save(self, path: str):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(self.to_dict(), f, ensure_ascii=False, indent=2)
+
+    @classmethod
+    def load(cls, path: str):
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return cls.from_dict(data)
