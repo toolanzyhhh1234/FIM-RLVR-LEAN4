@@ -30,8 +30,8 @@ DATA_PARQUET = os.environ.get(
 MAX_STEPS = int(os.environ.get("FIM_MAX_STEPS", "50"))
 NUM_GENERATIONS = int(os.environ.get("FIM_NUM_GENERATIONS", "4"))
 # Completion cap: bounds reasoning + code tokens; stay well below model's 128k ctx.
-# Default 65536 keeps long traces while preventing runaway generation.
-MAX_COMPLETION_LENGTH = int(os.environ.get("FIM_MAX_COMPLETION_LENGTH", "65536"))
+# Default 32768 gives a 32k reasoning budget; raise if needed but watch VRAM/time.
+MAX_COMPLETION_LENGTH = int(os.environ.get("FIM_MAX_COMPLETION_LENGTH", "32768"))
 # Verifier workers: cap Lean checks; default = cores-1 to leave headroom for trainer/logging.
 DEFAULT_VERIFIERS = max(1, (os.cpu_count() or 4) - 1)
 MAX_VERIFIERS = int(os.environ.get("FIM_MAX_VERIFIERS", str(DEFAULT_VERIFIERS)))
