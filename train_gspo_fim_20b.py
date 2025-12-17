@@ -19,7 +19,7 @@ from fim_rlvr_lean4.masking import reconstruct_full_code, apply_dynamic_mask
 
 # Configuration
 MAX_SEQ_LENGTH = 1024
-LORA_RANK = 4
+LORA_RANK = 16
 MODEL_NAME = "unsloth/gpt-oss-20b"
 OUTPUT_DIR = "outputs_fim_grpo"
 CURRICULUM_STATE_PATH = os.path.join(OUTPUT_DIR, "curriculum_state.json")
@@ -240,7 +240,8 @@ def main():
             "up_proj",
             "down_proj",
         ],
-        lora_alpha=LORA_RANK * 2,
+        lora_alpha=32,
+        lora_dropout=0.0,
         use_gradient_checkpointing="unsloth",
         random_state=3407,
     )
