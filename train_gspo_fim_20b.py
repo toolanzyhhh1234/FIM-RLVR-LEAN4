@@ -74,7 +74,9 @@ def load_training_dataset(parquet_path: str) -> Dataset:
     return Dataset.from_polars(df)
 
 
-def filter_valid_rows(dataset: Dataset, reconstruct_fn=reconstruct_full_code) -> Dataset:
+def filter_valid_rows(
+    dataset: Dataset, reconstruct_fn=reconstruct_full_code
+) -> Dataset:
     """Drop samples whose prompt cannot be reconstructed into prefix/suffix."""
 
     def _is_valid(example):
@@ -86,7 +88,9 @@ def filter_valid_rows(dataset: Dataset, reconstruct_fn=reconstruct_full_code) ->
     after = len(filtered)
     print(f"Filtered dataset for valid FIM structure: {before} -> {after}")
     if after == 0:
-        raise ValueError("All samples were filtered out; check dataset format and reconstruct_full_code().")
+        raise ValueError(
+            "All samples were filtered out; check dataset format and reconstruct_full_code()."
+        )
     return filtered
 
 
