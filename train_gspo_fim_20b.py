@@ -1,7 +1,8 @@
 # train_grpo_fim.py
 from unsloth import FastLanguageModel
 from trl import GRPOConfig, GRPOTrainer
-from datasets import load_dataset
+from datasets import Dataset
+import polars as pl
 import torch
 import os
 import sys
@@ -20,7 +21,47 @@ MAX_SEQ_LENGTH = 1024
 LORA_RANK = 4
 MODEL_NAME = "unsloth/gpt-oss-20b"
 OUTPUT_DIR = "outputs_fim_grpo"
-DATA_FILE = "data/fim_fresh.jsonl"
+DATA_PARQUET = os.environ.get(
+    "FIM_PARQUET_PATH",
+    "hf://datasets/AI-MO/NuminaMath-LEAN/data/train-00000-of-00001.parquet",
+)
+
+
+def load_training_dataset(parquet_path: str) -> Dataset:
+    """
+    Load training data from a Parquet shard with Polars and return a HF Dataset.
+    Expects columns for prompt/completion; attempts light remapping when possible.
+    """
+    df = pl.read_parquet(parquet_path)
+    cols = set(df.columns)
+
+    prompt_col = None
+    completion_col = None
+
+    for candidate in ["prompt", "input", "problem", "question"]:
+        if candidate in cols:
+            prompt_col = candidate
+            break
+
+    for candidate in ["completion", "formal_ground_truth", "answer", "output"]:
+        if candidate in cols:
+            completion_col = candidate
+            break
+
+    if not prompt_col or not completion_col:
+        raise ValueError(
+            f"Dataset missing prompt/completion columns in parquet {parquet_path}. "
+            f"Found columns: {sorted(cols)}"
+        )
+
+    select_cols = [prompt_col, completion_col]
+    metadata_col = "metadata" if "metadata" in cols else None
+    if metadata_col:
+        select_cols.append(metadata_col)
+
+    df = df.select(select_cols)
+    df = df.rename({prompt_col: "prompt", completion_col: "completion"})
+    return Dataset.from_polars(df)
 
 
 def build_dynamic_transform(
@@ -179,8 +220,8 @@ def main():
     )
 
     # Load Dataset
-    print(f"Loading dataset from {DATA_FILE}")
-    dataset = load_dataset("json", data_files=DATA_FILE, split="train")
+    print(f"Loading dataset from {DATA_PARQUET}")
+    dataset = load_training_dataset(DATA_PARQUET)
 
     # Initialize Verifier
     verifier = LeanVerifier("./verification_env")

@@ -1,6 +1,5 @@
 import sys
 import os
-from datasets import load_dataset
 
 sys.path.append(os.getcwd())
 from fim_rlvr_lean4.lean_verifier import LeanVerifier
@@ -8,10 +7,12 @@ from fim_rlvr_lean4.lean_verifier import LeanVerifier
 
 def main():
     print("Loading NuminaMath dataset (first 100 examples)...")
-    
-    # Load small subset efficiently 
+
+    # Lazy import to avoid failures during pytest collection or environments without datasets.
+    from datasets import load_dataset
+
+    # Load small subset efficiently
     ds = load_dataset('AI-MO/NuminaMath-LEAN', split='train', streaming=True)
-    
     verifier = LeanVerifier("./verification_env")
     
     tested = 0

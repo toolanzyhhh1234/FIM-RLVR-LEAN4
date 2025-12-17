@@ -24,6 +24,15 @@ def _ensure_stubbed_dependencies():
     if "datasets" not in sys.modules:
         datasets = types.ModuleType("datasets")
 
+        class DummyDataset:
+            def __init__(self, rows=None):
+                self.rows = rows or []
+
+            @classmethod
+            def from_polars(cls, df):
+                return cls(df.to_dicts())
+
+        datasets.Dataset = DummyDataset
         def _fake_load_dataset(*args, **kwargs):
             raise RuntimeError("load_dataset should not be invoked in unit tests")
 
@@ -34,6 +43,7 @@ def _ensure_stubbed_dependencies():
 _ensure_stubbed_dependencies()
 
 from train_gspo_fim_20b import build_dynamic_transform, lean_validity_reward_factory
+import train_gspo_fim_20b as trainer_mod
 
 
 class FakeTokenizer:
@@ -71,6 +81,28 @@ class RecordingVerifier:
 
 
 class TrainGspoFIM20BTests(unittest.TestCase):
+    def test_load_training_dataset_from_parquet_minimal(self):
+        import tempfile
+        import polars as pl
+
+        df = pl.DataFrame(
+            {
+                "prompt": ["<PFX>a<SFX>b<MID>"],
+                "completion": ["c"],
+                "metadata": [{"theorem_name": "thm"}],
+            }
+        )
+        with tempfile.NamedTemporaryFile(suffix=".parquet") as tmp:
+            df.write_parquet(tmp.name)
+            # Monkeypatch Dataset to our dummy with from_polars
+            trainer_mod.Dataset = sys.modules["datasets"].Dataset
+            dataset = trainer_mod.load_training_dataset(tmp.name)
+
+        self.assertEqual(len(dataset.rows), 1)
+        self.assertEqual(dataset.rows[0]["prompt"], "<PFX>a<SFX>b<MID>")
+        self.assertEqual(dataset.rows[0]["completion"], "c")
+        self.assertEqual(dataset.rows[0]["metadata"]["theorem_name"], "thm")
+
     def test_dynamic_transform_builds_prompts_and_metadata(self):
         tokenizer = FakeTokenizer()
         curriculum = RecordingCurriculum(ratio=0.4)
