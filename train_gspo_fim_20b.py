@@ -40,64 +40,42 @@ MAX_VERIFIERS = int(os.environ.get("FIM_MAX_VERIFIERS", str(DEFAULT_VERIFIERS)))
 def load_training_dataset(parquet_path: str) -> Dataset:
     """
     Load training data from a Parquet shard with Polars and return a HF Dataset.
-    Expects columns for prompt/completion; attempts light remapping when possible.
+    This dataset has Lean code in `formal_ground_truth` (full theorem + proof).
+    We use it as the source to mask for FIM; `completion` is unused by masking.
     """
     df = pl.read_parquet(parquet_path)
     cols = set(df.columns)
 
-    prompt_col = None
-    completion_col = None
-
-    for candidate in ["prompt", "input", "problem", "question"]:
-        if candidate in cols:
-            prompt_col = candidate
-            break
-
-    for candidate in ["completion", "formal_ground_truth", "answer", "output"]:
-        if candidate in cols:
-            completion_col = candidate
-            break
-
-    if not prompt_col or not completion_col:
+    if "formal_ground_truth" not in cols:
         raise ValueError(
-            f"Dataset missing prompt/completion columns in parquet {parquet_path}. "
+            f"Expected 'formal_ground_truth' column in {parquet_path}. "
             f"Found columns: {sorted(cols)}"
         )
 
-    select_cols = [prompt_col, completion_col]
-    metadata_col = "metadata" if "metadata" in cols else None
-    if metadata_col:
-        select_cols.append(metadata_col)
+    prompt_col = "formal_ground_truth"
+    select_cols = [prompt_col]
+    if "uuid" in cols:
+        select_cols.append("uuid")
 
+    # Keep a completion column for API compatibility; duplicate the same text.
     df = df.select(select_cols)
-    df = df.rename({prompt_col: "prompt", completion_col: "completion"})
+    df = df.rename({prompt_col: "prompt"})
+    df = df.with_columns(pl.col("prompt").alias("completion"))
+    # Optionally keep uuid as metadata if present
+    if "uuid" in cols:
+        df = df.with_columns(pl.col("uuid"))
     return Dataset.from_polars(df)
 
 
-def filter_valid_rows(
-    dataset: Dataset, reconstruct_fn=reconstruct_full_code
-) -> Dataset:
-    """Drop samples whose prompt cannot be reconstructed into prefix/suffix."""
-
-    def _is_valid(example):
-        p_pre, p_suf = reconstruct_fn(example["prompt"])
-        return p_pre is not None and p_suf is not None
-
-    before = len(dataset)
-    filtered = dataset.filter(_is_valid)
-    after = len(filtered)
-    print(f"Filtered dataset for valid FIM structure: {before} -> {after}")
-    if after == 0:
-        raise ValueError(
-            "All samples were filtered out; check dataset format and reconstruct_full_code()."
-        )
-    return filtered
+def filter_valid_rows(dataset: Dataset) -> Dataset:
+    """No-op filter now that we mask from full formal code directly."""
+    print(f"Dataset rows (no filtering applied): {len(dataset)}")
+    return dataset
 
 
 def build_dynamic_transform(
     tokenizer,
     curriculum,
-    reconstruct_fn=reconstruct_full_code,
     mask_fn=apply_dynamic_mask,
 ):
     """
@@ -113,33 +91,21 @@ def build_dynamic_transform(
 
         # Batch is a dict of lists
         for i in range(len(batch["prompt"])):
-            raw_p = batch["prompt"][i]
-            mid_truth = batch["completion"][i]  # The original middle from dataset
-
-            # Reconstruct full code
-            p_pre, p_suf = reconstruct_fn(raw_p)
-            full_code = None if p_pre is None else p_pre + mid_truth + p_suf
+            full_code = batch["prompt"][i]  # full Lean code (formal_ground_truth)
 
             # Get Theorem ID (using metadata name)
             # Check safely
-            th_name = str(i)  # Default to index if missing
-            if (
-                "metadata" in batch
-                and batch["metadata"][i]
-                and "theorem_name" in batch["metadata"][i]
-            ):
-                th_name = batch["metadata"][i]["theorem_name"]
+            th_name = str(i)  # Default to index if nothing else
+            if "uuid" in batch:
+                th_name = str(batch["uuid"][i])
+
             theorem_ids.append(th_name)
 
             # Get current curriculum ratio
             ratio = curriculum.get_mask_ratio(th_name)
 
-            # Apply dynamic masking
-            if full_code is None:
-                # Should not happen because we filter beforehand; keep lengths aligned.
-                new_pre, new_suf, new_mid = "", "", ""
-            else:
-                new_pre, new_suf, new_mid = mask_fn(full_code, ratio)
+            # Apply dynamic masking on full code
+            new_pre, new_suf, new_mid = mask_fn(full_code, ratio)
 
             # Construct Chat Prompt
             user_content = f"{new_pre}[MISSING_BLOCK]\n{new_suf}"

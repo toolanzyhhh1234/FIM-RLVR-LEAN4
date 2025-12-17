@@ -2,6 +2,9 @@
 set -euo pipefail
 
 # Activate env with torch 2.6 + cu124 + flash-attn wheel
+if [ -f /root/anaconda3/etc/profile.d/conda.sh ]; then
+  source /root/anaconda3/etc/profile.d/conda.sh
+fi
 conda activate unsloth-py310
 
 LOGDIR="training_logs"
