@@ -25,6 +25,9 @@ DATA_PARQUET = os.environ.get(
     "FIM_PARQUET_PATH",
     "hf://datasets/AI-MO/NuminaMath-LEAN/data/train-00000-of-00001.parquet",
 )
+MAX_STEPS = int(os.environ.get("FIM_MAX_STEPS", "50"))
+NUM_GENERATIONS = int(os.environ.get("FIM_NUM_GENERATIONS", "4"))
+MAX_COMPLETION_LENGTH = int(os.environ.get("FIM_MAX_COMPLETION_LENGTH", "512"))
 
 
 def load_training_dataset(parquet_path: str) -> Dataset:
@@ -242,12 +245,12 @@ def main():
         per_device_train_batch_size=1,
         gradient_accumulation_steps=1,
         max_prompt_length=MAX_SEQ_LENGTH,
-        max_completion_length=512,
+        max_completion_length=MAX_COMPLETION_LENGTH,
         loss_type="gspo",  # GSPO is compulsory for GPT-OSS(which is MOE model)
-        max_steps=50,
+        max_steps=MAX_STEPS,
         logging_steps=1,
         report_to="none",
-        num_generations=4,  # We can tune this depending our VRAM consumption, potentially speed up here
+        num_generations=NUM_GENERATIONS,  # We can tune this depending our VRAM consumption, potentially speed up here
         temperature=0.8,
         dataloader_num_workers=0,  # IMPORTANT: Ensure main process for shared curriculum state
     )
