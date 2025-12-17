@@ -84,9 +84,27 @@ def load_training_dataset(parquet_path: str) -> Dataset:
 
 
 def filter_valid_rows(dataset: Dataset) -> Dataset:
-    """No-op filter now that we mask from full formal code directly."""
-    print(f"Dataset rows (no filtering applied): {len(dataset)}")
-    return dataset
+    """
+    Drop clearly invalid/empty rows so masking doesn't produce empty prompts.
+    Heuristics: non-empty, minimum length, and contains a theorem/lemma keyword.
+    """
+
+    def _is_valid(example):
+        txt = example["prompt"]
+        if not txt:
+            return False
+        stripped = txt.strip()
+        if len(stripped) < 50:
+            return False
+        return ("theorem" in stripped) or ("lemma" in stripped)
+
+    before = len(dataset)
+    filtered = dataset.filter(_is_valid)
+    after = len(filtered)
+    print(f"Filtered dataset for non-empty Lean code: {before} -> {after}")
+    if after == 0:
+        raise ValueError("All samples were filtered out; dataset may be empty or malformed.")
+    return filtered
 
 
 def build_dynamic_transform(
