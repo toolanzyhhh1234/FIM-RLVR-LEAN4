@@ -30,7 +30,7 @@ def main():
             fast_inference=True,  # Enables vLLM backend
             max_seq_length=MAX_SEQ_LENGTH,
             load_in_4bit=True,
-            offload_embedding=True,
+            offload_embedding=False,  # do not move embedding to cpu otherwise it will slow down the process
         )
     except Exception as e:
         print(f"Error loading model: {e}")
