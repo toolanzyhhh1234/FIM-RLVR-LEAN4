@@ -1,5 +1,5 @@
 # train_grpo_fim.py
-from unsloth import FastLanguageModel
+from unsloth import FastLanguageModel, PatchFastRL
 from trl import GRPOConfig, GRPOTrainer
 from datasets import Dataset
 import polars as pl
@@ -196,6 +196,9 @@ def lean_validity_reward_factory(verifier, curriculum):
 
 
 def main():
+    # Apply Unsloth's TRL RL patches (enables GSPO and other RL fixes)
+    PatchFastRL()
+
     print(f"Loading model: {MODEL_NAME}")
     model, tokenizer = FastLanguageModel.from_pretrained(
         model_name=MODEL_NAME,
@@ -246,7 +249,9 @@ def main():
         gradient_accumulation_steps=1,
         max_prompt_length=MAX_SEQ_LENGTH,
         max_completion_length=MAX_COMPLETION_LENGTH,
-        loss_type="gspo",  # GSPO is compulsory for GPT-OSS(which is MOE model)
+        # TRL upstream does not recognize "gspo"; use "grpo" with seq-level IS to mirror GSPO.
+        loss_type="grpo",
+        importance_sampling_level="sequence",
         max_steps=MAX_STEPS,
         logging_steps=1,
         report_to="none",
