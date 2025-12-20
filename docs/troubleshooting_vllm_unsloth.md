@@ -114,3 +114,36 @@ rewrote Transformers inference to deliver faster RL inference instead.
 **Implication**
 Using vLLM for gpt-oss RL is expected to be brittle until upstream support
 lands; prefer Unsloth's built-in fast inference path.
+
+## 8) Qwen3 MoE + Unsloth vLLM -> HF conversion fails (gate_up_proj missing)
+
+**Symptom**
+```
+AttributeError: 'Qwen3MoeSparseMoeBlock' object has no attribute 'gate_up_proj'
+```
+
+**Cause**
+Unsloth's vLLM -> HF state_dict conversion assumes LLaMA-style MLP layout
+(`gate_up_proj`). Qwen3 MoE uses `mlp.gate` + `mlp.experts`, so the expected
+projection attributes are not present. This happens before LoRA is applied.
+
+**Fix (recommended)**
+Disable vLLM fast inference so Unsloth does not attempt the vLLM -> HF
+conversion path for Qwen3 MoE.
+
+## 9) Qwen3 MoE + vLLM + bitsandbytes 4-bit can fail
+
+**Symptom**
+```
+NotImplementedError: BitsAndBytesMoEMethod must select appropriate gemm implementation ...
+```
+
+**Cause**
+vLLM's bitsandbytes MoE path does not select a GEMM implementation for
+this model/config.
+
+**Fix (recommended)**
+Run in BF16 (disable 4-bit):
+```
+FIM_LOAD_IN_4BIT=0 python train_gspo_fim_30b.py
+```
