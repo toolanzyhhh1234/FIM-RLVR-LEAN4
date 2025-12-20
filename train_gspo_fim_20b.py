@@ -36,8 +36,16 @@ def _int_env(name, default):
     except ValueError:
         return default
 
+def _bool_env(name, default: bool) -> bool:
+    val = os.environ.get(name, "")
+    if val.strip() == "":
+        return default
+    return val.strip().lower() in {"1", "true", "yes", "y", "on"}
+
 MAX_STEPS = _int_env("FIM_MAX_STEPS", 50)
 NUM_GENERATIONS = _int_env("FIM_NUM_GENERATIONS", 4)
+# Allow turning off 4bit if vLLM + bitsandbytes has incompatibilities.
+LOAD_IN_4BIT = _bool_env("FIM_LOAD_IN_4BIT", True)
 # Completion cap: bounds reasoning + code tokens; stay well below model's 128k ctx.
 # Default 32768 gives a 32k reasoning budget; raise if needed but watch VRAM/time.
 MAX_COMPLETION_LENGTH = _int_env("FIM_MAX_COMPLETION_LENGTH", 32768)
@@ -266,7 +274,7 @@ def main():
     model, tokenizer = FastLanguageModel.from_pretrained(
         model_name=MODEL_NAME,
         max_seq_length=MAX_SEQ_LENGTH,
-        load_in_4bit=True,
+        load_in_4bit=LOAD_IN_4BIT,
         fast_inference = True,  # Enable vLLM fast inference
         offload_embedding=False,  # Do not load embedding in cpu(it will slow the process down)
     )
