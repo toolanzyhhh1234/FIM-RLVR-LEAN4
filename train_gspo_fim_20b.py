@@ -267,6 +267,7 @@ def main():
         model_name=MODEL_NAME,
         max_seq_length=MAX_SEQ_LENGTH,
         load_in_4bit=True,
+        fast_inference = True,  # Enable vLLM fast inference
         offload_embedding=False,  # Do not load embedding in cpu(it will slow the process down)
     )
 
@@ -321,7 +322,7 @@ def main():
         max_prompt_length=MAX_SEQ_LENGTH,
         max_completion_length=MAX_COMPLETION_LENGTH,
         # TRL upstream does not recognize "gspo"; use "grpo" with seq-level IS to mirror GSPO.
-        loss_type="grpo",
+        loss_type="dr_grpo",
         importance_sampling_level="sequence",
         max_steps=MAX_STEPS,
         logging_steps=1,
