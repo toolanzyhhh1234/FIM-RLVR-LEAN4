@@ -1,0 +1,88 @@
+defaults: ../../../RL/examples/configs/grpo_math_1B.yaml
+
+grpo:
+  num_prompts_per_step: 32
+  num_generations_per_prompt: 8
+  max_num_epochs: 1
+  max_num_steps: 50
+  val_period: 0
+  val_at_start: false
+  max_val_samples: 0
+  val_batch_size: 1
+
+loss_fn:
+  reference_policy_kl_penalty: 0.0
+  sequence_level_importance_ratios: true
+  token_level_loss: false
+  use_importance_sampling_correction: false
+
+checkpointing:
+  enabled: true
+  checkpoint_dir: "outputs_fim_grpo_nemo"
+  metric_name: "train:accuracy"
+  higher_is_better: true
+  keep_top_k: 3
+  save_period: 10
+
+policy:
+  model_name: "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-FP8"
+  tokenizer:
+    name: "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-FP8"
+  train_global_batch_size: 64
+  train_micro_batch_size: 1
+  logprob_batch_size: 1
+  max_total_sequence_length: 1024
+  dtensor_cfg:
+    enabled: false
+  megatron_cfg:
+    enabled: true
+    tensor_model_parallel_size: 4
+    pipeline_model_parallel_size: 2
+    expert_model_parallel_size: 2
+    sequence_parallel: true
+    activation_checkpointing: true
+    defer_fp32_logits: true
+    empty_unused_memory_level: 1
+    fp8_cfg:
+      enabled: true
+      fp8: e4m3
+      fp8_recipe: blockwise
+      fp8_param: false
+    env_vars:
+      NVTE_FP8_BLOCK_SCALING_FP32_SCALES: '1'
+  make_sequence_length_divisible_by: ${policy.megatron_cfg.tensor_model_parallel_size}
+  generation:
+    backend: "vllm"
+    vllm_cfg:
+      async_engine: false
+      precision: fp8
+      max_model_len: ${policy.max_total_sequence_length}
+      enforce_eager: true
+      tensor_parallel_size: ${policy.megatron_cfg.tensor_model_parallel_size}
+  sequence_packing:
+    enabled: false
+
+data:
+  max_input_seq_length: 1024
+  dataset_name: "fim_lean4"
+  shuffle: true
+  num_workers: 0
+
+env:
+  lean:
+    num_workers: 8
+
+logger:
+  log_dir: "outputs_fim_grpo_nemo/logs"
+  wandb_enabled: false
+  tensorboard_enabled: true
+  num_val_samples_to_print: 0
+
+cluster:
+  num_nodes: 1
+  gpus_per_node: 8
+
+fim:
+  parquet_path: null
+  curriculum_state_path: null
+  lean_env_path: "./verification_env"
