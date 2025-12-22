@@ -9,10 +9,10 @@ export CUDA_DEVICE_MAX_CONNECTIONS=1
 
 ########################### Quick Config ###########################
 
-TP=${TP:-2}
-PP=${PP:-2}
-CP=${CP:-2}
-EP=${EP:-4}
+TP=${TP:-1}
+PP=${PP:-1}
+CP=${CP:-1}
+EP=${EP:-1}
 ETP=${ETP:-1}
 
 ALL_OFFLOAD=${ALL_OFFLOAD:-True}
@@ -22,9 +22,9 @@ project_name='fim_rlvr_lean4'
 exp_name='qwen3_30b_fim_gspo'
 adv_estimator=grpo
 
-# FIM-RLVR-LEAN4 data paths
-fim_train_path=/home/admin1/CodeProjects/FIM-RLVR-LEAN4/data/fim_fresh.jsonl
-fim_test_path=/home/admin1/CodeProjects/FIM-RLVR-LEAN4/data/fim_fresh.jsonl
+# FIM-RLVR-LEAN4 data paths - using HuggingFace dataset
+fim_train_path=hf://datasets/AI-MO/NuminaMath-LEAN/train.parquet
+fim_test_path=hf://datasets/AI-MO/NuminaMath-LEAN/test.parquet
 
 ########################### Parameter Arrays ###########################
 
@@ -77,11 +77,11 @@ ACTOR=(
 )
 
 ROLLOUT=(
-    actor_rollout_ref.rollout.tensor_model_parallel_size=8
-    actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=4
+    actor_rollout_ref.rollout.tensor_model_parallel_size=1
+    actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=2
     actor_rollout_ref.rollout.log_prob_use_dynamic_bsz=True
     actor_rollout_ref.rollout.name=${rollout_name}
-    actor_rollout_ref.rollout.gpu_memory_utilization=0.25
+    actor_rollout_ref.rollout.gpu_memory_utilization=0.6
     actor_rollout_ref.rollout.enforce_eager=True
     actor_rollout_ref.rollout.free_cache_engine=True
     actor_rollout_ref.rollout.n=4
@@ -115,7 +115,7 @@ TRAINER=(
     trainer.logger='["console","wandb"]'
     trainer.project_name=${project_name}
     trainer.experiment_name=${exp_name}
-    trainer.n_gpus_per_node=8
+    trainer.n_gpus_per_node=1
     trainer.nnodes=1
     trainer.save_freq=10
     trainer.test_freq=5
