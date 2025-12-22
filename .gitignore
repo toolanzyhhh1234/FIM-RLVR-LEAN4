@@ -35,3 +35,4 @@ checkpoints/
 *.bin
 *.safetensors
 wandb/training_logs/
+.kiro/settings/mcp.json
