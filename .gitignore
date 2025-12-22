@@ -37,3 +37,6 @@ checkpoints/
 wandb/training_logs/
 .kiro/settings/mcp.json
 .kiro/verl-investigation
+
+# External libraries
+verl/
