@@ -6,6 +6,8 @@ FROM nvidia/cuda:12.4.1-devel-ubuntu22.04
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
 ENV PIP_NO_CACHE_DIR=1
+ENV CONDA_DIR=/opt/conda
+ENV PATH=$CONDA_DIR/bin:$PATH
 
 # 3. Install System Dependencies
 # We include 'git' and 'ssh' so you don't need startup scripts.
@@ -25,6 +27,12 @@ RUN apt-get update && apt-get install -y \
     ninja-build \
     && rm -rf /var/lib/apt/lists/*
 
+# 4. Install Miniconda (for optional conda-based workflows)
+RUN wget -q https://repo.anaconda.com/miniconda/Miniconda3-py310_24.9.2-0-Linux-x86_64.sh -O /tmp/miniconda.sh && \
+    bash /tmp/miniconda.sh -b -p $CONDA_DIR && \
+    rm -f /tmp/miniconda.sh && \
+    $CONDA_DIR/bin/conda config --system --set auto_activate_base false
+
 # 4. Set Python 3.10 as default
 RUN ln -s /usr/bin/python3.10 /usr/bin/python
 
@@ -32,6 +40,9 @@ RUN ln -s /usr/bin/python3.10 /usr/bin/python
 # We install this FIRST to ensure subsequent packages detect CUDA support.
 RUN pip install --upgrade pip && \
     pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+
+# 5b. Install uv for faster Python package management
+RUN pip install uv
 
 # 6. Install FlashAttention-2 & vLLM (Pre-built Wheels)
 # CRITICAL: Because we used CUDA 12.4 base, these will download binaries.
