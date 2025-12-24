@@ -69,6 +69,30 @@ Stand up a working VERL training environment (Megatron + vLLM) on a Blackwell GP
 - 30B Megatron run hits GPU OOM on single GPU (expected).
 - 3B FSDP test now runs further but hit missing `vllm` then FA2 issues; SDPA/disable remove-padding is the workaround.
 
+## H200 Run (Success)
+We got the 3B GSPO run to complete on a single H200 by reducing sequence length
+and batch sizes at runtime (no code changes). Command (from `/workspace/verl`
+inside the container):
+
+```bash
+unset PYTORCH_CUDA_ALLOC_CONF
+bash run_test_gspo_3b_math_patched.sh \
+  data.max_prompt_length=512 \
+  data.max_response_length=1024 \
+  data.train_batch_size=8 \
+  actor_rollout_ref.rollout.n=2 \
+  actor_rollout_ref.actor.ppo_mini_batch_size=4 \
+  actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=1 \
+  actor_rollout_ref.actor.ppo_max_token_len_per_gpu=3072 \
+  actor_rollout_ref.ref.log_prob_max_token_len_per_gpu=4096 \
+  actor_rollout_ref.rollout.log_prob_max_token_len_per_gpu=4096 \
+  actor_rollout_ref.rollout.max_num_batched_tokens=1536 \
+  actor_rollout_ref.rollout.gpu_memory_utilization=0.4
+```
+
+Note: `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True` is not compatible with
+vLLM v1 memory pool, so it must be unset.
+
 ## Recommended Next Steps
 1) Run `run_test_gspo_3b_math_patched.sh` again after installing `vllm` in the active env.
 2) If SDPA path works, keep it for environment validation.
