@@ -37,9 +37,16 @@ RUN wget -q https://repo.anaconda.com/miniconda/Miniconda3-py310_24.9.2-0-Linux-
 RUN ln -s /usr/bin/python3.10 /usr/bin/python
 
 # 5. Install PyTorch (CUDA 12.4 Wheels)
-# We install this FIRST to ensure subsequent packages detect CUDA support.
+# Pin torch/vision/audio to a cu124-compatible set to avoid dependency churn.
+ARG TORCH_VERSION=2.4.1
+ARG TORCHVISION_VERSION=0.19.1
+ARG TORCHAUDIO_VERSION=2.4.1
 RUN pip install --upgrade pip && \
-    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+    pip install \
+      torch==${TORCH_VERSION}+cu124 \
+      torchvision==${TORCHVISION_VERSION}+cu124 \
+      torchaudio==${TORCHAUDIO_VERSION}+cu124 \
+      --index-url https://download.pytorch.org/whl/cu124
 
 # 5b. Install uv for faster Python package management
 RUN pip install uv
@@ -48,7 +55,8 @@ RUN pip install uv
 # CRITICAL: Because we used CUDA 12.4 base, these will download binaries.
 # No compilation = No 128GB RAM requirement = No Crash.
 RUN pip install flash-attn --no-build-isolation
-RUN pip install vllm
+ARG VLLM_VERSION=0.11.1
+RUN pip install vllm==${VLLM_VERSION}
 
 # 7. Install VERL
 # We clone it into /app/verl
