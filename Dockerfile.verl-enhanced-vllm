@@ -51,7 +51,8 @@ RUN pip install --upgrade pip && \
       --index-url https://download.pytorch.org/whl/cu124
 
 # 5a. Install APEX (from source; matches installed torch/CUDA)
-ENV TORCH_CUDA_ARCH_LIST=12.0+PTX
+# Hopper (H100/H200) build target.
+ENV TORCH_CUDA_ARCH_LIST=9.0
 RUN git clone --depth=1 https://github.com/NVIDIA/apex.git /opt/apex && \
     cd /opt/apex && \
     pip install -v --no-build-isolation --no-cache-dir \
