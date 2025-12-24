@@ -1,0 +1,61 @@
++ export GPUS_PER_NODE=1
++ GPUS_PER_NODE=1
++ export NNODES=1
++ NNODES=1
++ export TORCH_CUDA_ARCH_LIST=12.0+PTX
++ TORCH_CUDA_ARCH_LIST=12.0+PTX
++ export VLLM_USE_V1=1
++ VLLM_USE_V1=1
++ export WANDB_MODE=disabled
++ WANDB_MODE=disabled
++ project_name=RL-GSPO
++ adv_estimator=grpo
++ loss_mode=gspo
++ loss_agg_mode=seq-mean-token-mean
++ MODEL_PATH=Qwen/Qwen2.5-3B-Instruct
++ offload=false
++ rollout_engine=vllm
++ rollout_mode=async
++ return_raw_chat=True
++ gpu_memory_utilization=0.6
++ reward_manager=dapo
++ shuffle_dataset=true
++ train_batch_size=64
++ ppo_mini_batch_size=16
++ ppo_micro_batch_size_per_gpu=2
++ n_resp_per_prompt=4
++ max_prompt_length=2048
++ max_response_length=4096
++ enable_overlong_buffer=false
++ overlong_buffer_len=4096
++ overlong_penalty_factor=1.0
++ test_freq=10
++ save_freq=10
++ total_epochs=1
++ total_training_steps=100
++ val_before_train=false
++ use_kl_in_reward=false
++ kl_coef=0.0
++ use_kl_loss=false
++ kl_loss_coef=0.0
++ clip_ratio_low=0.0003
++ clip_ratio_high=0.0004
+++ basename Qwen/Qwen2.5-3B-Instruct
++ SFT_MODEL=Qwen2.5-3B-Instruct
++ exp_name=gspo-epslow-0.0003-epshigh-0.0004-Qwen2.5-3B-Instruct-RL
++ CKPTS_DIR=/workspace/checkpoints/gspo/gspo-epslow-0.0003-epshigh-0.0004-Qwen2.5-3B-Instruct-RL
++ temperature=1.0
++ top_p=1.0
++ top_k=-1
++ val_top_p=0.7
++ sp_size=1
++ use_dynamic_bsz=true
++ actor_ppo_max_token_len=12288
++ infer_ppo_max_token_len=18432
++ gen_tp=1
++ entropy_checkpointing=true
++ DATA_DIR=/workspace/data/gsm8k
++ mkdir -p /workspace/data/gsm8k
++ '[' '!' -f /workspace/data/gsm8k/train.parquet ']'
++ python verl/examples/data_preprocess/gsm8k.py --local_save_dir /workspace/data/gsm8k
+python: can't open file '/workspace/verl/examples/data_preprocess/gsm8k.py': [Errno 2] No such file or directory

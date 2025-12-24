@@ -1,0 +1,1010 @@
++ export GPUS_PER_NODE=1
++ GPUS_PER_NODE=1
++ export NNODES=1
++ NNODES=1
++ export TORCH_CUDA_ARCH_LIST=12.0+PTX
++ TORCH_CUDA_ARCH_LIST=12.0+PTX
++ export VLLM_USE_V1=1
++ VLLM_USE_V1=1
++ export WANDB_MODE=disabled
++ WANDB_MODE=disabled
++ project_name=RL-GSPO
++ adv_estimator=grpo
++ loss_mode=gspo
++ loss_agg_mode=seq-mean-token-mean
++ MODEL_PATH=Qwen/Qwen2.5-3B-Instruct
++ offload=false
++ rollout_engine=vllm
++ rollout_mode=async
++ return_raw_chat=True
++ gpu_memory_utilization=0.6
++ reward_manager=dapo
++ shuffle_dataset=true
++ train_batch_size=64
++ ppo_mini_batch_size=16
++ ppo_micro_batch_size_per_gpu=2
++ n_resp_per_prompt=4
++ max_prompt_length=2048
++ max_response_length=4096
++ enable_overlong_buffer=false
++ overlong_buffer_len=4096
++ overlong_penalty_factor=1.0
++ test_freq=10
++ save_freq=10
++ total_epochs=1
++ total_training_steps=100
++ val_before_train=false
++ use_kl_in_reward=false
++ kl_coef=0.0
++ use_kl_loss=false
++ kl_loss_coef=0.0
++ clip_ratio_low=0.0003
++ clip_ratio_high=0.0004
+++ basename Qwen/Qwen2.5-3B-Instruct
++ SFT_MODEL=Qwen2.5-3B-Instruct
++ exp_name=gspo-epslow-0.0003-epshigh-0.0004-Qwen2.5-3B-Instruct-RL
++ CKPTS_DIR=/app/checkpoints/gspo/gspo-epslow-0.0003-epshigh-0.0004-Qwen2.5-3B-Instruct-RL
++ temperature=1.0
++ top_p=1.0
++ top_k=-1
++ val_top_p=0.7
++ sp_size=1
++ use_dynamic_bsz=true
++ actor_ppo_max_token_len=12288
++ infer_ppo_max_token_len=18432
++ gen_tp=1
++ entropy_checkpointing=true
++ DATA_DIR=/app/data/gsm8k
++ mkdir -p /app/data/gsm8k
++ '[' '!' -f /app/data/gsm8k/train.parquet ']'
++ python verl/examples/data_preprocess/gsm8k.py --local_save_dir /app/data/gsm8k
+Generating train split:   0%|          | 0/7473 [00:00<?, ? examples/s]Generating train split: 100%|██████████| 7473/7473 [00:00<00:00, 276258.68 examples/s]
+Generating test split:   0%|          | 0/1319 [00:00<?, ? examples/s]Generating test split: 100%|██████████| 1319/1319 [00:00<00:00, 193551.66 examples/s]
+Map:   0%|          | 0/7473 [00:00<?, ? examples/s]Map:  30%|██▉       | 2236/7473 [00:00<00:00, 21453.55 examples/s]Map:  67%|██████▋   | 5000/7473 [00:00<00:00, 24342.86 examples/s]Map: 100%|██████████| 7473/7473 [00:00<00:00, 24315.32 examples/s]
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 22970.70 examples/s]
+Creating parquet from Arrow format:   0%|          | 0/1 [00:00<?, ?ba/s]Creating parquet from Arrow format: 100%|██████████| 1/1 [00:00<00:00, 29.99ba/s]
+Creating parquet from Arrow format:   0%|          | 0/1 [00:00<?, ?ba/s]Creating parquet from Arrow format: 100%|██████████| 1/1 [00:00<00:00, 168.53ba/s]
++ gsm8k_train_path=/app/data/gsm8k/train.parquet
++ gsm8k_test_path=/app/data/gsm8k/test.parquet
++ train_files='['\''/app/data/gsm8k/train.parquet'\'']'
++ test_files='['\''/app/data/gsm8k/test.parquet'\'']'
++ python3 -m verl.trainer.main_ppo algorithm.adv_estimator=grpo actor_rollout_ref.actor.policy_loss.loss_mode=gspo +actor_rollout_ref.model.override_config.attn_implementation=sdpa +actor_rollout_ref.ref.override_config.attn_implementation=sdpa 'data.train_files=['\''/app/data/gsm8k/train.parquet'\'']' 'data.val_files=['\''/app/data/gsm8k/test.parquet'\'']' data.shuffle=true data.prompt_key=prompt data.truncation=error data.filter_overlong_prompts=true data.return_raw_chat=True data.train_batch_size=64 data.max_prompt_length=2048 data.max_response_length=4096 actor_rollout_ref.rollout.n=4 algorithm.use_kl_in_reward=false algorithm.kl_ctrl.kl_coef=0.0 actor_rollout_ref.actor.use_kl_loss=false actor_rollout_ref.actor.kl_loss_coef=0.0 actor_rollout_ref.actor.clip_ratio_low=0.0003 actor_rollout_ref.actor.clip_ratio_high=0.0004 actor_rollout_ref.model.use_remove_padding=false actor_rollout_ref.actor.use_dynamic_bsz=true actor_rollout_ref.ref.log_prob_use_dynamic_bsz=true actor_rollout_ref.rollout.log_prob_use_dynamic_bsz=true actor_rollout_ref.actor.ppo_max_token_len_per_gpu=12288 actor_rollout_ref.ref.log_prob_max_token_len_per_gpu=18432 actor_rollout_ref.rollout.log_prob_max_token_len_per_gpu=18432 actor_rollout_ref.rollout.name=vllm actor_rollout_ref.rollout.mode=async actor_rollout_ref.model.path=Qwen/Qwen2.5-3B-Instruct actor_rollout_ref.model.enable_gradient_checkpointing=true actor_rollout_ref.actor.optim.lr=1e-6 actor_rollout_ref.actor.optim.lr_warmup_steps_ratio=0.05 actor_rollout_ref.actor.optim.weight_decay=0.1 actor_rollout_ref.actor.ppo_mini_batch_size=16 actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=2 actor_rollout_ref.actor.fsdp_config.param_offload=false actor_rollout_ref.actor.fsdp_config.optimizer_offload=false actor_rollout_ref.actor.entropy_coeff=0 actor_rollout_ref.actor.grad_clip=1.0 actor_rollout_ref.actor.loss_agg_mode=seq-mean-token-mean actor_rollout_ref.actor.ulysses_sequence_parallel_size=1 actor_rollout_ref.rollout.gpu_memory_utilization=0.6 actor_rollout_ref.rollout.tensor_model_parallel_size=1 actor_rollout_ref.rollout.enable_chunked_prefill=true actor_rollout_ref.rollout.max_num_batched_tokens=6144 actor_rollout_ref.rollout.temperature=1.0 actor_rollout_ref.rollout.top_p=1.0 actor_rollout_ref.rollout.top_k=-1 actor_rollout_ref.rollout.val_kwargs.temperature=1.0 actor_rollout_ref.rollout.val_kwargs.top_p=0.7 actor_rollout_ref.rollout.val_kwargs.top_k=-1 actor_rollout_ref.rollout.val_kwargs.do_sample=true actor_rollout_ref.rollout.val_kwargs.n=1 actor_rollout_ref.ref.fsdp_config.param_offload=false actor_rollout_ref.ref.ulysses_sequence_parallel_size=1 actor_rollout_ref.actor.entropy_checkpointing=true reward_model.reward_manager=dapo +reward_model.reward_kwargs.overlong_buffer_cfg.enable=false +reward_model.reward_kwargs.overlong_buffer_cfg.len=4096 +reward_model.reward_kwargs.overlong_buffer_cfg.penalty_factor=1.0 +reward_model.reward_kwargs.overlong_buffer_cfg.log=false +reward_model.reward_kwargs.max_resp_len=4096 'trainer.logger=["console"]' trainer.project_name=RL-GSPO trainer.experiment_name=gspo-epslow-0.0003-epshigh-0.0004-Qwen2.5-3B-Instruct-RL trainer.n_gpus_per_node=1 trainer.nnodes=1 trainer.val_before_train=false trainer.test_freq=10 trainer.save_freq=10 trainer.total_epochs=1 trainer.total_training_steps=100 trainer.default_local_dir=/app/checkpoints/gspo/gspo-epslow-0.0003-epshigh-0.0004-Qwen2.5-3B-Instruct-RL trainer.resume_mode=auto trainer.log_val_generations=2
+/opt/conda/lib/python3.10/site-packages/megatron/core/distributed/fsdp/src/megatron_fsdp/utils.py:109: UserWarning: Transformer Engine and Apex are not installed. Falling back to local implementations of multi_tensor_applier and multi_tensor_scale
+  warnings.warn(
+WARNING:2025-12-24 07:57:54,310:fused_indices_to_multihot has reached end of life. Please migrate to a non-experimental function.
+/opt/conda/lib/python3.10/site-packages/megatron/core/optimizer/__init__.py:22: UserWarning: Transformer Engine and Apex are not installed. Falling back to Torch optimizers.
+  warnings.warn(
+/opt/conda/lib/python3.10/site-packages/megatron/core/optimizer/optimizer.py:27: UserWarning: Transformer Engine and Apex are not installed. Falling back to local implementations of multi_tensor_applier and multi_tensor_scale
+  warnings.warn(
+/opt/conda/lib/python3.10/site-packages/megatron/core/optimizer/clip_grads.py:29: UserWarning: Transformer Engine and Apex are not installed. Falling back to local implementations of multi_tensor_applier, multi_tensor_l2norm, and multi_tensor_scale
+  warnings.warn(
+/opt/conda/lib/python3.10/site-packages/megatron/core/models/backends.py:21: UserWarning: Apex is not installed. Falling back to Torch Norm
+  warnings.warn("Apex is not installed. Falling back to Torch Norm")
+/opt/conda/lib/python3.10/site-packages/megatron/core/models/gpt/gpt_layer_specs.py:67: UserWarning: Apex is not installed. Falling back to Torch Norm
+  warnings.warn("Apex is not installed. Falling back to Torch Norm")
+ray init kwargs: {'num_cpus': None, 'runtime_env': {'env_vars': {'TOKENIZERS_PARALLELISM': 'true', 'NCCL_DEBUG': 'WARN', 'VLLM_LOGGING_LEVEL': 'WARN', 'VLLM_ALLOW_RUNTIME_LORA_UPDATING': 'true', 'VLLM_ALLREDUCE_USE_SYMM_MEM': '0', 'CUDA_DEVICE_MAX_CONNECTIONS': '1', 'NCCL_CUMEM_ENABLE': '0'}, 'working_dir': None}}
+2025-12-24 07:58:21,561	WARNING services.py:2137 -- WARNING: The object store is using /tmp instead of /dev/shm because /dev/shm has only 67108864 bytes available. This will harm performance! You may be able to free up space by deleting files in /dev/shm. If you are inside a Docker container, you can increase /dev/shm size by passing '--shm-size=10.24gb' to 'docker run' (or add it to the run_options list in a Ray cluster config). Make sure to set this to more than 30% of available RAM.
+2025-12-24 07:58:21,760	INFO worker.py:1998 -- Started a local Ray instance. View the dashboard at [1m[32m127.0.0.1:8265 [39m[22m
+/opt/conda/lib/python3.10/site-packages/ray/_private/worker.py:2046: FutureWarning: Tip: In future versions of Ray, Ray will no longer override accelerator visible devices env var if num_gpus=0 or num_gpus=None (default). To enable this behavior and turn off this error message, set RAY_ACCEL_ENV_VAR_OVERRIDE_ON_ZERO=0
+  warnings.warn(
+[36m(pid=2699)[0m W1224 07:58:30.584000 2699 site-packages/torch/utils/cpp_extension.py:117] No CUDA runtime is found, using CUDA_HOME='/usr/local/cuda'
+[36m(pid=2699)[0m /opt/conda/lib/python3.10/site-packages/megatron/core/distributed/fsdp/src/megatron_fsdp/utils.py:109: UserWarning: Transformer Engine and Apex are not installed. Falling back to local implementations of multi_tensor_applier and multi_tensor_scale
+[36m(pid=2699)[0m   warnings.warn(
+[36m(pid=2699)[0m WARNING:2025-12-24 07:58:30,639:fused_indices_to_multihot has reached end of life. Please migrate to a non-experimental function.
+[36m(pid=2699)[0m /opt/conda/lib/python3.10/site-packages/megatron/core/optimizer/__init__.py:22: UserWarning: Transformer Engine and Apex are not installed. Falling back to Torch optimizers.
+[36m(pid=2699)[0m   warnings.warn(
+[36m(pid=2699)[0m /opt/conda/lib/python3.10/site-packages/megatron/core/optimizer/optimizer.py:27: UserWarning: Transformer Engine and Apex are not installed. Falling back to local implementations of multi_tensor_applier and multi_tensor_scale
+[36m(pid=2699)[0m   warnings.warn(
+[36m(pid=2699)[0m /opt/conda/lib/python3.10/site-packages/megatron/core/optimizer/clip_grads.py:29: UserWarning: Transformer Engine and Apex are not installed. Falling back to local implementations of multi_tensor_applier, multi_tensor_l2norm, and multi_tensor_scale
+[36m(pid=2699)[0m   warnings.warn(
+[36m(pid=2699)[0m /opt/conda/lib/python3.10/site-packages/megatron/core/models/backends.py:21: UserWarning: Apex is not installed. Falling back to Torch Norm
+[36m(pid=2699)[0m   warnings.warn("Apex is not installed. Falling back to Torch Norm")
+[36m(pid=2699)[0m /opt/conda/lib/python3.10/site-packages/megatron/core/models/gpt/gpt_layer_specs.py:67: UserWarning: Apex is not installed. Falling back to Torch Norm
+[36m(pid=2699)[0m   warnings.warn("Apex is not installed. Falling back to Torch Norm")
+[36m(TaskRunner pid=2699)[0m TaskRunner hostname: 817df2f0a080, PID: 2699
+[36m(TaskRunner pid=2699)[0m {'actor_rollout_ref': {'actor': {'_target_': 'verl.workers.config.FSDPActorConfig',
+[36m(TaskRunner pid=2699)[0m                                  'calculate_entropy': False,
+[36m(TaskRunner pid=2699)[0m                                  'checkpoint': {'_target_': 'verl.trainer.config.CheckpointConfig',
+[36m(TaskRunner pid=2699)[0m                                                 'async_save': False,
+[36m(TaskRunner pid=2699)[0m                                                 'load_contents': ['model',
+[36m(TaskRunner pid=2699)[0m                                                                   'optimizer',
+[36m(TaskRunner pid=2699)[0m                                                                   'extra'],
+[36m(TaskRunner pid=2699)[0m                                                 'save_contents': ['model',
+[36m(TaskRunner pid=2699)[0m                                                                   'optimizer',
+[36m(TaskRunner pid=2699)[0m                                                                   'extra']},
+[36m(TaskRunner pid=2699)[0m                                  'clip_ratio': 0.2,
+[36m(TaskRunner pid=2699)[0m                                  'clip_ratio_c': 3.0,
+[36m(TaskRunner pid=2699)[0m                                  'clip_ratio_high': 0.0004,
+[36m(TaskRunner pid=2699)[0m                                  'clip_ratio_low': 0.0003,
+[36m(TaskRunner pid=2699)[0m                                  'data_loader_seed': 42,
+[36m(TaskRunner pid=2699)[0m                                  'entropy_checkpointing': True,
+[36m(TaskRunner pid=2699)[0m                                  'entropy_coeff': 0,
+[36m(TaskRunner pid=2699)[0m                                  'entropy_from_logits_with_chunking': False,
+[36m(TaskRunner pid=2699)[0m                                  'freeze_vision_tower': False,
+[36m(TaskRunner pid=2699)[0m                                  'fsdp_config': {'_target_': 'verl.workers.config.FSDPEngineConfig',
+[36m(TaskRunner pid=2699)[0m                                                  'dtype': 'bfloat16',
+[36m(TaskRunner pid=2699)[0m                                                  'entropy_checkpointing': False,
+[36m(TaskRunner pid=2699)[0m                                                  'entropy_from_logits_with_chunking': False,
+[36m(TaskRunner pid=2699)[0m                                                  'forward_only': False,
+[36m(TaskRunner pid=2699)[0m                                                  'forward_prefetch': False,
+[36m(TaskRunner pid=2699)[0m                                                  'fsdp_size': -1,
+[36m(TaskRunner pid=2699)[0m                                                  'full_determinism': False,
+[36m(TaskRunner pid=2699)[0m                                                  'model_dtype': 'fp32',
+[36m(TaskRunner pid=2699)[0m                                                  'offload_policy': False,
+[36m(TaskRunner pid=2699)[0m                                                  'optimizer_offload': False,
+[36m(TaskRunner pid=2699)[0m                                                  'param_offload': False,
+[36m(TaskRunner pid=2699)[0m                                                  'reshard_after_forward': True,
+[36m(TaskRunner pid=2699)[0m                                                  'seed': 42,
+[36m(TaskRunner pid=2699)[0m                                                  'strategy': 'fsdp',
+[36m(TaskRunner pid=2699)[0m                                                  'ulysses_sequence_parallel_size': 1,
+[36m(TaskRunner pid=2699)[0m                                                  'use_orig_params': False,
+[36m(TaskRunner pid=2699)[0m                                                  'use_torch_compile': True,
+[36m(TaskRunner pid=2699)[0m                                                  'wrap_policy': {'min_num_params': 0}},
+[36m(TaskRunner pid=2699)[0m                                  'grad_clip': 1.0,
+[36m(TaskRunner pid=2699)[0m                                  'kl_loss_coef': 0.0,
+[36m(TaskRunner pid=2699)[0m                                  'kl_loss_type': 'low_var_kl',
+[36m(TaskRunner pid=2699)[0m                                  'loss_agg_mode': 'seq-mean-token-mean',
+[36m(TaskRunner pid=2699)[0m                                  'loss_scale_factor': None,
+[36m(TaskRunner pid=2699)[0m                                  'optim': {'_target_': 'verl.workers.config.FSDPOptimizerConfig',
+[36m(TaskRunner pid=2699)[0m                                            'betas': [0.9, 0.999],
+[36m(TaskRunner pid=2699)[0m                                            'clip_grad': 1.0,
+[36m(TaskRunner pid=2699)[0m                                            'lr': 1e-06,
+[36m(TaskRunner pid=2699)[0m                                            'lr_scheduler_type': 'constant',
+[36m(TaskRunner pid=2699)[0m                                            'lr_warmup_steps': -1,
+[36m(TaskRunner pid=2699)[0m                                            'lr_warmup_steps_ratio': 0.05,
+[36m(TaskRunner pid=2699)[0m                                            'min_lr_ratio': 0.0,
+[36m(TaskRunner pid=2699)[0m                                            'num_cycles': 0.5,
+[36m(TaskRunner pid=2699)[0m                                            'optimizer': 'AdamW',
+[36m(TaskRunner pid=2699)[0m                                            'optimizer_impl': 'torch.optim',
+[36m(TaskRunner pid=2699)[0m                                            'override_optimizer_config': None,
+[36m(TaskRunner pid=2699)[0m                                            'total_training_steps': -1,
+[36m(TaskRunner pid=2699)[0m                                            'warmup_style': None,
+[36m(TaskRunner pid=2699)[0m                                            'weight_decay': 0.1},
+[36m(TaskRunner pid=2699)[0m                                  'policy_loss': {'_target_': 'verl.workers.config.PolicyLossConfig',
+[36m(TaskRunner pid=2699)[0m                                                  'clip_cov_lb': 1.0,
+[36m(TaskRunner pid=2699)[0m                                                  'clip_cov_ratio': 0.0002,
+[36m(TaskRunner pid=2699)[0m                                                  'clip_cov_ub': 5.0,
+[36m(TaskRunner pid=2699)[0m                                                  'kl_cov_ratio': 0.0002,
+[36m(TaskRunner pid=2699)[0m                                                  'loss_mode': 'gspo',
+[36m(TaskRunner pid=2699)[0m                                                  'ppo_kl_coef': 0.1},
+[36m(TaskRunner pid=2699)[0m                                  'ppo_epochs': 1,
+[36m(TaskRunner pid=2699)[0m                                  'ppo_max_token_len_per_gpu': 12288,
+[36m(TaskRunner pid=2699)[0m                                  'ppo_micro_batch_size': None,
+[36m(TaskRunner pid=2699)[0m                                  'ppo_micro_batch_size_per_gpu': 2,
+[36m(TaskRunner pid=2699)[0m                                  'ppo_mini_batch_size': 16,
+[36m(TaskRunner pid=2699)[0m                                  'profiler': {'_target_': 'verl.utils.profiler.ProfilerConfig',
+[36m(TaskRunner pid=2699)[0m                                               'all_ranks': False,
+[36m(TaskRunner pid=2699)[0m                                               'enable': False,
+[36m(TaskRunner pid=2699)[0m                                               'ranks': [],
+[36m(TaskRunner pid=2699)[0m                                               'save_path': 'outputs/profile',
+[36m(TaskRunner pid=2699)[0m                                               'tool': None,
+[36m(TaskRunner pid=2699)[0m                                               'tool_config': {'npu': {'_target_': 'verl.utils.profiler.config.NPUToolConfig',
+[36m(TaskRunner pid=2699)[0m                                                                       'analysis': True,
+[36m(TaskRunner pid=2699)[0m                                                                       'contents': [],
+[36m(TaskRunner pid=2699)[0m                                                                       'discrete': False,
+[36m(TaskRunner pid=2699)[0m                                                                       'level': 'level0'},
+[36m(TaskRunner pid=2699)[0m                                                               'nsys': {'_target_': 'verl.utils.profiler.config.NsightToolConfig',
+[36m(TaskRunner pid=2699)[0m                                                                        'discrete': False},
+[36m(TaskRunner pid=2699)[0m                                                               'torch': {'_target_': 'verl.utils.profiler.config.TorchProfilerToolConfig',
+[36m(TaskRunner pid=2699)[0m                                                                         'step_end': None,
+[36m(TaskRunner pid=2699)[0m                                                                         'step_start': 0},
+[36m(TaskRunner pid=2699)[0m                                                               'torch_memory': {'_target_': 'verl.utils.profiler.config.TorchMemoryToolConfig',
+[36m(TaskRunner pid=2699)[0m                                                                                'stack_depth': 32,
+[36m(TaskRunner pid=2699)[0m                                                                                'trace_alloc_max_entries': 100000}}},
+[36m(TaskRunner pid=2699)[0m                                  'rollout_n': 4,
+[36m(TaskRunner pid=2699)[0m                                  'router_replay': {'_target_': 'verl.workers.config.RouterReplayConfig',
+[36m(TaskRunner pid=2699)[0m                                                    'mode': 'disabled',
+[36m(TaskRunner pid=2699)[0m                                                    'record_file': None,
+[36m(TaskRunner pid=2699)[0m                                                    'replay_file': None},
+[36m(TaskRunner pid=2699)[0m                                  'shuffle': False,
+[36m(TaskRunner pid=2699)[0m                                  'strategy': 'fsdp',
+[36m(TaskRunner pid=2699)[0m                                  'ulysses_sequence_parallel_size': 1,
+[36m(TaskRunner pid=2699)[0m                                  'use_dynamic_bsz': True,
+[36m(TaskRunner pid=2699)[0m                                  'use_fused_kernels': False,
+[36m(TaskRunner pid=2699)[0m                                  'use_kl_loss': False,
+[36m(TaskRunner pid=2699)[0m                                  'use_remove_padding': False,
+[36m(TaskRunner pid=2699)[0m                                  'use_torch_compile': True},
+[36m(TaskRunner pid=2699)[0m                        'hybrid_engine': True,
+[36m(TaskRunner pid=2699)[0m                        'model': {'_target_': 'verl.workers.config.HFModelConfig',
+[36m(TaskRunner pid=2699)[0m                                  'custom_chat_template': None,
+[36m(TaskRunner pid=2699)[0m                                  'enable_activation_offload': False,
+[36m(TaskRunner pid=2699)[0m                                  'enable_gradient_checkpointing': True,
+[36m(TaskRunner pid=2699)[0m                                  'exclude_modules': None,
+[36m(TaskRunner pid=2699)[0m                                  'external_lib': None,
+[36m(TaskRunner pid=2699)[0m                                  'fused_kernel_options': {'impl_backend': 'torch'},
+[36m(TaskRunner pid=2699)[0m                                  'hf_config_path': None,
+[36m(TaskRunner pid=2699)[0m                                  'lora_adapter_path': None,
+[36m(TaskRunner pid=2699)[0m                                  'lora_alpha': 16,
+[36m(TaskRunner pid=2699)[0m                                  'lora_rank': 0,
+[36m(TaskRunner pid=2699)[0m                                  'override_config': {'attn_implementation': 'sdpa'},
+[36m(TaskRunner pid=2699)[0m                                  'path': 'Qwen/Qwen2.5-3B-Instruct',
+[36m(TaskRunner pid=2699)[0m                                  'target_modules': 'all-linear',
+[36m(TaskRunner pid=2699)[0m                                  'tokenizer_path': None,
+[36m(TaskRunner pid=2699)[0m                                  'trust_remote_code': False,
+[36m(TaskRunner pid=2699)[0m                                  'use_fused_kernels': False,
+[36m(TaskRunner pid=2699)[0m                                  'use_liger': False,
+[36m(TaskRunner pid=2699)[0m                                  'use_remove_padding': False,
+[36m(TaskRunner pid=2699)[0m                                  'use_shm': False},
+[36m(TaskRunner pid=2699)[0m                        'nccl_timeout': 600,
+[36m(TaskRunner pid=2699)[0m                        'ref': {'_target_': 'verl.workers.config.FSDPActorConfig',
+[36m(TaskRunner pid=2699)[0m                                'entropy_checkpointing': False,
+[36m(TaskRunner pid=2699)[0m                                'entropy_from_logits_with_chunking': False,
+[36m(TaskRunner pid=2699)[0m                                'fsdp_config': {'_target_': 'verl.workers.config.FSDPEngineConfig',
+[36m(TaskRunner pid=2699)[0m                                                'dtype': 'bfloat16',
+[36m(TaskRunner pid=2699)[0m                                                'entropy_checkpointing': False,
+[36m(TaskRunner pid=2699)[0m                                                'entropy_from_logits_with_chunking': False,
+[36m(TaskRunner pid=2699)[0m                                                'forward_only': True,
+[36m(TaskRunner pid=2699)[0m                                                'forward_prefetch': False,
+[36m(TaskRunner pid=2699)[0m                                                'fsdp_size': -1,
+[36m(TaskRunner pid=2699)[0m                                                'full_determinism': False,
+[36m(TaskRunner pid=2699)[0m                                                'model_dtype': 'fp32',
+[36m(TaskRunner pid=2699)[0m                                                'offload_policy': False,
+[36m(TaskRunner pid=2699)[0m                                                'optimizer_offload': False,
+[36m(TaskRunner pid=2699)[0m                                                'param_offload': False,
+[36m(TaskRunner pid=2699)[0m                                                'reshard_after_forward': True,
+[36m(TaskRunner pid=2699)[0m                                                'seed': 42,
+[36m(TaskRunner pid=2699)[0m                                                'strategy': 'fsdp',
+[36m(TaskRunner pid=2699)[0m                                                'ulysses_sequence_parallel_size': 1,
+[36m(TaskRunner pid=2699)[0m                                                'use_orig_params': False,
+[36m(TaskRunner pid=2699)[0m                                                'use_torch_compile': True,
+[36m(TaskRunner pid=2699)[0m                                                'wrap_policy': {'min_num_params': 0}},
+[36m(TaskRunner pid=2699)[0m                                'log_prob_max_token_len_per_gpu': 18432,
+[36m(TaskRunner pid=2699)[0m                                'log_prob_micro_batch_size': None,
+[36m(TaskRunner pid=2699)[0m                                'log_prob_micro_batch_size_per_gpu': None,
+[36m(TaskRunner pid=2699)[0m                                'log_prob_use_dynamic_bsz': True,
+[36m(TaskRunner pid=2699)[0m                                'override_config': {'attn_implementation': 'sdpa'},
+[36m(TaskRunner pid=2699)[0m                                'profiler': {'_target_': 'verl.utils.profiler.ProfilerConfig',
+[36m(TaskRunner pid=2699)[0m                                             'all_ranks': False,
+[36m(TaskRunner pid=2699)[0m                                             'enable': False,
+[36m(TaskRunner pid=2699)[0m                                             'ranks': [],
+[36m(TaskRunner pid=2699)[0m                                             'save_path': 'outputs/profile',
+[36m(TaskRunner pid=2699)[0m                                             'tool': None,
+[36m(TaskRunner pid=2699)[0m                                             'tool_config': {'npu': {'_target_': 'verl.utils.profiler.config.NPUToolConfig',
+[36m(TaskRunner pid=2699)[0m                                                                     'analysis': True,
+[36m(TaskRunner pid=2699)[0m                                                                     'contents': [],
+[36m(TaskRunner pid=2699)[0m                                                                     'discrete': False,
+[36m(TaskRunner pid=2699)[0m                                                                     'level': 'level0'},
+[36m(TaskRunner pid=2699)[0m                                                             'nsys': {'_target_': 'verl.utils.profiler.config.NsightToolConfig',
+[36m(TaskRunner pid=2699)[0m                                                                      'discrete': False},
+[36m(TaskRunner pid=2699)[0m                                                             'torch': {'_target_': 'verl.utils.profiler.config.TorchProfilerToolConfig',
+[36m(TaskRunner pid=2699)[0m                                                                       'step_end': None,
+[36m(TaskRunner pid=2699)[0m                                                                       'step_start': 0},
+[36m(TaskRunner pid=2699)[0m                                                             'torch_memory': {'_target_': 'verl.utils.profiler.config.TorchMemoryToolConfig',
+[36m(TaskRunner pid=2699)[0m                                                                              'stack_depth': 32,
+[36m(TaskRunner pid=2699)[0m                                                                              'trace_alloc_max_entries': 100000}}},
+[36m(TaskRunner pid=2699)[0m                                'rollout_n': 4,
+[36m(TaskRunner pid=2699)[0m                                'router_replay': {'_target_': 'verl.workers.config.RouterReplayConfig',
+[36m(TaskRunner pid=2699)[0m                                                  'mode': 'disabled',
+[36m(TaskRunner pid=2699)[0m                                                  'record_file': None,
+[36m(TaskRunner pid=2699)[0m                                                  'replay_file': None},
+[36m(TaskRunner pid=2699)[0m                                'strategy': 'fsdp',
+[36m(TaskRunner pid=2699)[0m                                'ulysses_sequence_parallel_size': 1,
+[36m(TaskRunner pid=2699)[0m                                'use_torch_compile': True},
+[36m(TaskRunner pid=2699)[0m                        'rollout': {'_target_': 'verl.workers.config.RolloutConfig',
+[36m(TaskRunner pid=2699)[0m                                    'agent': {'_target_': 'verl.workers.config.AgentLoopConfig',
+[36m(TaskRunner pid=2699)[0m                                              'agent_loop_config_path': None,
+[36m(TaskRunner pid=2699)[0m                                              'custom_async_server': {'_target_': 'verl.workers.config.CustomAsyncServerConfig',
+[36m(TaskRunner pid=2699)[0m                                                                      'name': None,
+[36m(TaskRunner pid=2699)[0m                                                                      'path': None},
+[36m(TaskRunner pid=2699)[0m                                              'default_agent_loop': 'single_turn_agent',
+[36m(TaskRunner pid=2699)[0m                                              'num_workers': 8},
+[36m(TaskRunner pid=2699)[0m                                    'calculate_log_probs': False,
+[36m(TaskRunner pid=2699)[0m                                    'cudagraph_capture_sizes': None,
+[36m(TaskRunner pid=2699)[0m                                    'data_parallel_size': 1,
+[36m(TaskRunner pid=2699)[0m                                    'disable_log_stats': True,
+[36m(TaskRunner pid=2699)[0m                                    'do_sample': True,
+[36m(TaskRunner pid=2699)[0m                                    'dtype': 'bfloat16',
+[36m(TaskRunner pid=2699)[0m                                    'enable_chunked_prefill': True,
+[36m(TaskRunner pid=2699)[0m                                    'enable_prefix_caching': True,
+[36m(TaskRunner pid=2699)[0m                                    'enable_rollout_routing_replay': False,
+[36m(TaskRunner pid=2699)[0m                                    'enforce_eager': False,
+[36m(TaskRunner pid=2699)[0m                                    'engine_kwargs': {'sglang': {}, 'vllm': {}},
+[36m(TaskRunner pid=2699)[0m                                    'expert_parallel_size': 1,
+[36m(TaskRunner pid=2699)[0m                                    'free_cache_engine': True,
+[36m(TaskRunner pid=2699)[0m                                    'gpu_memory_utilization': 0.6,
+[36m(TaskRunner pid=2699)[0m                                    'ignore_eos': False,
+[36m(TaskRunner pid=2699)[0m                                    'layered_summon': False,
+[36m(TaskRunner pid=2699)[0m                                    'load_format': 'dummy',
+[36m(TaskRunner pid=2699)[0m                                    'log_prob_max_token_len_per_gpu': 18432,
+[36m(TaskRunner pid=2699)[0m                                    'log_prob_micro_batch_size': None,
+[36m(TaskRunner pid=2699)[0m                                    'log_prob_micro_batch_size_per_gpu': None,
+[36m(TaskRunner pid=2699)[0m                                    'log_prob_use_dynamic_bsz': True,
+[36m(TaskRunner pid=2699)[0m                                    'max_model_len': None,
+[36m(TaskRunner pid=2699)[0m                                    'max_num_batched_tokens': 6144,
+[36m(TaskRunner pid=2699)[0m                                    'max_num_seqs': 1024,
+[36m(TaskRunner pid=2699)[0m                                    'mode': 'async',
+[36m(TaskRunner pid=2699)[0m                                    'multi_stage_wake_up': False,
+[36m(TaskRunner pid=2699)[0m                                    'multi_turn': {'_target_': 'verl.workers.config.MultiTurnConfig',
+[36m(TaskRunner pid=2699)[0m                                                   'enable': False,
+[36m(TaskRunner pid=2699)[0m                                                   'format': 'hermes',
+[36m(TaskRunner pid=2699)[0m                                                   'interaction_config_path': None,
+[36m(TaskRunner pid=2699)[0m                                                   'max_assistant_turns': None,
+[36m(TaskRunner pid=2699)[0m                                                   'max_parallel_calls': 1,
+[36m(TaskRunner pid=2699)[0m                                                   'max_tool_response_length': 256,
+[36m(TaskRunner pid=2699)[0m                                                   'max_user_turns': None,
+[36m(TaskRunner pid=2699)[0m                                                   'num_repeat_rollouts': None,
+[36m(TaskRunner pid=2699)[0m                                                   'tokenization_sanity_check_mode': 'strict',
+[36m(TaskRunner pid=2699)[0m                                                   'tool_config_path': None,
+[36m(TaskRunner pid=2699)[0m                                                   'tool_response_truncate_side': 'middle',
+[36m(TaskRunner pid=2699)[0m                                                   'use_inference_chat_template': False},
+[36m(TaskRunner pid=2699)[0m                                    'n': 4,
+[36m(TaskRunner pid=2699)[0m                                    'name': 'vllm',
+[36m(TaskRunner pid=2699)[0m                                    'over_sample_rate': 0,
+[36m(TaskRunner pid=2699)[0m                                    'pipeline_model_parallel_size': 1,
+[36m(TaskRunner pid=2699)[0m                                    'profiler': {'_target_': 'verl.utils.profiler.ProfilerConfig',
+[36m(TaskRunner pid=2699)[0m                                                 'all_ranks': False,
+[36m(TaskRunner pid=2699)[0m                                                 'enable': False,
+[36m(TaskRunner pid=2699)[0m                                                 'ranks': [],
+[36m(TaskRunner pid=2699)[0m                                                 'save_path': 'outputs/profile',
+[36m(TaskRunner pid=2699)[0m                                                 'tool': None,
+[36m(TaskRunner pid=2699)[0m                                                 'tool_config': {'npu': {'_target_': 'verl.utils.profiler.config.NPUToolConfig',
+[36m(TaskRunner pid=2699)[0m                                                                         'analysis': True,
+[36m(TaskRunner pid=2699)[0m                                                                         'contents': [],
+[36m(TaskRunner pid=2699)[0m                                                                         'discrete': False,
+[36m(TaskRunner pid=2699)[0m                                                                         'level': 'level0'},
+[36m(TaskRunner pid=2699)[0m                                                                 'nsys': {'_target_': 'verl.utils.profiler.config.NsightToolConfig',
+[36m(TaskRunner pid=2699)[0m                                                                          'discrete': False},
+[36m(TaskRunner pid=2699)[0m                                                                 'torch': {'_target_': 'verl.utils.profiler.config.TorchProfilerToolConfig',
+[36m(TaskRunner pid=2699)[0m                                                                           'step_end': None,
+[36m(TaskRunner pid=2699)[0m                                                                           'step_start': 0},
+[36m(TaskRunner pid=2699)[0m                                                                 'torch_memory': {'_target_': 'verl.utils.profiler.config.TorchMemoryToolConfig',
+[36m(TaskRunner pid=2699)[0m                                                                                  'stack_depth': 32,
+[36m(TaskRunner pid=2699)[0m                                                                                  'trace_alloc_max_entries': 100000}}},
+[36m(TaskRunner pid=2699)[0m                                    'prometheus': {'_target_': 'verl.workers.config.PrometheusConfig',
+[36m(TaskRunner pid=2699)[0m                                                   'enable': False,
+[36m(TaskRunner pid=2699)[0m                                                   'file': '/tmp/ray/session_latest/metrics/prometheus/prometheus.yml',
+[36m(TaskRunner pid=2699)[0m                                                   'port': 9090,
+[36m(TaskRunner pid=2699)[0m                                                   'served_model_name': 'Qwen/Qwen2.5-3B-Instruct'},
+[36m(TaskRunner pid=2699)[0m                                    'prompt_length': 2048,
+[36m(TaskRunner pid=2699)[0m                                    'quantization': None,
+[36m(TaskRunner pid=2699)[0m                                    'quantization_config_file': None,
+[36m(TaskRunner pid=2699)[0m                                    'response_length': 4096,
+[36m(TaskRunner pid=2699)[0m                                    'skip_dump_dir': '/tmp/rollout_dump',
+[36m(TaskRunner pid=2699)[0m                                    'skip_rollout': False,
+[36m(TaskRunner pid=2699)[0m                                    'skip_tokenizer_init': True,
+[36m(TaskRunner pid=2699)[0m                                    'temperature': 1.0,
+[36m(TaskRunner pid=2699)[0m                                    'tensor_model_parallel_size': 1,
+[36m(TaskRunner pid=2699)[0m                                    'top_k': -1,
+[36m(TaskRunner pid=2699)[0m                                    'top_p': 1.0,
+[36m(TaskRunner pid=2699)[0m                                    'trace': {'_target_': 'verl.workers.config.TraceConfig',
+[36m(TaskRunner pid=2699)[0m                                              'backend': None,
+[36m(TaskRunner pid=2699)[0m                                              'max_samples_per_step_per_worker': None,
+[36m(TaskRunner pid=2699)[0m                                              'token2text': False},
+[36m(TaskRunner pid=2699)[0m                                    'update_weights_bucket_megabytes': 512,
+[36m(TaskRunner pid=2699)[0m                                    'val_kwargs': {'_target_': 'verl.workers.config.SamplingConfig',
+[36m(TaskRunner pid=2699)[0m                                                   'do_sample': True,
+[36m(TaskRunner pid=2699)[0m                                                   'n': 1,
+[36m(TaskRunner pid=2699)[0m                                                   'temperature': 1.0,
+[36m(TaskRunner pid=2699)[0m                                                   'top_k': -1,
+[36m(TaskRunner pid=2699)[0m                                                   'top_p': 0.7}}},
+[36m(TaskRunner pid=2699)[0m  'algorithm': {'_target_': 'verl.trainer.config.AlgoConfig',
+[36m(TaskRunner pid=2699)[0m                'adv_estimator': 'grpo',
+[36m(TaskRunner pid=2699)[0m                'gamma': 1.0,
+[36m(TaskRunner pid=2699)[0m                'kl_ctrl': {'_target_': 'verl.trainer.config.KLControlConfig',
+[36m(TaskRunner pid=2699)[0m                            'horizon': 10000,
+[36m(TaskRunner pid=2699)[0m                            'kl_coef': 0.0,
+[36m(TaskRunner pid=2699)[0m                            'target_kl': 0.1,
+[36m(TaskRunner pid=2699)[0m                            'type': 'fixed'},
+[36m(TaskRunner pid=2699)[0m                'kl_penalty': 'kl',
+[36m(TaskRunner pid=2699)[0m                'lam': 1.0,
+[36m(TaskRunner pid=2699)[0m                'norm_adv_by_std_in_grpo': True,
+[36m(TaskRunner pid=2699)[0m                'pf_ppo': {'reweight_method': 'pow', 'weight_pow': 2.0},
+[36m(TaskRunner pid=2699)[0m                'rollout_correction': {'bypass_mode': False,
+[36m(TaskRunner pid=2699)[0m                                       'loss_type': 'ppo_clip',
+[36m(TaskRunner pid=2699)[0m                                       'rollout_is': None,
+[36m(TaskRunner pid=2699)[0m                                       'rollout_is_batch_normalize': False,
+[36m(TaskRunner pid=2699)[0m                                       'rollout_is_threshold': 2.0,
+[36m(TaskRunner pid=2699)[0m                                       'rollout_rs': None,
+[36m(TaskRunner pid=2699)[0m                                       'rollout_rs_threshold': None,
+[36m(TaskRunner pid=2699)[0m                                       'rollout_rs_threshold_lower': None,
+[36m(TaskRunner pid=2699)[0m                                       'rollout_token_veto_threshold': None},
+[36m(TaskRunner pid=2699)[0m                'use_kl_in_reward': False,
+[36m(TaskRunner pid=2699)[0m                'use_pf_ppo': False},
+[36m(TaskRunner pid=2699)[0m  'critic': {'_target_': 'verl.workers.config.FSDPCriticConfig',
+[36m(TaskRunner pid=2699)[0m             'checkpoint': {'_target_': 'verl.trainer.config.CheckpointConfig',
+[36m(TaskRunner pid=2699)[0m                            'async_save': False,
+[36m(TaskRunner pid=2699)[0m                            'load_contents': ['model', 'optimizer', 'extra'],
+[36m(TaskRunner pid=2699)[0m                            'save_contents': ['model', 'optimizer', 'extra']},
+[36m(TaskRunner pid=2699)[0m             'cliprange_value': 0.5,
+[36m(TaskRunner pid=2699)[0m             'data_loader_seed': 42,
+[36m(TaskRunner pid=2699)[0m             'enable': None,
+[36m(TaskRunner pid=2699)[0m             'forward_max_token_len_per_gpu': 32768,
+[36m(TaskRunner pid=2699)[0m             'forward_micro_batch_size': None,
+[36m(TaskRunner pid=2699)[0m             'forward_micro_batch_size_per_gpu': None,
+[36m(TaskRunner pid=2699)[0m             'grad_clip': 1.0,
+[36m(TaskRunner pid=2699)[0m             'loss_agg_mode': 'seq-mean-token-mean',
+[36m(TaskRunner pid=2699)[0m             'model': {'_target_': 'verl.workers.config.FSDPCriticModelCfg',
+[36m(TaskRunner pid=2699)[0m                       'enable_activation_offload': False,
+[36m(TaskRunner pid=2699)[0m                       'enable_gradient_checkpointing': True,
+[36m(TaskRunner pid=2699)[0m                       'external_lib': None,
+[36m(TaskRunner pid=2699)[0m                       'fsdp_config': {'_target_': 'verl.workers.config.FSDPEngineConfig',
+[36m(TaskRunner pid=2699)[0m                                       'dtype': 'bfloat16',
+[36m(TaskRunner pid=2699)[0m                                       'entropy_checkpointing': False,
+[36m(TaskRunner pid=2699)[0m                                       'entropy_from_logits_with_chunking': False,
+[36m(TaskRunner pid=2699)[0m                                       'forward_only': False,
+[36m(TaskRunner pid=2699)[0m                                       'forward_prefetch': False,
+[36m(TaskRunner pid=2699)[0m                                       'fsdp_size': -1,
+[36m(TaskRunner pid=2699)[0m                                       'full_determinism': False,
+[36m(TaskRunner pid=2699)[0m                                       'model_dtype': 'fp32',
+[36m(TaskRunner pid=2699)[0m                                       'offload_policy': False,
+[36m(TaskRunner pid=2699)[0m                                       'optimizer_offload': False,
+[36m(TaskRunner pid=2699)[0m                                       'param_offload': False,
+[36m(TaskRunner pid=2699)[0m                                       'reshard_after_forward': True,
+[36m(TaskRunner pid=2699)[0m                                       'seed': 42,
+[36m(TaskRunner pid=2699)[0m                                       'strategy': 'fsdp',
+[36m(TaskRunner pid=2699)[0m                                       'ulysses_sequence_parallel_size': 1,
+[36m(TaskRunner pid=2699)[0m                                       'use_orig_params': False,
+[36m(TaskRunner pid=2699)[0m                                       'use_torch_compile': True,
+[36m(TaskRunner pid=2699)[0m                                       'wrap_policy': {'min_num_params': 0}},
+[36m(TaskRunner pid=2699)[0m                       'lora_alpha': 16,
+[36m(TaskRunner pid=2699)[0m                       'lora_rank': 0,
+[36m(TaskRunner pid=2699)[0m                       'override_config': {},
+[36m(TaskRunner pid=2699)[0m                       'path': '~/models/deepseek-llm-7b-chat',
+[36m(TaskRunner pid=2699)[0m                       'target_modules': 'all-linear',
+[36m(TaskRunner pid=2699)[0m                       'tokenizer_path': 'Qwen/Qwen2.5-3B-Instruct',
+[36m(TaskRunner pid=2699)[0m                       'trust_remote_code': False,
+[36m(TaskRunner pid=2699)[0m                       'use_remove_padding': False,
+[36m(TaskRunner pid=2699)[0m                       'use_shm': False},
+[36m(TaskRunner pid=2699)[0m             'optim': {'_target_': 'verl.workers.config.FSDPOptimizerConfig',
+[36m(TaskRunner pid=2699)[0m                       'betas': [0.9, 0.999],
+[36m(TaskRunner pid=2699)[0m                       'clip_grad': 1.0,
+[36m(TaskRunner pid=2699)[0m                       'lr': 1e-05,
+[36m(TaskRunner pid=2699)[0m                       'lr_scheduler_type': 'constant',
+[36m(TaskRunner pid=2699)[0m                       'lr_warmup_steps': -1,
+[36m(TaskRunner pid=2699)[0m                       'lr_warmup_steps_ratio': 0.0,
+[36m(TaskRunner pid=2699)[0m                       'min_lr_ratio': 0.0,
+[36m(TaskRunner pid=2699)[0m                       'num_cycles': 0.5,
+[36m(TaskRunner pid=2699)[0m                       'optimizer': 'AdamW',
+[36m(TaskRunner pid=2699)[0m                       'optimizer_impl': 'torch.optim',
+[36m(TaskRunner pid=2699)[0m                       'override_optimizer_config': None,
+[36m(TaskRunner pid=2699)[0m                       'total_training_steps': -1,
+[36m(TaskRunner pid=2699)[0m                       'warmup_style': None,
+[36m(TaskRunner pid=2699)[0m                       'weight_decay': 0.01},
+[36m(TaskRunner pid=2699)[0m             'ppo_epochs': 1,
+[36m(TaskRunner pid=2699)[0m             'ppo_max_token_len_per_gpu': 32768,
+[36m(TaskRunner pid=2699)[0m             'ppo_micro_batch_size': None,
+[36m(TaskRunner pid=2699)[0m             'ppo_micro_batch_size_per_gpu': None,
+[36m(TaskRunner pid=2699)[0m             'ppo_mini_batch_size': 16,
+[36m(TaskRunner pid=2699)[0m             'profiler': {'_target_': 'verl.utils.profiler.ProfilerConfig',
+[36m(TaskRunner pid=2699)[0m                          'all_ranks': False,
+[36m(TaskRunner pid=2699)[0m                          'enable': False,
+[36m(TaskRunner pid=2699)[0m                          'ranks': [],
+[36m(TaskRunner pid=2699)[0m                          'save_path': 'outputs/profile',
+[36m(TaskRunner pid=2699)[0m                          'tool': None,
+[36m(TaskRunner pid=2699)[0m                          'tool_config': {'npu': {'_target_': 'verl.utils.profiler.config.NPUToolConfig',
+[36m(TaskRunner pid=2699)[0m                                                  'analysis': True,
+[36m(TaskRunner pid=2699)[0m                                                  'contents': [],
+[36m(TaskRunner pid=2699)[0m                                                  'discrete': False,
+[36m(TaskRunner pid=2699)[0m                                                  'level': 'level0'},
+[36m(TaskRunner pid=2699)[0m                                          'nsys': {'_target_': 'verl.utils.profiler.config.NsightToolConfig',
+[36m(TaskRunner pid=2699)[0m                                                   'discrete': False},
+[36m(TaskRunner pid=2699)[0m                                          'torch': {'_target_': 'verl.utils.profiler.config.TorchProfilerToolConfig',
+[36m(TaskRunner pid=2699)[0m                                                    'step_end': None,
+[36m(TaskRunner pid=2699)[0m                                                    'step_start': 0},
+[36m(TaskRunner pid=2699)[0m                                          'torch_memory': {'_target_': 'verl.utils.profiler.config.TorchMemoryToolConfig',
+[36m(TaskRunner pid=2699)[0m                                                           'stack_depth': 32,
+[36m(TaskRunner pid=2699)[0m                                                           'trace_alloc_max_entries': 100000}}},
+[36m(TaskRunner pid=2699)[0m             'rollout_n': 4,
+[36m(TaskRunner pid=2699)[0m             'shuffle': False,
+[36m(TaskRunner pid=2699)[0m             'strategy': 'fsdp',
+[36m(TaskRunner pid=2699)[0m             'ulysses_sequence_parallel_size': 1,
+[36m(TaskRunner pid=2699)[0m             'use_dynamic_bsz': True},
+[36m(TaskRunner pid=2699)[0m  'custom_reward_function': {'name': 'compute_score', 'path': None},
+[36m(TaskRunner pid=2699)[0m  'data': {'apply_chat_template_kwargs': {},
+[36m(TaskRunner pid=2699)[0m           'custom_cls': {'name': None, 'path': None},
+[36m(TaskRunner pid=2699)[0m           'datagen': {'name': None, 'path': None},
+[36m(TaskRunner pid=2699)[0m           'dataloader_num_workers': 8,
+[36m(TaskRunner pid=2699)[0m           'filter_overlong_prompts': True,
+[36m(TaskRunner pid=2699)[0m           'filter_overlong_prompts_workers': 1,
+[36m(TaskRunner pid=2699)[0m           'image_key': 'images',
+[36m(TaskRunner pid=2699)[0m           'image_patch_size': 14,
+[36m(TaskRunner pid=2699)[0m           'max_prompt_length': 2048,
+[36m(TaskRunner pid=2699)[0m           'max_response_length': 4096,
+[36m(TaskRunner pid=2699)[0m           'prompt_key': 'prompt',
+[36m(TaskRunner pid=2699)[0m           'return_full_prompt': False,
+[36m(TaskRunner pid=2699)[0m           'return_multi_modal_inputs': True,
+[36m(TaskRunner pid=2699)[0m           'return_raw_chat': True,
+[36m(TaskRunner pid=2699)[0m           'return_raw_input_ids': False,
+[36m(TaskRunner pid=2699)[0m           'reward_fn_key': 'data_source',
+[36m(TaskRunner pid=2699)[0m           'sampler': {'class_name': None, 'class_path': None},
+[36m(TaskRunner pid=2699)[0m           'seed': None,
+[36m(TaskRunner pid=2699)[0m           'shuffle': True,
+[36m(TaskRunner pid=2699)[0m           'tokenizer': None,
+[36m(TaskRunner pid=2699)[0m           'tool_config_path': None,
+[36m(TaskRunner pid=2699)[0m           'train_batch_size': 64,
+[36m(TaskRunner pid=2699)[0m           'train_files': ['/app/data/gsm8k/train.parquet'],
+[36m(TaskRunner pid=2699)[0m           'train_max_samples': -1,
+[36m(TaskRunner pid=2699)[0m           'truncation': 'error',
+[36m(TaskRunner pid=2699)[0m           'trust_remote_code': False,
+[36m(TaskRunner pid=2699)[0m           'use_shm': False,
+[36m(TaskRunner pid=2699)[0m           'val_batch_size': None,
+[36m(TaskRunner pid=2699)[0m           'val_files': ['/app/data/gsm8k/test.parquet'],
+[36m(TaskRunner pid=2699)[0m           'val_max_samples': -1,
+[36m(TaskRunner pid=2699)[0m           'validation_shuffle': False,
+[36m(TaskRunner pid=2699)[0m           'video_key': 'videos'},
+[36m(TaskRunner pid=2699)[0m  'global_profiler': {'_target_': 'verl.utils.profiler.ProfilerConfig',
+[36m(TaskRunner pid=2699)[0m                      'global_tool_config': {'nsys': {'_target_': 'verl.utils.profiler.config.NsightToolConfig',
+[36m(TaskRunner pid=2699)[0m                                                      'controller_nsight_options': {'cuda-graph-trace': 'graph',
+[36m(TaskRunner pid=2699)[0m                                                                                    'cuda-memory-usage': 'true',
+[36m(TaskRunner pid=2699)[0m                                                                                    'trace': 'cuda,nvtx,cublas,ucx'},
+[36m(TaskRunner pid=2699)[0m                                                      'discrete': False,
+[36m(TaskRunner pid=2699)[0m                                                      'worker_nsight_options': {'capture-range': 'cudaProfilerApi',
+[36m(TaskRunner pid=2699)[0m                                                                                'capture-range-end': None,
+[36m(TaskRunner pid=2699)[0m                                                                                'cuda-graph-trace': 'graph',
+[36m(TaskRunner pid=2699)[0m                                                                                'cuda-memory-usage': 'true',
+[36m(TaskRunner pid=2699)[0m                                                                                'kill': 'none',
+[36m(TaskRunner pid=2699)[0m                                                                                'trace': 'cuda,nvtx,cublas,ucx'}},
+[36m(TaskRunner pid=2699)[0m                                             'torch_memory': {'context': 'all',
+[36m(TaskRunner pid=2699)[0m                                                              'kw_args': {},
+[36m(TaskRunner pid=2699)[0m                                                              'stack_depth': 32,
+[36m(TaskRunner pid=2699)[0m                                                              'stacks': 'all',
+[36m(TaskRunner pid=2699)[0m                                                              'trace_alloc_max_entries': 100000}},
+[36m(TaskRunner pid=2699)[0m                      'profile_continuous_steps': False,
+[36m(TaskRunner pid=2699)[0m                      'save_path': 'outputs/profile',
+[36m(TaskRunner pid=2699)[0m                      'steps': None,
+[36m(TaskRunner pid=2699)[0m                      'tool': None},
+[36m(TaskRunner pid=2699)[0m  'ray_kwargs': {'ray_init': {'num_cpus': None}, 'timeline_json_file': None},
+[36m(TaskRunner pid=2699)[0m  'reward_manager': {'_target_': 'verl.trainer.config.config.RewardManagerConfig',
+[36m(TaskRunner pid=2699)[0m                     'module': {'_target_': 'verl.trainer.config.config.ModuleConfig',
+[36m(TaskRunner pid=2699)[0m                                'name': 'custom_reward_manager',
+[36m(TaskRunner pid=2699)[0m                                'path': None},
+[36m(TaskRunner pid=2699)[0m                     'name': 'dapo',
+[36m(TaskRunner pid=2699)[0m                     'source': 'register'},
+[36m(TaskRunner pid=2699)[0m  'reward_model': {'enable': False,
+[36m(TaskRunner pid=2699)[0m                   'enable_resource_pool': False,
+[36m(TaskRunner pid=2699)[0m                   'forward_max_token_len_per_gpu': 32768,
+[36m(TaskRunner pid=2699)[0m                   'launch_reward_fn_async': False,
+[36m(TaskRunner pid=2699)[0m                   'max_length': None,
+[36m(TaskRunner pid=2699)[0m                   'micro_batch_size': None,
+[36m(TaskRunner pid=2699)[0m                   'micro_batch_size_per_gpu': None,
+[36m(TaskRunner pid=2699)[0m                   'model': {'external_lib': None,
+[36m(TaskRunner pid=2699)[0m                             'fsdp_config': {'_target_': 'verl.workers.config.FSDPEngineConfig',
+[36m(TaskRunner pid=2699)[0m                                             'forward_prefetch': False,
+[36m(TaskRunner pid=2699)[0m                                             'fsdp_size': -1,
+[36m(TaskRunner pid=2699)[0m                                             'param_offload': False,
+[36m(TaskRunner pid=2699)[0m                                             'reshard_after_forward': True,
+[36m(TaskRunner pid=2699)[0m                                             'wrap_policy': {'min_num_params': 0}},
+[36m(TaskRunner pid=2699)[0m                             'input_tokenizer': 'Qwen/Qwen2.5-3B-Instruct',
+[36m(TaskRunner pid=2699)[0m                             'override_config': {},
+[36m(TaskRunner pid=2699)[0m                             'path': '~/models/FsfairX-LLaMA3-RM-v0.1',
+[36m(TaskRunner pid=2699)[0m                             'trust_remote_code': False,
+[36m(TaskRunner pid=2699)[0m                             'use_fused_kernels': False,
+[36m(TaskRunner pid=2699)[0m                             'use_remove_padding': False,
+[36m(TaskRunner pid=2699)[0m                             'use_shm': False},
+[36m(TaskRunner pid=2699)[0m                   'n_gpus_per_node': 8,
+[36m(TaskRunner pid=2699)[0m                   'nnodes': 0,
+[36m(TaskRunner pid=2699)[0m                   'num_workers': 1,
+[36m(TaskRunner pid=2699)[0m                   'profiler': {'_target_': 'verl.utils.profiler.ProfilerConfig',
+[36m(TaskRunner pid=2699)[0m                                'all_ranks': False,
+[36m(TaskRunner pid=2699)[0m                                'enable': False,
+[36m(TaskRunner pid=2699)[0m                                'ranks': [],
+[36m(TaskRunner pid=2699)[0m                                'save_path': 'outputs/profile',
+[36m(TaskRunner pid=2699)[0m                                'tool': None,
+[36m(TaskRunner pid=2699)[0m                                'tool_config': {'npu': {'_target_': 'verl.utils.profiler.config.NPUToolConfig',
+[36m(TaskRunner pid=2699)[0m                                                        'analysis': True,
+[36m(TaskRunner pid=2699)[0m                                                        'contents': [],
+[36m(TaskRunner pid=2699)[0m                                                        'discrete': False,
+[36m(TaskRunner pid=2699)[0m                                                        'level': 'level0'},
+[36m(TaskRunner pid=2699)[0m                                                'nsys': {'_target_': 'verl.utils.profiler.config.NsightToolConfig',
+[36m(TaskRunner pid=2699)[0m                                                         'discrete': False},
+[36m(TaskRunner pid=2699)[0m                                                'torch': {'_target_': 'verl.utils.profiler.config.TorchProfilerToolConfig',
+[36m(TaskRunner pid=2699)[0m                                                          'step_end': None,
+[36m(TaskRunner pid=2699)[0m                                                          'step_start': 0},
+[36m(TaskRunner pid=2699)[0m                                                'torch_memory': {'_target_': 'verl.utils.profiler.config.TorchMemoryToolConfig',
+[36m(TaskRunner pid=2699)[0m                                                                 'stack_depth': 32,
+[36m(TaskRunner pid=2699)[0m                                                                 'trace_alloc_max_entries': 100000}}},
+[36m(TaskRunner pid=2699)[0m                   'reward_kwargs': {'max_resp_len': 4096,
+[36m(TaskRunner pid=2699)[0m                                     'overlong_buffer_cfg': {'enable': False,
+[36m(TaskRunner pid=2699)[0m                                                             'len': 4096,
+[36m(TaskRunner pid=2699)[0m                                                             'log': False,
+[36m(TaskRunner pid=2699)[0m                                                             'penalty_factor': 1.0}},
+[36m(TaskRunner pid=2699)[0m                   'reward_loop_class_name': None,
+[36m(TaskRunner pid=2699)[0m                   'reward_loop_module_path': None,
+[36m(TaskRunner pid=2699)[0m                   'reward_loop_source': 'register',
+[36m(TaskRunner pid=2699)[0m                   'reward_manager': 'dapo',
+[36m(TaskRunner pid=2699)[0m                   'rollout': {'_target_': 'verl.workers.config.RolloutConfig',
+[36m(TaskRunner pid=2699)[0m                               'cudagraph_capture_sizes': None,
+[36m(TaskRunner pid=2699)[0m                               'data_parallel_size': 1,
+[36m(TaskRunner pid=2699)[0m                               'disable_log_stats': True,
+[36m(TaskRunner pid=2699)[0m                               'dtype': 'bfloat16',
+[36m(TaskRunner pid=2699)[0m                               'enable_chunked_prefill': True,
+[36m(TaskRunner pid=2699)[0m                               'enable_prefix_caching': True,
+[36m(TaskRunner pid=2699)[0m                               'enforce_eager': True,
+[36m(TaskRunner pid=2699)[0m                               'engine_kwargs': {},
+[36m(TaskRunner pid=2699)[0m                               'expert_parallel_size': 1,
+[36m(TaskRunner pid=2699)[0m                               'free_cache_engine': True,
+[36m(TaskRunner pid=2699)[0m                               'gpu_memory_utilization': 0.5,
+[36m(TaskRunner pid=2699)[0m                               'limit_images': None,
+[36m(TaskRunner pid=2699)[0m                               'load_format': 'auto',
+[36m(TaskRunner pid=2699)[0m                               'max_model_len': None,
+[36m(TaskRunner pid=2699)[0m                               'max_num_batched_tokens': 8192,
+[36m(TaskRunner pid=2699)[0m                               'max_num_seqs': 1024,
+[36m(TaskRunner pid=2699)[0m                               'name': '???',
+[36m(TaskRunner pid=2699)[0m                               'prompt_length': 2048,
+[36m(TaskRunner pid=2699)[0m                               'response_length': 2048,
+[36m(TaskRunner pid=2699)[0m                               'skip_tokenizer_init': False,
+[36m(TaskRunner pid=2699)[0m                               'tensor_model_parallel_size': 2},
+[36m(TaskRunner pid=2699)[0m                   'sandbox_fusion': {'max_concurrent': 64,
+[36m(TaskRunner pid=2699)[0m                                      'memory_limit_mb': 1024,
+[36m(TaskRunner pid=2699)[0m                                      'url': None},
+[36m(TaskRunner pid=2699)[0m                   'strategy': 'fsdp',
+[36m(TaskRunner pid=2699)[0m                   'ulysses_sequence_parallel_size': 1,
+[36m(TaskRunner pid=2699)[0m                   'use_dynamic_bsz': True,
+[36m(TaskRunner pid=2699)[0m                   'use_reward_loop': True},
+[36m(TaskRunner pid=2699)[0m  'trainer': {'balance_batch': True,
+[36m(TaskRunner pid=2699)[0m              'critic_warmup': 0,
+[36m(TaskRunner pid=2699)[0m              'default_hdfs_dir': None,
+[36m(TaskRunner pid=2699)[0m              'default_local_dir': '/app/checkpoints/gspo/gspo-epslow-0.0003-epshigh-0.0004-Qwen2.5-3B-Instruct-RL',
+[36m(TaskRunner pid=2699)[0m              'del_local_ckpt_after_load': False,
+[36m(TaskRunner pid=2699)[0m              'device': 'cuda',
+[36m(TaskRunner pid=2699)[0m              'esi_redundant_time': 0,
+[36m(TaskRunner pid=2699)[0m              'experiment_name': 'gspo-epslow-0.0003-epshigh-0.0004-Qwen2.5-3B-Instruct-RL',
+[36m(TaskRunner pid=2699)[0m              'log_val_generations': 2,
+[36m(TaskRunner pid=2699)[0m              'logger': ['console'],
+[36m(TaskRunner pid=2699)[0m              'max_actor_ckpt_to_keep': None,
+[36m(TaskRunner pid=2699)[0m              'max_critic_ckpt_to_keep': None,
+[36m(TaskRunner pid=2699)[0m              'n_gpus_per_node': 1,
+[36m(TaskRunner pid=2699)[0m              'nnodes': 1,
+[36m(TaskRunner pid=2699)[0m              'project_name': 'RL-GSPO',
+[36m(TaskRunner pid=2699)[0m              'ray_wait_register_center_timeout': 300,
+[36m(TaskRunner pid=2699)[0m              'resume_from_path': None,
+[36m(TaskRunner pid=2699)[0m              'resume_mode': 'auto',
+[36m(TaskRunner pid=2699)[0m              'rollout_data_dir': None,
+[36m(TaskRunner pid=2699)[0m              'save_freq': 10,
+[36m(TaskRunner pid=2699)[0m              'test_freq': 10,
+[36m(TaskRunner pid=2699)[0m              'total_epochs': 1,
+[36m(TaskRunner pid=2699)[0m              'total_training_steps': 100,
+[36m(TaskRunner pid=2699)[0m              'use_legacy_worker_impl': 'auto',
+[36m(TaskRunner pid=2699)[0m              'val_before_train': False,
+[36m(TaskRunner pid=2699)[0m              'val_only': False,
+[36m(TaskRunner pid=2699)[0m              'validation_data_dir': None},
+[36m(TaskRunner pid=2699)[0m  'transfer_queue': {'enable': False}}
+[36m(TaskRunner pid=2699)[0m /app/verl/verl/trainer/main_ppo.py:307: UserWarning: Disabled critic as algorithm.adv_estimator != gae. If it is not intended, please set critic.enable=True
+[36m(TaskRunner pid=2699)[0m   use_critic=need_critic(config),
+[36m(TaskRunner pid=2699)[0m /app/verl/verl/utils/profiler/config.py:49: UserWarning: Torch profiler tool config is not fully supported now.
+[36m(TaskRunner pid=2699)[0m   warnings.warn("Torch profiler tool config is not fully supported now.", stacklevel=1)
+[36m(TaskRunner pid=2699)[0m [validate_config] All configuration checks passed successfully!
+[36m(TaskRunner pid=2699)[0m Using dataset class: RLHFDataset
+[36m(TaskRunner pid=2699)[0m Generating train split: 0 examples [00:00, ? examples/s]
+[36m(TaskRunner pid=2699)[0m Generating train split: 7473 examples [00:00, 128086.44 examples/s]
+[36m(TaskRunner pid=2699)[0m dataset len: 7473
+[36m(TaskRunner pid=2699)[0m Setting TOKENIZERS_PARALLELISM=false for forked processes.
+[36m(TaskRunner pid=2699)[0m WARNING:2025-12-24 07:59:06,543:Setting TOKENIZERS_PARALLELISM=false for forked processes.
+[36m(TaskRunner pid=2699)[0m Filtering prompts longer than 2048 tokens (num_proc=1):   0%|          | 0/7473 [00:00<?, ? examples/s]
+[36m(TaskRunner pid=2699)[0m Filtering prompts longer than 2048 tokens (num_proc=1):  13%|█▎        | 1000/7473 [00:01<00:07, 862.57 examples/s]
+[36m(TaskRunner pid=2699)[0m Filtering prompts longer than 2048 tokens (num_proc=1):  27%|██▋       | 2000/7473 [00:01<00:03, 1431.26 examples/s]
+[36m(TaskRunner pid=2699)[0m Filtering prompts longer than 2048 tokens (num_proc=1):  40%|████      | 3000/7473 [00:01<00:02, 1843.29 examples/s]
+[36m(TaskRunner pid=2699)[0m Filtering prompts longer than 2048 tokens (num_proc=1):  54%|█████▎    | 4000/7473 [00:02<00:01, 2112.11 examples/s]
+[36m(TaskRunner pid=2699)[0m Filtering prompts longer than 2048 tokens (num_proc=1):  67%|██████▋   | 5000/7473 [00:02<00:01, 2299.22 examples/s]
+[36m(TaskRunner pid=2699)[0m Filtering prompts longer than 2048 tokens (num_proc=1):  80%|████████  | 6000/7473 [00:03<00:00, 2402.20 examples/s]
+[36m(TaskRunner pid=2699)[0m Filtering prompts longer than 2048 tokens (num_proc=1):  94%|█████████▎| 7000/7473 [00:03<00:00, 2426.76 examples/s]
+[36m(TaskRunner pid=2699)[0m Filtering prompts longer than 2048 tokens (num_proc=1): 100%|██████████| 7473/7473 [00:03<00:00, 2447.91 examples/s]
+[36m(TaskRunner pid=2699)[0m Filtering prompts longer than 2048 tokens (num_proc=1): 100%|██████████| 7473/7473 [00:03<00:00, 2006.74 examples/s]
+[36m(TaskRunner pid=2699)[0m filter dataset len: 7473
+[36m(TaskRunner pid=2699)[0m Using dataset class: RLHFDataset
+[36m(TaskRunner pid=2699)[0m Generating train split: 0 examples [00:00, ? examples/s]Generating train split: 1319 examples [00:00, 71925.41 examples/s]
+[36m(TaskRunner pid=2699)[0m dataset len: 1319
+[36m(TaskRunner pid=2699)[0m Setting TOKENIZERS_PARALLELISM=false for forked processes.
+[36m(TaskRunner pid=2699)[0m WARNING:2025-12-24 07:59:10,650:Setting TOKENIZERS_PARALLELISM=false for forked processes.
+[36m(TaskRunner pid=2699)[0m Filtering prompts longer than 2048 tokens (num_proc=1):   0%|          | 0/1319 [00:00<?, ? examples/s]
+[36m(TaskRunner pid=2699)[0m Filtering prompts longer than 2048 tokens (num_proc=1):  76%|███████▌  | 1000/1319 [00:01<00:00, 863.73 examples/s]
+[36m(TaskRunner pid=2699)[0m Filtering prompts longer than 2048 tokens (num_proc=1): 100%|██████████| 1319/1319 [00:01<00:00, 1092.35 examples/s]
+[36m(TaskRunner pid=2699)[0m Filtering prompts longer than 2048 tokens (num_proc=1): 100%|██████████| 1319/1319 [00:01<00:00, 931.59 examples/s] 
+[36m(TaskRunner pid=2699)[0m /app/verl/verl/trainer/ppo/ray_trainer.py:335: UserWarning: Disabled critic as algorithm.adv_estimator != gae. If it is not intended, please set critic.enable=True
+[36m(TaskRunner pid=2699)[0m   self.use_critic = need_critic(self.config)
+[36m(TaskRunner pid=2699)[0m filter dataset len: 1319
+[36m(TaskRunner pid=2699)[0m Size of train dataloader: 116, Size of val dataloader: 1
+[36m(TaskRunner pid=2699)[0m Total training steps: 100
+[36m(TaskRunner pid=2699)[0m colocated worker base class <class 'verl.single_controller.base.worker.Worker'>
+[36m(TaskRunner pid=2699)[0m bind role actor_rollout method chat_completion to class <class 'verl.single_controller.ray.base.create_colocated_worker_cls.<locals>.WorkerDict'>
+[36m(TaskRunner pid=2699)[0m bind role actor_rollout method generate to class <class 'verl.single_controller.ray.base.create_colocated_worker_cls.<locals>.WorkerDict'>
+[36m(TaskRunner pid=2699)[0m bind role actor_rollout method get_zeromq_address to class <class 'verl.single_controller.ray.base.create_colocated_worker_cls.<locals>.WorkerDict'>
+[36m(TaskRunner pid=2699)[0m bind role actor_rollout method sleep to class <class 'verl.single_controller.ray.base.create_colocated_worker_cls.<locals>.WorkerDict'>
+[36m(TaskRunner pid=2699)[0m bind role actor_rollout method wake_up to class <class 'verl.single_controller.ray.base.create_colocated_worker_cls.<locals>.WorkerDict'>
+[36m(pid=3212)[0m /opt/conda/lib/python3.10/site-packages/megatron/core/distributed/fsdp/src/megatron_fsdp/utils.py:109: UserWarning: Transformer Engine and Apex are not installed. Falling back to local implementations of multi_tensor_applier and multi_tensor_scale
+[36m(pid=3212)[0m   warnings.warn(
+[36m(pid=3212)[0m WARNING:2025-12-24 07:59:20,767:fused_indices_to_multihot has reached end of life. Please migrate to a non-experimental function.
+[36m(pid=3212)[0m /opt/conda/lib/python3.10/site-packages/megatron/core/optimizer/__init__.py:22: UserWarning: Transformer Engine and Apex are not installed. Falling back to Torch optimizers.
+[36m(pid=3212)[0m   warnings.warn(
+[36m(pid=3212)[0m /opt/conda/lib/python3.10/site-packages/megatron/core/optimizer/optimizer.py:27: UserWarning: Transformer Engine and Apex are not installed. Falling back to local implementations of multi_tensor_applier and multi_tensor_scale
+[36m(pid=3212)[0m   warnings.warn(
+[36m(pid=3212)[0m /opt/conda/lib/python3.10/site-packages/megatron/core/optimizer/clip_grads.py:29: UserWarning: Transformer Engine and Apex are not installed. Falling back to local implementations of multi_tensor_applier, multi_tensor_l2norm, and multi_tensor_scale
+[36m(pid=3212)[0m   warnings.warn(
+[36m(pid=3212)[0m /opt/conda/lib/python3.10/site-packages/megatron/core/models/backends.py:21: UserWarning: Apex is not installed. Falling back to Torch Norm
+[36m(pid=3212)[0m   warnings.warn("Apex is not installed. Falling back to Torch Norm")
+[36m(pid=3212)[0m /opt/conda/lib/python3.10/site-packages/megatron/core/models/gpt/gpt_layer_specs.py:67: UserWarning: Apex is not installed. Falling back to Torch Norm
+[36m(pid=3212)[0m   warnings.warn("Apex is not installed. Falling back to Torch Norm")
+[36m(WorkerDict pid=3212)[0m [Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[36m(WorkerDict pid=3212)[0m Model config after override: Qwen2Config {
+[36m(WorkerDict pid=3212)[0m   "architectures": [
+[36m(WorkerDict pid=3212)[0m     "Qwen2ForCausalLM"
+[36m(WorkerDict pid=3212)[0m   ],
+[36m(WorkerDict pid=3212)[0m   "attention_dropout": 0.0,
+[36m(WorkerDict pid=3212)[0m   "attn_implementation": "sdpa",
+[36m(WorkerDict pid=3212)[0m   "dtype": "bfloat16",
+[36m(WorkerDict pid=3212)[0m   "eos_token_id": 151645,
+[36m(WorkerDict pid=3212)[0m   "hidden_act": "silu",
+[36m(WorkerDict pid=3212)[0m   "hidden_size": 2048,
+[36m(WorkerDict pid=3212)[0m   "initializer_range": 0.02,
+[36m(WorkerDict pid=3212)[0m   "intermediate_size": 11008,
+[36m(WorkerDict pid=3212)[0m   "layer_types": [
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention",
+[36m(WorkerDict pid=3212)[0m     "full_attention"
+[36m(WorkerDict pid=3212)[0m   ],
+[36m(WorkerDict pid=3212)[0m   "max_position_embeddings": 32768,
+[36m(WorkerDict pid=3212)[0m   "max_window_layers": 70,
+[36m(WorkerDict pid=3212)[0m   "model_type": "qwen2",
+[36m(WorkerDict pid=3212)[0m   "num_attention_heads": 16,
+[36m(WorkerDict pid=3212)[0m   "num_hidden_layers": 36,
+[36m(WorkerDict pid=3212)[0m   "num_key_value_heads": 2,
+[36m(WorkerDict pid=3212)[0m   "pad_token_id": 151643,
+[36m(WorkerDict pid=3212)[0m   "rms_norm_eps": 1e-06,
+[36m(WorkerDict pid=3212)[0m   "rope_scaling": null,
+[36m(WorkerDict pid=3212)[0m   "rope_theta": 1000000.0,
+[36m(WorkerDict pid=3212)[0m   "sliding_window": null,
+[36m(WorkerDict pid=3212)[0m   "tie_word_embeddings": true,
+[36m(WorkerDict pid=3212)[0m   "transformers_version": "4.57.3",
+[36m(WorkerDict pid=3212)[0m   "use_cache": true,
+[36m(WorkerDict pid=3212)[0m   "use_sliding_window": false,
+[36m(WorkerDict pid=3212)[0m   "vocab_size": 151936
+[36m(WorkerDict pid=3212)[0m }
+[36m(WorkerDict pid=3212)[0m 
+[36m(WorkerDict pid=3212)[0m `torch_dtype` is deprecated! Use `dtype` instead!
+[36m(WorkerDict pid=3212)[0m Fetching 2 files:   0%|          | 0/2 [00:00<?, ?it/s]
+[36m(WorkerDict pid=3212)[0m Fetching 2 files:  50%|█████     | 1/2 [00:51<00:51, 51.42s/it]Fetching 2 files: 100%|██████████| 2/2 [00:51<00:00, 25.71s/it]
+[36m(WorkerDict pid=3212)[0m Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]
+[36m(WorkerDict pid=3212)[0m Loading checkpoint shards:  50%|█████     | 1/2 [00:32<00:32, 32.32s/it]
+[36m(WorkerDict pid=3212)[0m Loading checkpoint shards: 100%|██████████| 2/2 [00:43<00:00, 19.74s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:43<00:00, 21.63s/it]
+[36m(WorkerDict pid=3212)[0m /opt/conda/lib/python3.10/site-packages/torch/distributed/fsdp/_init_utils.py:430: UserWarning: FSDP is switching to use `NO_SHARD` instead of ShardingStrategy.FULL_SHARD since the world size is 1.
+[36m(WorkerDict pid=3212)[0m   warnings.warn(
+[36m(WorkerDict pid=3212)[0m Skipping monkey patch for Qwen2ForCausalLM as use_fused_kernels is False or fused_kernels_backend is torch
+[36m(WorkerDict pid=3212)[0m Qwen2ForCausalLM contains 3.09B parameters
+[36m(WorkerDict pid=3212)[0m wrap_policy: functools.partial(<function _or_policy at 0x77e9eb71d120>, policies=[functools.partial(<function transformer_auto_wrap_policy at 0x77e9eb71d000>, transformer_layer_cls={<class 'transformers.models.qwen2.modeling_qwen2.Qwen2DecoderLayer'>})])
+[36m(WorkerDict pid=3212)[0m NCCL version 2.27.5+cuda12.9
+[36m(WorkerDict pid=3212)[0m /app/verl/verl/utils/profiler/config.py:49: UserWarning: Torch profiler tool config is not fully supported now.
+[36m(WorkerDict pid=3212)[0m   warnings.warn("Torch profiler tool config is not fully supported now.", stacklevel=1)
+[36m(WorkerDict pid=3212)[0m Total steps: 100, num_warmup_steps: 5
+[36m(WorkerDict pid=3212)[0m Actor use_remove_padding=False
+[36m(WorkerDict pid=3212)[0m Actor use_fused_kernels=False
+[36m(WorkerDict pid=3212)[0m [Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[36m(WorkerDict pid=3212)[0m [Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[36m(WorkerDict pid=3212)[0m [Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[36m(WorkerDict pid=3212)[0m /opt/conda/lib/python3.10/site-packages/torch/distributed/fsdp/fully_sharded_data_parallel.py:675: FutureWarning: FSDP.state_dict_type() and FSDP.set_state_dict_type() are being deprecated. Please use APIs, get_state_dict() and set_state_dict(), which can support different parallelisms, FSDP1, FSDP2, DDP. API doc: https://pytorch.org/docs/stable/distributed.checkpoint.html#torch.distributed.checkpoint.state_dict.get_state_dict .Tutorial: https://pytorch.org/tutorials/recipes/distributed_checkpoint_recipe.html .
+[36m(WorkerDict pid=3212)[0m   warnings.warn(
+[36m(TaskRunner pid=2699)[0m /app/verl/verl/utils/profiler/config.py:49: UserWarning: Torch profiler tool config is not fully supported now.
+[36m(TaskRunner pid=2699)[0m   warnings.warn("Torch profiler tool config is not fully supported now.", stacklevel=1)
+[36m(pid=3800)[0m W1224 08:01:22.081000 3800 site-packages/torch/utils/cpp_extension.py:117] No CUDA runtime is found, using CUDA_HOME='/usr/local/cuda'
+[36m(pid=3800)[0m /opt/conda/lib/python3.10/site-packages/megatron/core/distributed/fsdp/src/megatron_fsdp/utils.py:109: UserWarning: Transformer Engine and Apex are not installed. Falling back to local implementations of multi_tensor_applier and multi_tensor_scale
+[36m(pid=3800)[0m   warnings.warn(
+[36m(pid=3800)[0m WARNING:2025-12-24 08:01:22,133:fused_indices_to_multihot has reached end of life. Please migrate to a non-experimental function.
+[36m(pid=3800)[0m /opt/conda/lib/python3.10/site-packages/megatron/core/optimizer/__init__.py:22: UserWarning: Transformer Engine and Apex are not installed. Falling back to Torch optimizers.
+[36m(pid=3800)[0m   warnings.warn(
+[36m(pid=3800)[0m /opt/conda/lib/python3.10/site-packages/megatron/core/optimizer/optimizer.py:27: UserWarning: Transformer Engine and Apex are not installed. Falling back to local implementations of multi_tensor_applier and multi_tensor_scale
+[36m(pid=3800)[0m   warnings.warn(
+[36m(pid=3800)[0m /opt/conda/lib/python3.10/site-packages/megatron/core/optimizer/clip_grads.py:29: UserWarning: Transformer Engine and Apex are not installed. Falling back to local implementations of multi_tensor_applier, multi_tensor_l2norm, and multi_tensor_scale
+[36m(pid=3800)[0m   warnings.warn(
+[36m(pid=3800)[0m /opt/conda/lib/python3.10/site-packages/megatron/core/models/backends.py:21: UserWarning: Apex is not installed. Falling back to Torch Norm
+[36m(pid=3800)[0m   warnings.warn("Apex is not installed. Falling back to Torch Norm")
+[36m(pid=3800)[0m /opt/conda/lib/python3.10/site-packages/megatron/core/models/gpt/gpt_layer_specs.py:67: UserWarning: Apex is not installed. Falling back to Torch Norm
+[36m(pid=3800)[0m   warnings.warn("Apex is not installed. Falling back to Torch Norm")
+[36m(vLLMHttpServer pid=3800)[0m INFO:2025-12-24 08:01:27,466:vLLMHttpServer, replica_rank: 0, master address: 172.17.0.2, master port: 44027, data parallel master port: 43281
+[36m(vLLMHttpServer pid=3800)[0m INFO:2025-12-24 08:01:27,478:override_generation_config: {'temperature': 1.0, 'top_k': -1, 'top_p': 1.0, 'repetition_penalty': 1.0, 'max_new_tokens': 4096}
+[36m(vLLMHttpServer pid=3800)[0m INFO:2025-12-24 08:01:27,478:enable_sleep_mode: True
+[36m(vLLMHttpServer pid=3800)[0m Using blocking ray.get inside async actor. This blocks the event loop. Please use `await` on object ref with asyncio.gather if you want to yield execution to the event loop instead.
+[36m(vLLMHttpServer pid=3800)[0m INFO:2025-12-24 08:01:27,522:replica_rank=0, node_rank=0, nnodes=1, get worker zmq addresses: ['ipc:///tmp/verl_vllm_zmq_3212_root.ipc']
+[36m(vLLMHttpServer pid=3800)[0m ['serve',
+[36m(vLLMHttpServer pid=3800)[0m  'Qwen/Qwen2.5-3B-Instruct',
+[36m(vLLMHttpServer pid=3800)[0m  '--dtype',
+[36m(vLLMHttpServer pid=3800)[0m  'bfloat16',
+[36m(vLLMHttpServer pid=3800)[0m  '--load_format',
+[36m(vLLMHttpServer pid=3800)[0m  'dummy',
+[36m(vLLMHttpServer pid=3800)[0m  '--max_model_len',
+[36m(vLLMHttpServer pid=3800)[0m  '6144',
+[36m(vLLMHttpServer pid=3800)[0m  '--max_num_seqs',
+[36m(vLLMHttpServer pid=3800)[0m  '1024',
+[36m(vLLMHttpServer pid=3800)[0m  '--enable_chunked_prefill',
+[36m(vLLMHttpServer pid=3800)[0m  '--max_num_batched_tokens',
+[36m(vLLMHttpServer pid=3800)[0m  '6144',
+[36m(vLLMHttpServer pid=3800)[0m  '--enable_prefix_caching',
+[36m(vLLMHttpServer pid=3800)[0m  '--enable_sleep_mode',
+[36m(vLLMHttpServer pid=3800)[0m  '--disable_custom_all_reduce',
+[36m(vLLMHttpServer pid=3800)[0m  '--gpu_memory_utilization',
+[36m(vLLMHttpServer pid=3800)[0m  '0.6',
+[36m(vLLMHttpServer pid=3800)[0m  '--disable_log_stats',
+[36m(vLLMHttpServer pid=3800)[0m  '--tensor_parallel_size',
+[36m(vLLMHttpServer pid=3800)[0m  '1',
+[36m(vLLMHttpServer pid=3800)[0m  '--seed',
+[36m(vLLMHttpServer pid=3800)[0m  '0',
+[36m(vLLMHttpServer pid=3800)[0m  '--override_generation_config',
+[36m(vLLMHttpServer pid=3800)[0m  '{"temperature": 1.0, "top_k": -1, "top_p": 1.0, "repetition_penalty": 1.0, '
+[36m(vLLMHttpServer pid=3800)[0m  '"max_new_tokens": 4096}',
+[36m(vLLMHttpServer pid=3800)[0m  '--hf_overrides',
+[36m(vLLMHttpServer pid=3800)[0m  '{}']
+[36m(vLLMHttpServer pid=3800)[0m WARNING 12-24 08:01:37 [system_utils.py:103] We must use the `spawn` multiprocessing start method. Overriding VLLM_WORKER_MULTIPROC_METHOD to 'spawn'. See https://docs.vllm.ai/en/latest/usage/troubleshooting.html#python-multiprocessing for more information. Reasons: In a Ray actor and can only be spawned
+[36m(vLLMHttpServer pid=3800)[0m W1224 08:01:46.787000 3974 site-packages/torch/utils/cpp_extension.py:117] No CUDA runtime is found, using CUDA_HOME='/usr/local/cuda'
+[36m(vLLMHttpServer pid=3800)[0m /opt/conda/lib/python3.10/site-packages/megatron/core/distributed/fsdp/src/megatron_fsdp/utils.py:109: UserWarning: Transformer Engine and Apex are not installed. Falling back to local implementations of multi_tensor_applier and multi_tensor_scale
+[36m(vLLMHttpServer pid=3800)[0m   warnings.warn(
+[36m(vLLMHttpServer pid=3800)[0m [2025-12-24 08:01:46] INFO megatron_fsdp.py:33: Detected Megatron Core, using Megatron-FSDP with Megatron.
+[36m(vLLMHttpServer pid=3800)[0m [2025-12-24 08:01:46] INFO param_and_grad_buffer.py:55: Detected Megatron Core, using Megatron-FSDP with Megatron.
+[36m(vLLMHttpServer pid=3800)[0m [2025-12-24 08:01:46] WARNING utils.py:130: fused_indices_to_multihot has reached end of life. Please migrate to a non-experimental function.
+[36m(vLLMHttpServer pid=3800)[0m /opt/conda/lib/python3.10/site-packages/megatron/core/optimizer/__init__.py:22: UserWarning: Transformer Engine and Apex are not installed. Falling back to Torch optimizers.
+[36m(vLLMHttpServer pid=3800)[0m   warnings.warn(
+[36m(vLLMHttpServer pid=3800)[0m /opt/conda/lib/python3.10/site-packages/megatron/core/optimizer/optimizer.py:27: UserWarning: Transformer Engine and Apex are not installed. Falling back to local implementations of multi_tensor_applier and multi_tensor_scale
+[36m(vLLMHttpServer pid=3800)[0m   warnings.warn(
+[36m(vLLMHttpServer pid=3800)[0m /opt/conda/lib/python3.10/site-packages/megatron/core/optimizer/clip_grads.py:29: UserWarning: Transformer Engine and Apex are not installed. Falling back to local implementations of multi_tensor_applier, multi_tensor_l2norm, and multi_tensor_scale
+[36m(vLLMHttpServer pid=3800)[0m   warnings.warn(
+[36m(vLLMHttpServer pid=3800)[0m /opt/conda/lib/python3.10/site-packages/megatron/core/models/backends.py:21: UserWarning: Apex is not installed. Falling back to Torch Norm
+[36m(vLLMHttpServer pid=3800)[0m   warnings.warn("Apex is not installed. Falling back to Torch Norm")
+[36m(vLLMHttpServer pid=3800)[0m /opt/conda/lib/python3.10/site-packages/megatron/core/models/gpt/gpt_layer_specs.py:67: UserWarning: Apex is not installed. Falling back to Torch Norm
+[36m(vLLMHttpServer pid=3800)[0m   warnings.warn("Apex is not installed. Falling back to Torch Norm")
+[36m(WorkerDict pid=3212)[0m WARNING 12-24 08:01:48 [worker_base.py:301] Missing `shared_worker_lock` argument from executor. This argument is needed for mm_processor_cache_type='shm'.
+[36m(WorkerDict pid=3212)[0m [Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[36m(WorkerDict pid=3212)[0m [Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[36m(WorkerDict pid=3212)[0m [Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[36m(WorkerDict pid=3212)[0m [Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[36m(WorkerDict pid=3212)[0m [Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[36m(WorkerDict pid=3212)[0m [Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[36m(WorkerDict pid=3212)[0m ERROR:2025-12-24 08:01:49,713:vLLMAsyncRollout _loop_forever error: Free memory on device (10.94/23.52 GiB) on startup is less than desired GPU memory utilization (0.6, 14.11 GiB). Decrease GPU memory utilization or reduce GPU memory used by other processes.
+[36m(WorkerDict pid=3212)[0m Traceback (most recent call last):
+[36m(WorkerDict pid=3212)[0m   File "/app/verl/verl/workers/rollout/vllm_rollout/vllm_rollout.py", line 171, in _loop_forever
+[36m(WorkerDict pid=3212)[0m     result = await self._execute_method(method, *args, **kwargs)
+[36m(WorkerDict pid=3212)[0m   File "/app/verl/verl/workers/rollout/vllm_rollout/vllm_rollout.py", line 218, in _execute_method
+[36m(WorkerDict pid=3212)[0m     return self.inference_engine.execute_method(method, *args, **kwargs)
+[36m(WorkerDict pid=3212)[0m   File "/opt/conda/lib/python3.10/site-packages/vllm/v1/worker/worker_base.py", line 343, in execute_method
+[36m(WorkerDict pid=3212)[0m     raise e
+[36m(WorkerDict pid=3212)[0m   File "/opt/conda/lib/python3.10/site-packages/vllm/v1/worker/worker_base.py", line 332, in execute_method
+[36m(WorkerDict pid=3212)[0m     return run_method(self, method, args, kwargs)
+[36m(WorkerDict pid=3212)[0m   File "/opt/conda/lib/python3.10/site-packages/vllm/v1/serial_utils.py", line 479, in run_method
+[36m(WorkerDict pid=3212)[0m     return func(*args, **kwargs)
+[36m(WorkerDict pid=3212)[0m   File "/opt/conda/lib/python3.10/site-packages/vllm/v1/worker/worker_base.py", line 324, in init_device
+[36m(WorkerDict pid=3212)[0m     self.worker.init_device()  # type: ignore
+[36m(WorkerDict pid=3212)[0m   File "/opt/conda/lib/python3.10/site-packages/vllm/v1/worker/gpu_worker.py", line 247, in init_device
+[36m(WorkerDict pid=3212)[0m     raise ValueError(
+[36m(WorkerDict pid=3212)[0m ValueError: Free memory on device (10.94/23.52 GiB) on startup is less than desired GPU memory utilization (0.6, 14.11 GiB). Decrease GPU memory utilization or reduce GPU memory used by other processes.
+[36m(WorkerDict pid=3212)[0m ERROR 12-24 08:01:49 [worker_base.py:342] Error executing method 'init_device'. This might cause deadlock in distributed execution.
+[36m(WorkerDict pid=3212)[0m ERROR 12-24 08:01:49 [worker_base.py:342] Traceback (most recent call last):
+[36m(WorkerDict pid=3212)[0m ERROR 12-24 08:01:49 [worker_base.py:342]   File "/opt/conda/lib/python3.10/site-packages/vllm/v1/worker/worker_base.py", line 332, in execute_method
+[36m(WorkerDict pid=3212)[0m ERROR 12-24 08:01:49 [worker_base.py:342]     return run_method(self, method, args, kwargs)
+[36m(WorkerDict pid=3212)[0m ERROR 12-24 08:01:49 [worker_base.py:342]   File "/opt/conda/lib/python3.10/site-packages/vllm/v1/serial_utils.py", line 479, in run_method
+[36m(WorkerDict pid=3212)[0m ERROR 12-24 08:01:49 [worker_base.py:342]     return func(*args, **kwargs)
+[36m(WorkerDict pid=3212)[0m ERROR 12-24 08:01:49 [worker_base.py:342]   File "/opt/conda/lib/python3.10/site-packages/vllm/v1/worker/worker_base.py", line 324, in init_device
+[36m(WorkerDict pid=3212)[0m ERROR 12-24 08:01:49 [worker_base.py:342]     self.worker.init_device()  # type: ignore
+[36m(WorkerDict pid=3212)[0m ERROR 12-24 08:01:49 [worker_base.py:342]   File "/opt/conda/lib/python3.10/site-packages/vllm/v1/worker/gpu_worker.py", line 247, in init_device
+[36m(WorkerDict pid=3212)[0m ERROR 12-24 08:01:49 [worker_base.py:342]     raise ValueError(
+[36m(WorkerDict pid=3212)[0m ERROR 12-24 08:01:49 [worker_base.py:342] ValueError: Free memory on device (10.94/23.52 GiB) on startup is less than desired GPU memory utilization (0.6, 14.11 GiB). Decrease GPU memory utilization or reduce GPU memory used by other processes.
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m Process EngineCore_DP0:
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m   File "/opt/conda/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m     self.run()
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m   File "/opt/conda/lib/python3.10/multiprocessing/process.py", line 108, in run
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m     self._target(*self._args, **self._kwargs)
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m   File "/opt/conda/lib/python3.10/site-packages/vllm/v1/engine/core.py", line 846, in run_engine_core
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m   File "/opt/conda/lib/python3.10/site-packages/vllm/v1/engine/core.py", line 833, in run_engine_core
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m     engine_core = EngineCoreProc(*args, **kwargs)
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m   File "/opt/conda/lib/python3.10/site-packages/vllm/v1/engine/core.py", line 606, in __init__
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m     super().__init__(
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m   File "/opt/conda/lib/python3.10/site-packages/vllm/v1/engine/core.py", line 102, in __init__
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m     self.model_executor = executor_class(vllm_config)
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m   File "/opt/conda/lib/python3.10/site-packages/vllm/v1/executor/abstract.py", line 101, in __init__
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m     self._init_executor()
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m   File "/app/verl/verl/workers/rollout/vllm_rollout/vllm_async_server.py", line 105, in _init_executor
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m     self.collective_rpc("init_device")
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m   File "/app/verl/verl/workers/rollout/vllm_rollout/vllm_async_server.py", line 156, in collective_rpc
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m     raise output
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m ERROR 12-24 08:01:49 [core.py:842] EngineCore failed to start.
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m ERROR 12-24 08:01:49 [core.py:842]   File "/opt/conda/lib/python3.10/site-packages/vllm/v1/engine/core.py", line 833, in run_engine_core
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m ERROR 12-24 08:01:49 [core.py:842]     engine_core = EngineCoreProc(*args, **kwargs)
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m ERROR 12-24 08:01:49 [core.py:842]   File "/opt/conda/lib/python3.10/site-packages/vllm/v1/engine/core.py", line 606, in __init__
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m ERROR 12-24 08:01:49 [core.py:842]     super().__init__(
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m ERROR 12-24 08:01:49 [core.py:842]   File "/opt/conda/lib/python3.10/site-packages/vllm/v1/engine/core.py", line 102, in __init__
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m ERROR 12-24 08:01:49 [core.py:842]     self.model_executor = executor_class(vllm_config)
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m ERROR 12-24 08:01:49 [core.py:842]   File "/opt/conda/lib/python3.10/site-packages/vllm/v1/executor/abstract.py", line 101, in __init__
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m ERROR 12-24 08:01:49 [core.py:842]     self._init_executor()
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m ERROR 12-24 08:01:49 [core.py:842]   File "/app/verl/verl/workers/rollout/vllm_rollout/vllm_async_server.py", line 105, in _init_executor
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m ERROR 12-24 08:01:49 [core.py:842]     self.collective_rpc("init_device")
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m ERROR 12-24 08:01:49 [core.py:842]   File "/app/verl/verl/workers/rollout/vllm_rollout/vllm_async_server.py", line 156, in collective_rpc
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m ERROR 12-24 08:01:49 [core.py:842]     raise output
+Error executing job with overrides: ['algorithm.adv_estimator=grpo', 'actor_rollout_ref.actor.policy_loss.loss_mode=gspo', '+actor_rollout_ref.model.override_config.attn_implementation=sdpa', '+actor_rollout_ref.ref.override_config.attn_implementation=sdpa', "data.train_files=['/app/data/gsm8k/train.parquet']", "data.val_files=['/app/data/gsm8k/test.parquet']", 'data.shuffle=true', 'data.prompt_key=prompt', 'data.truncation=error', 'data.filter_overlong_prompts=true', 'data.return_raw_chat=True', 'data.train_batch_size=64', 'data.max_prompt_length=2048', 'data.max_response_length=4096', 'actor_rollout_ref.rollout.n=4', 'algorithm.use_kl_in_reward=false', 'algorithm.kl_ctrl.kl_coef=0.0', 'actor_rollout_ref.actor.use_kl_loss=false', 'actor_rollout_ref.actor.kl_loss_coef=0.0', 'actor_rollout_ref.actor.clip_ratio_low=0.0003', 'actor_rollout_ref.actor.clip_ratio_high=0.0004', 'actor_rollout_ref.model.use_remove_padding=false', 'actor_rollout_ref.actor.use_dynamic_bsz=true', 'actor_rollout_ref.ref.log_prob_use_dynamic_bsz=true', 'actor_rollout_ref.rollout.log_prob_use_dynamic_bsz=true', 'actor_rollout_ref.actor.ppo_max_token_len_per_gpu=12288', 'actor_rollout_ref.ref.log_prob_max_token_len_per_gpu=18432', 'actor_rollout_ref.rollout.log_prob_max_token_len_per_gpu=18432', 'actor_rollout_ref.rollout.name=vllm', 'actor_rollout_ref.rollout.mode=async', 'actor_rollout_ref.model.path=Qwen/Qwen2.5-3B-Instruct', 'actor_rollout_ref.model.enable_gradient_checkpointing=true', 'actor_rollout_ref.actor.optim.lr=1e-6', 'actor_rollout_ref.actor.optim.lr_warmup_steps_ratio=0.05', 'actor_rollout_ref.actor.optim.weight_decay=0.1', 'actor_rollout_ref.actor.ppo_mini_batch_size=16', 'actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=2', 'actor_rollout_ref.actor.fsdp_config.param_offload=false', 'actor_rollout_ref.actor.fsdp_config.optimizer_offload=false', 'actor_rollout_ref.actor.entropy_coeff=0', 'actor_rollout_ref.actor.grad_clip=1.0', 'actor_rollout_ref.actor.loss_agg_mode=seq-mean-token-mean', 'actor_rollout_ref.actor.ulysses_sequence_parallel_size=1', 'actor_rollout_ref.rollout.gpu_memory_utilization=0.6', 'actor_rollout_ref.rollout.tensor_model_parallel_size=1', 'actor_rollout_ref.rollout.enable_chunked_prefill=true', 'actor_rollout_ref.rollout.max_num_batched_tokens=6144', 'actor_rollout_ref.rollout.temperature=1.0', 'actor_rollout_ref.rollout.top_p=1.0', 'actor_rollout_ref.rollout.top_k=-1', 'actor_rollout_ref.rollout.val_kwargs.temperature=1.0', 'actor_rollout_ref.rollout.val_kwargs.top_p=0.7', 'actor_rollout_ref.rollout.val_kwargs.top_k=-1', 'actor_rollout_ref.rollout.val_kwargs.do_sample=true', 'actor_rollout_ref.rollout.val_kwargs.n=1', 'actor_rollout_ref.ref.fsdp_config.param_offload=false', 'actor_rollout_ref.ref.ulysses_sequence_parallel_size=1', 'actor_rollout_ref.actor.entropy_checkpointing=true', 'reward_model.reward_manager=dapo', '+reward_model.reward_kwargs.overlong_buffer_cfg.enable=false', '+reward_model.reward_kwargs.overlong_buffer_cfg.len=4096', '+reward_model.reward_kwargs.overlong_buffer_cfg.penalty_factor=1.0', '+reward_model.reward_kwargs.overlong_buffer_cfg.log=false', '+reward_model.reward_kwargs.max_resp_len=4096', 'trainer.logger=["console"]', 'trainer.project_name=RL-GSPO', 'trainer.experiment_name=gspo-epslow-0.0003-epshigh-0.0004-Qwen2.5-3B-Instruct-RL', 'trainer.n_gpus_per_node=1', 'trainer.nnodes=1', 'trainer.val_before_train=false', 'trainer.test_freq=10', 'trainer.save_freq=10', 'trainer.total_epochs=1', 'trainer.total_training_steps=100', 'trainer.default_local_dir=/app/checkpoints/gspo/gspo-epslow-0.0003-epshigh-0.0004-Qwen2.5-3B-Instruct-RL', 'trainer.resume_mode=auto', 'trainer.log_val_generations=2']
+Traceback (most recent call last):
+  File "/app/verl/verl/trainer/main_ppo.py", line 45, in main
+    run_ppo(config)
+  File "/app/verl/verl/trainer/main_ppo.py", line 99, in run_ppo
+    ray.get(runner.run.remote(config))
+  File "/opt/conda/lib/python3.10/site-packages/ray/_private/auto_init_hook.py", line 22, in auto_init_wrapper
+    return fn(*args, **kwargs)
+  File "/opt/conda/lib/python3.10/site-packages/ray/_private/client_mode_hook.py", line 104, in wrapper
+    return func(*args, **kwargs)
+  File "/opt/conda/lib/python3.10/site-packages/ray/_private/worker.py", line 2967, in get
+    values, debugger_breakpoint = worker.get_objects(
+  File "/opt/conda/lib/python3.10/site-packages/ray/_private/worker.py", line 1015, in get_objects
+    raise value.as_instanceof_cause()
+ray.exceptions.RayTaskError(RuntimeError): [36mray::TaskRunner.run()[39m (pid=2699, ip=172.17.0.2, actor_id=3fcd94d9a55f29351f3ed3c701000000, repr=<main_ppo.TaskRunner object at 0x7afc8d7f2c50>)
+  File "/app/verl/verl/trainer/main_ppo.py", line 371, in run
+    trainer.init_workers()
+  File "/app/verl/verl/trainer/ppo/ray_trainer.py", line 933, in init_workers
+    self.async_rollout_manager = AgentLoopManager(
+  File "/app/verl/verl/experimental/agent_loop/agent_loop.py", line 734, in __init__
+    self._initialize_llm_servers()
+  File "/app/verl/verl/experimental/agent_loop/agent_loop.py", line 766, in _initialize_llm_servers
+    self._run_all([server.init_hybrid(self.worker_group) for server in self.rollout_replicas])
+  File "/app/verl/verl/experimental/agent_loop/agent_loop.py", line 871, in _run_all
+    asyncio.run(run_all())
+  File "/opt/conda/lib/python3.10/asyncio/runners.py", line 44, in run
+    return loop.run_until_complete(main)
+  File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+  File "/app/verl/verl/experimental/agent_loop/agent_loop.py", line 869, in run_all
+    await asyncio.gather(*tasks)
+  File "/app/verl/verl/workers/rollout/replica.py", line 125, in init_hybrid
+    await self.launch_servers()
+  File "/app/verl/verl/workers/rollout/vllm_rollout/vllm_async_server.py", line 735, in launch_servers
+    await asyncio.gather(
+  File "/opt/conda/lib/python3.10/asyncio/tasks.py", line 650, in _wrap_awaitable
+    return (yield from awaitable.__await__())
+ray.exceptions.RayTaskError(RuntimeError): [36mray::vLLMHttpServer.launch_server()[39m (pid=3800, ip=172.17.0.2, actor_id=6a1d129ec49df9a371e8784b01000000, repr=<verl.workers.rollout.vllm_rollout.vllm_async_server.vLLMHttpServer object at 0x7de890f14430>)
+  File "/opt/conda/lib/python3.10/concurrent/futures/_base.py", line 458, in result
+    return self.__get_result()
+  File "/opt/conda/lib/python3.10/concurrent/futures/_base.py", line 403, in __get_result
+    raise self._exception
+  File "/app/verl/verl/workers/rollout/vllm_rollout/vllm_async_server.py", line 397, in launch_server
+    await self.run_server(server_args)
+  File "/app/verl/verl/workers/rollout/vllm_rollout/vllm_async_server.py", line 414, in run_server
+    engine_client = AsyncLLM.from_vllm_config(vllm_config=vllm_config, usage_context=usage_context, **kwargs)
+  File "/opt/conda/lib/python3.10/site-packages/vllm/utils/func_utils.py", line 116, in inner
+    return fn(*args, **kwargs)
+  File "/opt/conda/lib/python3.10/site-packages/vllm/v1/engine/async_llm.py", line 203, in from_vllm_config
+    return cls(
+  File "/opt/conda/lib/python3.10/site-packages/vllm/v1/engine/async_llm.py", line 133, in __init__
+    self.engine_core = EngineCoreClient.make_async_mp_client(
+  File "/opt/conda/lib/python3.10/site-packages/vllm/v1/engine/core_client.py", line 121, in make_async_mp_client
+    return AsyncMPClient(*client_args)
+  File "/opt/conda/lib/python3.10/site-packages/vllm/v1/engine/core_client.py", line 808, in __init__
+    super().__init__(
+  File "/opt/conda/lib/python3.10/site-packages/vllm/v1/engine/core_client.py", line 469, in __init__
+    with launch_core_engines(vllm_config, executor_class, log_stats) as (
+  File "/opt/conda/lib/python3.10/contextlib.py", line 142, in __exit__
+    next(self.gen)
+  File "/opt/conda/lib/python3.10/site-packages/vllm/v1/engine/utils.py", line 907, in launch_core_engines
+    wait_for_engine_startup(
+  File "/opt/conda/lib/python3.10/site-packages/vllm/v1/engine/utils.py", line 964, in wait_for_engine_startup
+    raise RuntimeError(
+RuntimeError: Engine core initialization failed. See root cause above. Failed core proc(s): {}
+
+Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m ERROR 12-24 08:01:49 [core.py:842] Traceback (most recent call last):
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m ERROR 12-24 08:01:49 [core.py:842] ValueError: Free memory on device (10.94/23.52 GiB) on startup is less than desired GPU memory utilization (0.6, 14.11 GiB). Decrease GPU memory utilization or reduce GPU memory used by other processes.
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m Traceback (most recent call last):
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m     raise e
+[36m(vLLMHttpServer pid=3800)[0m [1;36m(EngineCore_DP0 pid=3974)[0;0m ValueError: Free memory on device (10.94/23.52 GiB) on startup is less than desired GPU memory utilization (0.6, 14.11 GiB). Decrease GPU memory utilization or reduce GPU memory used by other processes.
