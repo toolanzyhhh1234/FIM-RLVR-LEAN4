@@ -40,3 +40,5 @@ wandb/training_logs/
 
 # External libraries
 verl/
+apex/
+.claude/.mcp.json
