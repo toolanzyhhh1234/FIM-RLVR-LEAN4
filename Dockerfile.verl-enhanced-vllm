@@ -54,7 +54,8 @@ RUN pip install uv
 # 6. Install FlashAttention-2 & vLLM (Pre-built Wheels)
 # CRITICAL: Because we used CUDA 12.4 base, these will download binaries.
 # No compilation = No 128GB RAM requirement = No Crash.
-RUN pip install flash-attn --no-build-isolation
+RUN pip install psutil && \
+    pip install flash-attn --no-build-isolation
 ARG VLLM_VERSION=0.11.1
 RUN pip install vllm==${VLLM_VERSION}
 
