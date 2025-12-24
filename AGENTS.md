@@ -36,3 +36,4 @@
 - Training scripts may write to `outputs_fim_grpo/`; avoid committing large artifacts or datasets.
 - Keep API keys or tokens out of the repo; use environment variables or local config files ignored by git.
 - Codex-CLI note: running `datasets`/Polars/Unsloth may require full approval (disabling the default sandbox) so `/dev/shm` is writable; otherwise Intel OMP SHM errors can occur. In standard Docker hosts, use `--shm-size` or `--ipc=host` as an alternative.
+- Installation safety: prefer user-led installs for heavy or disruptive packages (e.g., `vllm`, `flash-attn`, `apex`). The assistant can suggest commands, but should not run them unless the user explicitly approves, since these installs can spike RAM/CPU and drop SSH sessions.
