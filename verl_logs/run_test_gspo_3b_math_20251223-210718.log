@@ -1,0 +1,75 @@
++ export GPUS_PER_NODE=1
++ GPUS_PER_NODE=1
++ export NNODES=1
++ NNODES=1
++ export TORCH_CUDA_ARCH_LIST=12.0+PTX
++ TORCH_CUDA_ARCH_LIST=12.0+PTX
++ export VLLM_USE_V1=1
++ VLLM_USE_V1=1
++ export WANDB_MODE=disabled
++ WANDB_MODE=disabled
++ project_name=RL-GSPO
++ adv_estimator=grpo
++ loss_mode=gspo
++ loss_agg_mode=seq-mean-token-mean
++ MODEL_PATH=Qwen/Qwen2.5-3B-Instruct
++ offload=false
++ rollout_engine=vllm
++ rollout_mode=async
++ return_raw_chat=True
++ gpu_memory_utilization=0.6
++ reward_manager=dapo
++ shuffle_dataset=true
++ train_batch_size=64
++ ppo_mini_batch_size=16
++ ppo_micro_batch_size_per_gpu=2
++ n_resp_per_prompt=4
++ max_prompt_length=2048
++ max_response_length=4096
++ enable_overlong_buffer=false
++ overlong_buffer_len=4096
++ overlong_penalty_factor=1.0
++ test_freq=10
++ save_freq=10
++ total_epochs=1
++ total_training_steps=100
++ val_before_train=false
++ use_kl_in_reward=false
++ kl_coef=0.0
++ use_kl_loss=false
++ kl_loss_coef=0.0
++ clip_ratio_low=0.0003
++ clip_ratio_high=0.0004
+++ basename Qwen/Qwen2.5-3B-Instruct
++ SFT_MODEL=Qwen2.5-3B-Instruct
++ exp_name=gspo-epslow-0.0003-epshigh-0.0004-Qwen2.5-3B-Instruct-RL
++ CKPTS_DIR=/root/FIM-RLVR-LEAN4/checkpoints/gspo/gspo-epslow-0.0003-epshigh-0.0004-Qwen2.5-3B-Instruct-RL
++ temperature=1.0
++ top_p=1.0
++ top_k=-1
++ val_top_p=0.7
++ sp_size=1
++ use_dynamic_bsz=true
++ actor_ppo_max_token_len=12288
++ infer_ppo_max_token_len=18432
++ gen_tp=1
++ entropy_checkpointing=true
++ DATA_DIR=/root/FIM-RLVR-LEAN4/data/gsm8k
++ mkdir -p /root/FIM-RLVR-LEAN4/data/gsm8k
++ '[' '!' -f /root/FIM-RLVR-LEAN4/data/gsm8k/train.parquet ']'
++ '[' '!' -f /root/FIM-RLVR-LEAN4/data/gsm8k/test.parquet ']'
++ gsm8k_train_path=/root/FIM-RLVR-LEAN4/data/gsm8k/train.parquet
++ gsm8k_test_path=/root/FIM-RLVR-LEAN4/data/gsm8k/test.parquet
++ train_files='['\''/root/FIM-RLVR-LEAN4/data/gsm8k/train.parquet'\'']'
++ test_files='['\''/root/FIM-RLVR-LEAN4/data/gsm8k/test.parquet'\'']'
++ python3 -m verl.trainer.main_ppo algorithm.adv_estimator=grpo actor_rollout_ref.actor.policy_loss.loss_mode=gspo actor_rollout_ref.model.override_config.attn_implementation=sdpa actor_rollout_ref.ref.override_config.attn_implementation=sdpa 'data.train_files=['\''/root/FIM-RLVR-LEAN4/data/gsm8k/train.parquet'\'']' 'data.val_files=['\''/root/FIM-RLVR-LEAN4/data/gsm8k/test.parquet'\'']' data.shuffle=true data.prompt_key=prompt data.truncation=error data.filter_overlong_prompts=true data.return_raw_chat=True data.train_batch_size=64 data.max_prompt_length=2048 data.max_response_length=4096 actor_rollout_ref.rollout.n=4 algorithm.use_kl_in_reward=false algorithm.kl_ctrl.kl_coef=0.0 actor_rollout_ref.actor.use_kl_loss=false actor_rollout_ref.actor.kl_loss_coef=0.0 actor_rollout_ref.actor.clip_ratio_low=0.0003 actor_rollout_ref.actor.clip_ratio_high=0.0004 actor_rollout_ref.model.use_remove_padding=true actor_rollout_ref.actor.use_dynamic_bsz=true actor_rollout_ref.ref.log_prob_use_dynamic_bsz=true actor_rollout_ref.rollout.log_prob_use_dynamic_bsz=true actor_rollout_ref.actor.ppo_max_token_len_per_gpu=12288 actor_rollout_ref.ref.log_prob_max_token_len_per_gpu=18432 actor_rollout_ref.rollout.log_prob_max_token_len_per_gpu=18432 actor_rollout_ref.rollout.name=vllm actor_rollout_ref.rollout.mode=async actor_rollout_ref.model.path=Qwen/Qwen2.5-3B-Instruct actor_rollout_ref.model.enable_gradient_checkpointing=true actor_rollout_ref.actor.optim.lr=1e-6 actor_rollout_ref.actor.optim.lr_warmup_steps_ratio=0.05 actor_rollout_ref.actor.optim.weight_decay=0.1 actor_rollout_ref.actor.ppo_mini_batch_size=16 actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=2 actor_rollout_ref.actor.fsdp_config.param_offload=false actor_rollout_ref.actor.fsdp_config.optimizer_offload=false actor_rollout_ref.actor.entropy_coeff=0 actor_rollout_ref.actor.grad_clip=1.0 actor_rollout_ref.actor.loss_agg_mode=seq-mean-token-mean actor_rollout_ref.actor.ulysses_sequence_parallel_size=1 actor_rollout_ref.rollout.gpu_memory_utilization=0.6 actor_rollout_ref.rollout.tensor_model_parallel_size=1 actor_rollout_ref.rollout.enable_chunked_prefill=true actor_rollout_ref.rollout.max_num_batched_tokens=6144 actor_rollout_ref.rollout.temperature=1.0 actor_rollout_ref.rollout.top_p=1.0 actor_rollout_ref.rollout.top_k=-1 actor_rollout_ref.rollout.val_kwargs.temperature=1.0 actor_rollout_ref.rollout.val_kwargs.top_p=0.7 actor_rollout_ref.rollout.val_kwargs.top_k=-1 actor_rollout_ref.rollout.val_kwargs.do_sample=true actor_rollout_ref.rollout.val_kwargs.n=1 actor_rollout_ref.ref.fsdp_config.param_offload=false actor_rollout_ref.ref.ulysses_sequence_parallel_size=1 actor_rollout_ref.actor.entropy_checkpointing=true reward_model.reward_manager=dapo +reward_model.reward_kwargs.overlong_buffer_cfg.enable=false +reward_model.reward_kwargs.overlong_buffer_cfg.len=4096 +reward_model.reward_kwargs.overlong_buffer_cfg.penalty_factor=1.0 +reward_model.reward_kwargs.overlong_buffer_cfg.log=false +reward_model.reward_kwargs.max_resp_len=4096 'trainer.logger=["console"]' trainer.project_name=RL-GSPO trainer.experiment_name=gspo-epslow-0.0003-epshigh-0.0004-Qwen2.5-3B-Instruct-RL trainer.n_gpus_per_node=1 trainer.nnodes=1 trainer.val_before_train=false trainer.test_freq=10 trainer.save_freq=10 trainer.total_epochs=1 trainer.total_training_steps=100 trainer.default_local_dir=/root/FIM-RLVR-LEAN4/checkpoints/gspo/gspo-epslow-0.0003-epshigh-0.0004-Qwen2.5-3B-Instruct-RL trainer.resume_mode=auto trainer.log_val_generations=2
+/root/anaconda3/envs/py310/lib/python3.10/site-packages/torch/cuda/__init__.py:63: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+WARNING:2025-12-23 21:07:23,098:fused_indices_to_multihot has reached end of life. Please migrate to a non-experimental function.
+Could not override 'actor_rollout_ref.model.override_config.attn_implementation'.
+To append to your config use +actor_rollout_ref.model.override_config.attn_implementation=sdpa
+Key 'attn_implementation' is not in struct
+    full_key: actor_rollout_ref.model.override_config.attn_implementation
+    object_type=dict
+
+Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.
