@@ -8,6 +8,8 @@ ENV PYTHONUNBUFFERED=1
 ENV PIP_NO_CACHE_DIR=1
 ENV CONDA_DIR=/opt/conda
 ENV PATH=$CONDA_DIR/bin:$PATH
+ENV CUDA_HOME=/usr/local/cuda
+ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64:${LD_LIBRARY_PATH}
 
 # 3. Install System Dependencies
 # We include 'git' and 'ssh' so you don't need startup scripts.
@@ -48,6 +50,16 @@ RUN pip install --upgrade pip && \
       torchaudio==${TORCHAUDIO_VERSION}+cu124 \
       --index-url https://download.pytorch.org/whl/cu124
 
+# 5a. Install APEX (from source; matches installed torch/CUDA)
+ENV TORCH_CUDA_ARCH_LIST=12.0+PTX
+RUN git clone --depth=1 https://github.com/NVIDIA/apex.git /opt/apex && \
+    cd /opt/apex && \
+    pip install -v --no-build-isolation --no-cache-dir \
+      --config-settings=--build-option=--cpp_ext \
+      --config-settings=--build-option=--cuda_ext \
+      . && \
+    rm -rf /opt/apex
+
 # 5b. Install uv for faster Python package management
 RUN pip install uv
 
@@ -82,6 +94,8 @@ ENV NVIDIA_VISIBLE_DEVICES=all
 ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
 # Just in case you ever manually compile something later:
 ENV MAX_JOBS=4
+# Silence vLLM multiprocessing warning in Ray contexts.
+ENV VLLM_WORKER_MULTIPROC_METHOD=spawn
 
 # 10. Default Command
 # Run SSH in foreground. This keeps the container alive.
