@@ -2,6 +2,9 @@
 set -euo pipefail
 set -x
 
+# NOTE: For Ray/vLLM performance inside Docker, run with larger shared memory.
+# Example: docker run --shm-size=10.24gb ...  (recommended >=30% of host RAM)
+
 mkdir -p verl_logs
 log_ts=$(date +%Y%m%d-%H%M%S)
 exec > >(tee -a "verl_logs/run_test_gspo_3b_math_${log_ts}.log") 2>&1
