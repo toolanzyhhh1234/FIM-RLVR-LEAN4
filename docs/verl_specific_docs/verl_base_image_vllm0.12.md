@@ -1,0 +1,279 @@
+1
+ARG RELEASE
+0 B
+2
+ARG LAUNCHPAD_BUILD_ARCH
+0 B
+3
+LABEL org.opencontainers.image.ref.name=ubuntu
+0 B
+4
+LABEL org.opencontainers.image.version=22.04
+0 B
+5
+ADD file ... in /
+28.17 MB
+6
+CMD ["/bin/bash"]
+0 B
+7
+ENV NVARCH=x86_64
+0 B
+8
+ENV NVIDIA_REQUIRE_CUDA=cuda>=12.9 brand=unknown,driver>=535,driver<536 brand=grid,driver>=535,driver<536 brand=tesla,driver>=535,driver<536
+0 B
+9
+ENV NV_CUDA_CUDART_VERSION=12.9.79-1
+0 B
+10
+ARG TARGETARCH
+0 B
+11
+LABEL maintainer=NVIDIA CORPORATION <cudatools@nvidia.com>
+0 B
+12
+RUN |1 TARGETARCH=amd64 /bin/sh -c
+4.43 MB
+13
+ENV CUDA_VERSION=12.9.1
+0 B
+14
+RUN |1 TARGETARCH=amd64 /bin/sh -c
+98.73 MB
+15
+RUN |1 TARGETARCH=amd64 /bin/sh -c
+184 B
+16
+ENV PATH=/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+0 B
+17
+ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64
+0 B
+18
+COPY NGC-DL-CONTAINER-LICENSE / # buildkit
+6.72 KB
+19
+ENV NVIDIA_VISIBLE_DEVICES=all
+0 B
+20
+ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
+0 B
+21
+ENV NV_CUDA_LIB_VERSION=12.9.1-1
+0 B
+22
+ENV NV_NVTX_VERSION=12.9.79-1
+0 B
+23
+ENV NV_LIBNPP_VERSION=12.4.1.87-1
+0 B
+24
+ENV NV_LIBNPP_PACKAGE=libnpp-12-9=12.4.1.87-1
+0 B
+25
+ENV NV_LIBCUSPARSE_VERSION=12.5.10.65-1
+0 B
+26
+ENV NV_LIBCUBLAS_PACKAGE_NAME=libcublas-12-9
+0 B
+27
+ENV NV_LIBCUBLAS_VERSION=12.9.1.4-1
+0 B
+28
+ENV NV_LIBCUBLAS_PACKAGE=libcublas-12-9=12.9.1.4-1
+0 B
+29
+ENV NV_LIBNCCL_PACKAGE_NAME=libnccl2
+0 B
+30
+ENV NV_LIBNCCL_PACKAGE_VERSION=2.27.3-1
+0 B
+31
+ENV NCCL_VERSION=2.27.3-1
+0 B
+32
+ENV NV_LIBNCCL_PACKAGE=libnccl2=2.27.3-1+cuda12.9
+0 B
+33
+ARG TARGETARCH
+0 B
+34
+LABEL maintainer=NVIDIA CORPORATION <cudatools@nvidia.com>
+0 B
+35
+RUN |1 TARGETARCH=amd64 /bin/sh -c
+2.15 GB
+36
+RUN |1 TARGETARCH=amd64 /bin/sh -c
+62.65 KB
+37
+COPY entrypoint.d/ /opt/nvidia/entrypoint.d/ # buildkit
+1.64 KB
+38
+COPY nvidia_entrypoint.sh /opt/nvidia/ # buildkit
+1.49 KB
+39
+ENV NVIDIA_PRODUCT_NAME=CUDA
+0 B
+40
+ENTRYPOINT ["/opt/nvidia/nvidia_entrypoint.sh"]
+0 B
+41
+ENV NV_CUDA_LIB_VERSION=12.9.1-1
+0 B
+42
+ENV NV_CUDA_CUDART_DEV_VERSION=12.9.79-1
+0 B
+43
+ENV NV_NVML_DEV_VERSION=12.9.79-1
+0 B
+44
+ENV NV_LIBCUSPARSE_DEV_VERSION=12.5.10.65-1
+0 B
+45
+ENV NV_LIBNPP_DEV_VERSION=12.4.1.87-1
+0 B
+46
+ENV NV_LIBNPP_DEV_PACKAGE=libnpp-dev-12-9=12.4.1.87-1
+0 B
+47
+ENV NV_LIBCUBLAS_DEV_VERSION=12.9.1.4-1
+0 B
+48
+ENV NV_LIBCUBLAS_DEV_PACKAGE_NAME=libcublas-dev-12-9
+0 B
+49
+ENV NV_LIBCUBLAS_DEV_PACKAGE=libcublas-dev-12-9=12.9.1.4-1
+0 B
+50
+ENV NV_CUDA_NSIGHT_COMPUTE_VERSION=12.9.1-1
+0 B
+51
+ENV NV_CUDA_NSIGHT_COMPUTE_DEV_PACKAGE=cuda-nsight-compute-12-9=12.9.1-1
+0 B
+52
+ENV NV_NVPROF_VERSION=12.9.79-1
+0 B
+53
+ENV NV_NVPROF_DEV_PACKAGE=cuda-nvprof-12-9=12.9.79-1
+0 B
+54
+ENV NV_LIBNCCL_DEV_PACKAGE_NAME=libnccl-dev
+0 B
+55
+ENV NV_LIBNCCL_DEV_PACKAGE_VERSION=2.27.3-1
+0 B
+56
+ENV NCCL_VERSION=2.27.3-1
+0 B
+57
+ENV NV_LIBNCCL_DEV_PACKAGE=libnccl-dev=2.27.3-1+cuda12.9
+0 B
+58
+ARG TARGETARCH
+0 B
+59
+LABEL maintainer=NVIDIA CORPORATION <cudatools@nvidia.com>
+0 B
+60
+RUN |1 TARGETARCH=amd64 /bin/sh -c
+3 GB
+61
+RUN |1 TARGETARCH=amd64 /bin/sh -c
+86.9 KB
+62
+ENV LIBRARY_PATH=/usr/local/cuda/lib64/stubs
+0 B
+63
+ARG DEBIAN_FRONTEND=noninteractive
+0 B
+64
+ARG PIP_NO_CACHE_DIR=1
+0 B
+65
+RUN |2 DEBIAN_FRONTEND=noninteractive PIP_NO_CACHE_DIR=1 /bin/sh
+86.37 MB
+66
+RUN |2 DEBIAN_FRONTEND=noninteractive PIP_NO_CACHE_DIR=1 /bin/sh
+3.44 MB
+67
+RUN |2 DEBIAN_FRONTEND=noninteractive PIP_NO_CACHE_DIR=1 /bin/sh
+164 B
+68
+RUN |2 DEBIAN_FRONTEND=noninteractive PIP_NO_CACHE_DIR=1 /bin/sh
+4.36 GB
+69
+RUN |2 DEBIAN_FRONTEND=noninteractive PIP_NO_CACHE_DIR=1 /bin/sh
+992.55 MB
+70
+RUN |2 DEBIAN_FRONTEND=noninteractive PIP_NO_CACHE_DIR=1 /bin/sh
+266.54 KB
+71
+RUN |2 DEBIAN_FRONTEND=noninteractive PIP_NO_CACHE_DIR=1 /bin/sh
+725.6 MB
+72
+RUN |2 DEBIAN_FRONTEND=noninteractive PIP_NO_CACHE_DIR=1 /bin/sh
+20.46 MB
+73
+RUN |2 DEBIAN_FRONTEND=noninteractive PIP_NO_CACHE_DIR=1 /bin/sh
+48.62 MB
+74
+RUN |2 DEBIAN_FRONTEND=noninteractive PIP_NO_CACHE_DIR=1 /bin/sh
+308.97 MB
+75
+RUN |2 DEBIAN_FRONTEND=noninteractive PIP_NO_CACHE_DIR=1 /bin/sh
+92 B
+76
+RUN |2 DEBIAN_FRONTEND=noninteractive PIP_NO_CACHE_DIR=1 /bin/sh
+41.25 MB
+77
+RUN |2 DEBIAN_FRONTEND=noninteractive PIP_NO_CACHE_DIR=1 /bin/sh
+120.98 MB
+78
+RUN |2 DEBIAN_FRONTEND=noninteractive PIP_NO_CACHE_DIR=1 /bin/sh
+403.96 MB
+79
+WORKDIR /home/dpsk_a2a
+149 B
+80
+RUN |2 DEBIAN_FRONTEND=noninteractive PIP_NO_CACHE_DIR=1 /bin/sh
+6.17 MB
+81
+ENV CUDA_HOME=/usr/local/cuda
+0 B
+82
+ENV GDRCOPY_HOME=/home/dpsk_a2a/gdrcopy
+0 B
+83
+WORKDIR /home/dpsk_a2a/deepep-nvshmem
+32 B
+84
+RUN |2 DEBIAN_FRONTEND=noninteractive PIP_NO_CACHE_DIR=1 /bin/sh
+611.16 MB
+85
+WORKDIR /home/dpsk_a2a/DeepEP
+32 B
+86
+ENV NVSHMEM_DIR=/home/dpsk_a2a/deepep-nvshmem/install
+0 B
+87
+RUN |2 DEBIAN_FRONTEND=noninteractive PIP_NO_CACHE_DIR=1 /bin/sh
+80.88 MB
+88
+RUN |2 DEBIAN_FRONTEND=noninteractive PIP_NO_CACHE_DIR=1 /bin/sh
+1.11 MB
+89
+RUN |2 DEBIAN_FRONTEND=noninteractive PIP_NO_CACHE_DIR=1 /bin/sh
+21.78 MB
+90
+RUN |2 DEBIAN_FRONTEND=noninteractive PIP_NO_CACHE_DIR=1 /bin/sh
+371.46 KB
+91
+RUN |2 DEBIAN_FRONTEND=noninteractive PIP_NO_CACHE_DIR=1 /bin/sh
+3.61 MB
+92
+RUN |2 DEBIAN_FRONTEND=noninteractive PIP_NO_CACHE_DIR=1 /bin/sh
+152.22 MB
+93
+RUN |2 DEBIAN_FRONTEND=noninteractive PIP_NO_CACHE_DIR=1 /bin/sh
+606.57 KB
