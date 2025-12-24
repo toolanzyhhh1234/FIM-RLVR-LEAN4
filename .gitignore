@@ -42,3 +42,4 @@ wandb/training_logs/
 verl/
 apex/
 .claude/.mcp.json
+docs/codex_session_dump/
