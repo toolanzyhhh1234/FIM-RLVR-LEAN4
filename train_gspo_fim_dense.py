@@ -4,7 +4,7 @@ FIM-RLVR-LEAN4: Fill-in-the-Middle + Reinforcement Learning with Verification Re
 Adapted from vision GRPO example for LEAN4 formal verification training.
 """
 
-from unsloth import FastLanguageModel, PatchFastRL
+from unsloth import FastVisionModel, PatchFastRL
 from trl import GRPOConfig, GRPOTrainer
 from transformers import TrainerCallback
 from datasets import Dataset
@@ -15,6 +15,8 @@ import sys
 import random
 import re
 from concurrent.futures import ThreadPoolExecutor
+from packaging.version import Version
+from transformers import __version__ as transformers_version
 
 # Ensure we can import from local modules
 sys.path.append(os.getcwd())
@@ -25,7 +27,10 @@ from fim_rlvr_lean4.masking import apply_dynamic_mask
 # Configuration
 MAX_SEQ_LENGTH = 2048
 LORA_RANK = 16
-MODEL_NAME = "unsloth/Qwen2.5-0.5B-Instruct"  # Dense model for local testing
+MODEL_NAME = os.environ.get(
+    "FIM_MODEL_NAME",
+    "unsloth/Qwen3-VL-8B-Instruct-unsloth-bnb-4bit",  # Dense model to avoid vLLM+MOE compatibility issue in unsloth
+)
 OUTPUT_DIR = "outputs_fim_grpo_dense"
 CURRICULUM_STATE_PATH = os.path.join(OUTPUT_DIR, "curriculum_state.json")
 DATA_PARQUET = os.environ.get(
@@ -51,6 +56,7 @@ def _bool_env(name, default: bool) -> bool:
 MAX_STEPS = _int_env("FIM_MAX_STEPS", 100)
 NUM_GENERATIONS = _int_env("FIM_NUM_GENERATIONS", 2)
 LOAD_IN_4BIT = _bool_env("FIM_LOAD_IN_4BIT", True)
+FAST_INFERENCE = _bool_env("FIM_FAST_INFERENCE", False)
 MAX_COMPLETION_LENGTH = _int_env("FIM_MAX_COMPLETION_LENGTH", 1024)
 DEFAULT_VERIFIERS = max(1, (os.cpu_count() or 4) - 1)
 MAX_VERIFIERS = int(os.environ.get("FIM_MAX_VERIFIERS", str(DEFAULT_VERIFIERS)))
@@ -59,6 +65,19 @@ LOG_VERIFICATION_LIMIT = int(os.environ.get("FIM_LOG_VERIFICATION_LIMIT", "3"))
 LOG_DIR = "training_logs"
 LOG_PROMPTS = bool(int(os.environ.get("FIM_LOG_PROMPTS", "1")))
 LOG_PROMPTS_LIMIT = int(os.environ.get("FIM_LOG_PROMPTS_LIMIT", "3"))
+TRUST_REMOTE_CODE = _bool_env("FIM_TRUST_REMOTE_CODE", True)
+
+
+def _ensure_transformers_compat(model_name: str) -> None:
+    """Fail fast with a clear message if transformers is too old for the model."""
+    lowered = model_name.lower()
+    if "mistral-3" in lowered or "ministral-3" in lowered or "mistral3" in lowered:
+        if Version(transformers_version) < Version("5.0.0.dev0"):
+            raise RuntimeError(
+                "This model requires transformers>=5.0.0.dev0. "
+                "Update with `uv pip install --upgrade git+https://github.com/huggingface/transformers.git` "
+                "or `pip install --upgrade git+https://github.com/huggingface/transformers.git`."
+            )
 
 
 def load_training_dataset(data_path: str) -> Dataset:
@@ -256,15 +275,17 @@ def main():
     PatchFastRL()
 
     print(f"Loading model: {MODEL_NAME}")
-    model, tokenizer = FastLanguageModel.from_pretrained(
+    _ensure_transformers_compat(MODEL_NAME)
+    model, tokenizer = FastVisionModel.from_pretrained(
         model_name=MODEL_NAME,
         max_seq_length=MAX_SEQ_LENGTH,
-        load_in_4bit=LOAD_IN_4BIT,
-        fast_inference=True,
+        load_in_4bit=LOAD_IN_4BIT,  # Switch to False (8-bit) if training unstable
+        fast_inference=FAST_INFERENCE,
+        trust_remote_code=TRUST_REMOTE_CODE,
     )
 
     # Add LoRA adapters
-    model = FastLanguageModel.get_peft_model(
+    model = FastVisionModel.get_peft_model(
         model,
         r=LORA_RANK,
         target_modules=[
