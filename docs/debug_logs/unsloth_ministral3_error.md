@@ -59,3 +59,19 @@ Commands:
 ## Qwen3-VL example requirements (official notebook)
 - Added `requirements_unsloth_qwen3vl.txt` to mirror the Unsloth Qwen3-VL GRPO example.
 - Pinned: `transformers==4.57.0`, `trl==0.22.2`, `xformers==0.0.33.post1`, `datasets>=3.4.1,<4.0.0`.
+
+## xFormers load failure (Torch 2.9.0+cu130 / Python 3.12)
+- xFormers warning during `train_gspo_fim_dense.py` startup:
+  - Built for PyTorch 2.9.0+cu128 + CUDA 1208 + Python 3.10.19
+  - Running on PyTorch 2.9.0+cu130 + CUDA 12.0 + Python 3.12.12
+- Result: xFormers C++/CUDA extensions fail to load; Unsloth falls back to SDPA/fast eager.
+
+## Conclusion: GRPO ref_hidden_states error persists across stacks
+- Error: `TypeError: grpo_accumulated_loss() missing 1 required positional argument: 'ref_hidden_states'`
+- Observed in:
+  - Qwen3-VL env (`.venv310`, transformers==4.57.0, trl==0.22.2, unsloth==2025.9.5)
+  - Mistral-3 env (`.venv310_mistral3`, transformers==5.0.0.dev0, trl==0.22.2, unsloth==2025.9.5)
+- Deleting `unsloth_compiled_cache` regenerates `UnslothGRPOTrainer.py` with the same missing arg.
+- Manual cache patch (adding `ref_hidden_states=None`) is overwritten on regeneration.
+- Tried vanilla TRL GRPO (non-DR loss) and still hit the same `ref_hidden_states` issue.
+- Conclusion: likely an upstream Unsloth/TRL compatibility bug; not stable to patch generated cache.

@@ -276,13 +276,16 @@ def main():
 
     print(f"Loading model: {MODEL_NAME}")
     _ensure_transformers_compat(MODEL_NAME)
-    model, tokenizer = FastVisionModel.from_pretrained(
+    model_kwargs = dict(
         model_name=MODEL_NAME,
         max_seq_length=MAX_SEQ_LENGTH,
         load_in_4bit=LOAD_IN_4BIT,  # Switch to False (8-bit) if training unstable
-        fast_inference=FAST_INFERENCE,
         trust_remote_code=TRUST_REMOTE_CODE,
     )
+    # Avoid passing fast_inference=False into model init for older Qwen3-VL stacks.
+    if FAST_INFERENCE:
+        model_kwargs["fast_inference"] = True
+    model, tokenizer = FastVisionModel.from_pretrained(**model_kwargs)
 
     # Add LoRA adapters
     model = FastVisionModel.get_peft_model(

@@ -1997,3 +1997,93 @@ theorem add_comm (a b : ℕ) : a + b = b + a := by
   induction a with
 Add_comm theorem implementation for natural numbers using the induction principle.  | succ a ih => simp [Nat.succ_add, ih]
 ---
+[verify] success=False th=sample_1 gen_len=11
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+induction a  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]
+---
+[verify] success=False th=sample_1 gen_len=29
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+| zero => simp [Nat.add_zero]  | succ a ih => simp [Nat.succ_add, ih]
+---
+[verify] success=False th=sample_1 gen_len=11
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+induction a  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]
+---
+[verify] success=False th=sample_1 gen_len=29
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+| zero => simp [Nat.add_zero]  | succ a ih => simp [Nat.succ_add, ih]
+---
+[verify] success=False th=sample_1 gen_len=11
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+induction a  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]
+---
+[verify] success=False th=sample_1 gen_len=29
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+| zero => simp [Nat.add_zero]  | succ a ih => simp [Nat.succ_add, ih]
+---
+[verify] success=False th=sample_1 gen_len=80
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+```leanĊcasesNatĠbĠ(funĠ_Ġb'Ġ=>ĠcasesNatĠb'Ġ(funĠ_Ġ=>ĠsimpĠ[Nat.succ_add]));Ċ```  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]
+---
+[verify] success=False th=sample_1 gen_len=81
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+```leanĊ|Ġ0ĠbĠ=>ĠsimpĠ[Nat.zero_add]ĊĠĠ|ĠsuccĠaĠihĠ=>ĠsimpĠ[Nat.succ_add,Ġih]Ċ```  | succ a ih => simp [Nat.succ_add, ih]
+---
+[verify] success=False th=sample_1 gen_len=80
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+```leanĊcasesNatĠbĠ(funĠ_Ġb'Ġ=>ĠcasesNatĠb'Ġ(funĠ_Ġ=>ĠsimpĠ[Nat.succ_add]));Ċ```  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]
+---
+[verify] success=False th=sample_1 gen_len=81
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+```leanĊ|Ġ0ĠbĠ=>ĠsimpĠ[Nat.zero_add]ĊĠĠ|ĠsuccĠaĠihĠ=>ĠsimpĠ[Nat.succ_add,Ġih]Ċ```  | succ a ih => simp [Nat.succ_add, ih]
+---
+[verify] success=False th=sample_1 gen_len=80
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+```leanĊcasesNatĠbĠ(funĠ_Ġb'Ġ=>ĠcasesNatĠb'Ġ(funĠ_Ġ=>ĠsimpĠ[Nat.succ_add]));Ċ```  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]
+---
+[verify] success=False th=sample_1 gen_len=81
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+```leanĊ|Ġ0ĠbĠ=>ĠsimpĠ[Nat.zero_add]ĊĠĠ|ĠsuccĠaĠihĠ=>ĠsimpĠ[Nat.succ_add,Ġih]Ċ```  | succ a ih => simp [Nat.succ_add, ih]
+---
+[verify] success=False th=sample_1 gen_len=80
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+```leanĊcasesNatĠbĠ(funĠ_Ġb'Ġ=>ĠcasesNatĠb'Ġ(funĠ_Ġ=>ĠsimpĠ[Nat.succ_add]));Ċ```  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]
+---
+[verify] success=False th=sample_1 gen_len=81
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+```leanĊ|Ġ0ĠbĠ=>ĠsimpĠ[Nat.zero_add]ĊĠĠ|ĠsuccĠaĠihĠ=>ĠsimpĠ[Nat.succ_add,Ġih]Ċ```  | succ a ih => simp [Nat.succ_add, ih]
+---
+[verify] success=False th=sample_1 gen_len=11
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+induction a  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]
+---
+[verify] success=False th=sample_1 gen_len=29
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+| zero => simp [Nat.add_zero]  | succ a ih => simp [Nat.succ_add, ih]
+---
+[verify] success=False th=sample_1 gen_len=149
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+```leanĊtheoremĠadd_commĠ(aĠbĠ:ĠâĦķ)Ġ:ĠaĠ+ĠbĠ=ĠbĠ+ĠaĠ:=ĠbyĊinductionĠaĠwithĊĠĠ|ĠzeroĠ{ĠbĠ:=ĠbyĠrflĠ}ĊĠĠ|ĠsuccĠaĠihĠ{ĠbyĠsimpĠ[Nat.succ_add,Ġih]Ġ}Ċ```  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]
+---
+[verify] success=False th=sample_1 gen_len=104
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+```leanĊĠĠĠĠinductionĠbĠwithĊ|ĠzeroĠbĠ=>ĊĠĠexactĠNat.zero_addĊ|ĠsuccĠbĠihĠ=>ĠsimpĠ[Nat.add_succ,Ġih]Ċ```  | succ a ih => simp [Nat.succ_add, ih]
+---
