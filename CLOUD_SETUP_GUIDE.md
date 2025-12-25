@@ -18,6 +18,14 @@ pip install -r requirements.txt
 # need to install vLLM with uv as well
 uv pip install vllm --torch-backend=auto
 
+# CUDA runtime caveat (vLLM):
+# vLLM wheels are CUDA-version specific. The error "libcudart.so.12: cannot open"
+# means you installed a cu12 wheel but only have CUDA 13 runtime (or vice versa).
+# Match the vLLM wheel to your CUDA runtime (e.g., cu130 for CUDA 13.0).
+# Example (CUDA 13.0):
+#   uv pip install https://github.com/vllm-project/vllm/releases/download/v0.13.0/vllm-0.13.0+cu130-cp38-abi3-manylinux_2_35_x86_64.whl \
+#     --extra-index-url https://download.pytorch.org/whl/cu130
+
 
 ### Node.js Setup (Required for MCP Servers)
 Some tools (like `@openai/codex` or modern MCP servers) require Node.js v16+. Standard Ubuntu repositories often have v12, which is too old.

@@ -36,3 +36,5 @@ checkpoints/
 *.safetensors
 wandb/training_logs/
 .kiro/
+outputs_fim_grpo_dense/
+grpo_trainer_lora_model/

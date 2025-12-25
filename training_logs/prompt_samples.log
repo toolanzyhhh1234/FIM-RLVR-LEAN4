@@ -154,3 +154,2276 @@ Calls to these tools must go to the commentary channel: 'functions'.<|end|><|sta
 You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|end|><|start|>user<|message|>[MISSING_BLOCK]
 <|end|><|start|>assistant
 ---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.20
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.20
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.20
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.20
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.20
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.20
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.20
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.20
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.20
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.20
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.20
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.20
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.20
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.20
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.20
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.20
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.20
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.20
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.20
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.20
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.20
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.20
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
+[prompt] th=sample_1 ratio=0.10
+<|im_start|>system
+You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|im_end|>
+<|im_start|>user
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih]<|im_end|>
+<|im_start|>assistant
+
+---
