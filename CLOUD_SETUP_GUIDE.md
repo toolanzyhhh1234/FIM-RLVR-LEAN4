@@ -15,6 +15,9 @@ pip install --upgrade pip
 # Install dependencies from requirements.txt
 pip install -r requirements.txt
 ```
+# need to install vLLM with uv as well
+uv pip install vllm --torch-backend=auto
+
 
 ### Node.js Setup (Required for MCP Servers)
 Some tools (like `@openai/codex` or modern MCP servers) require Node.js v16+. Standard Ubuntu repositories often have v12, which is too old.
