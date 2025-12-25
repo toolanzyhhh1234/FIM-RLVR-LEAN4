@@ -1,0 +1,29 @@
+# Qwen3-VL notebook stack plus repo base deps not already covered.
+# Install torch/torchvision with the cu128 index:
+#   uv pip install --index-url https://download.pytorch.org/whl/cu128 -r requirements_unsloth_qwen3vl_full.txt
+
+unsloth
+unsloth_zoo
+bitsandbytes
+accelerate
+triton
+cut_cross_entropy
+peft
+sentencepiece
+protobuf
+datasets>=3.4.1,<4.0.0
+huggingface_hub>=0.34.0
+hf_transfer
+transformers==4.57.0  # Yanked on PyPI due to setup issues; this matches the official notebook.
+trl==0.22.2
+# xformers matches torch 2.9.x in the official example notebook
+xformers==0.0.33.post1
+
+# Base repo requirements not already specified above
+numpy
+pandas
+pillow
+polars
+tqdm
+torch==2.9.0+cu128
+torchvision==0.24.0+cu128
