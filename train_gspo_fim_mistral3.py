@@ -29,7 +29,7 @@ MAX_SEQ_LENGTH = 2048
 LORA_RANK = 16
 MODEL_NAME = os.environ.get(
     "FIM_MODEL_NAME",
-    "unsloth/Ministral-3-3B-Instruct-2512",
+    "unsloth/Ministral-3-14B-Reasoning-2512",
 )
 OUTPUT_DIR = "outputs_fim_grpo_mistral3"
 CURRICULUM_STATE_PATH = os.path.join(OUTPUT_DIR, "curriculum_state.json")
@@ -71,6 +71,34 @@ TRUST_REMOTE_CODE = _bool_env("FIM_TRUST_REMOTE_CODE", True)
 
 FIM_CODE_TAG = "FIM_CODE"
 FULL_CODE_TAG = "FULL_CODE"
+
+
+def _fix_byte_bpe_decoding(text: str) -> str:
+    """
+    Fix byte-level BPE decoding artifacts from Ministral 3's tokenizer.
+
+    The LlamaTokenizer for Ministral 3 uses byte-level BPE but doesn't properly
+    convert byte tokens back to actual bytes during decode. This results in
+    characters like:
+      - Ġ (U+0120, 288) which should be space (32)
+      - Ċ (U+010A, 266) which should be newline (10)
+
+    The byte offset is 256 (e.g., 288 - 32 = 256).
+    """
+    if not text:
+        return text
+
+    # Build translation table for all byte-level BPE characters (offset 256)
+    # Characters U+0100 to U+01FF map to bytes 0x00 to 0xFF
+    result = []
+    for char in text:
+        code = ord(char)
+        if 0x100 <= code <= 0x1FF:
+            # This is a byte-level BPE character, convert back to actual byte
+            result.append(chr(code - 256))
+        else:
+            result.append(char)
+    return ''.join(result)
 
 
 def _ensure_transformers_compat(model_name: str) -> None:
@@ -290,6 +318,9 @@ def lean_validity_reward_factory(verifier, curriculum):
         verification_inputs = []
         raw_logs = []
         for idx, (generated_text, prefix, suffix) in enumerate(zip(completions, fim_prefix, fim_suffix)):
+            # Fix byte-level BPE decoding artifacts (TRL version compatibility issue)
+            generated_text = _fix_byte_bpe_decoding(generated_text)
+
             task = None
             if task_type is not None and idx < len(task_type):
                 task = task_type[idx]
