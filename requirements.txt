@@ -1,3 +1,4 @@
+ # Base runtime deps only; full pinned env snapshot lives in ministral-training-requirements.txt
 datasets
 numpy
 pandas
