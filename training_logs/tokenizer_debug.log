@@ -34,4 +34,7 @@ Has sp_model: False
 Has backend_tokenizer: True
 Has vocab: True
 
+After _fix_bpe_artifacts[0][:200]: 'The task is to prove that addition of natural numbers is commutative, i.e., `a + b = b + a`. The given proof outline uses induction on `a` with the induction hypothesis `ih`.\n\n### Analysis of the Give'
+After fix has artifacts: False
+
 === END DEEP DEBUG ===
