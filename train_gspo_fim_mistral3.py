@@ -67,6 +67,9 @@ LOG_PROMPTS = bool(int(os.environ.get("FIM_LOG_PROMPTS", "1")))
 LOG_PROMPTS_LIMIT = int(os.environ.get("FIM_LOG_PROMPTS_LIMIT", "3"))
 TRUST_REMOTE_CODE = _bool_env("FIM_TRUST_REMOTE_CODE", True)
 
+FIM_CODE_TAG = "FIM_CODE"
+FULL_CODE_TAG = "FULL_CODE"
+
 
 def _ensure_transformers_compat(model_name: str) -> None:
     """Fail fast with a clear message if transformers is too old for the model."""
@@ -158,11 +161,13 @@ def build_dynamic_transform(tokenizer, curriculum):
         fim_prefixes = []
         fim_suffixes = []
         theorem_ids = []
+        task_types = []
         logged = 0
 
         for i in range(len(batch["prompt"])):
             full_code = batch["prompt"][i]
-            
+            full_solution_required = "[FULL-SOLUTION-REQUIRED]" in full_code
+
             # Get theorem ID
             th_name = str(i)
             if "uuid" in batch:
@@ -172,16 +177,56 @@ def build_dynamic_transform(tokenizer, curriculum):
             # Get curriculum mask ratio
             ratio = curriculum.get_mask_ratio(th_name)
             
-            # Apply dynamic masking
-            new_pre, new_suf, new_mid = apply_dynamic_mask(full_code, ratio)
+            # Apply dynamic masking (unless full solution is required)
+            cleaned_code = full_code.replace("[FULL-SOLUTION-REQUIRED]", "").strip()
+            if full_solution_required:
+                new_pre, new_suf = "", ""
+                user_content = cleaned_code
+                task_type = "full"
+            else:
+                new_pre, new_suf, _ = apply_dynamic_mask(cleaned_code, ratio)
+                user_content = f"{new_pre}[MISSING_BLOCK]\n{new_suf}"
+                task_type = "fim"
+            task_types.append(task_type)
 
-            # Create chat prompt
-            user_content = f"{new_pre}[MISSING_BLOCK]\n{new_suf}"
+            system_prompt = (
+                "You are a Lean 4 expert. Solve the task strictly following this format:\n"
+                "1) First write your reasoning inside [THINK]...[/THINK].\n"
+                f"2) Then output ONLY the code inside <{FIM_CODE_TAG}>...</{FIM_CODE_TAG}> "
+                f"for fill-in-the-middle tasks, or <{FULL_CODE_TAG}>...</{FULL_CODE_TAG}> "
+                "for full solutions.\n"
+                "3) Do NOT include markdown fences or extra text outside the tags.\n"
+                "4) The tagged code must be valid Lean 4.\n"
+                "If the user includes [FULL-SOLUTION-REQUIRED], output a full solution in <FULL_CODE>.\n\n"
+                "[USER]\n"
+                "theorem simple_add (n : ℕ) : 0 + n = n := by\n"
+                "  [MISSING_BLOCK]\n\n"
+                "[ASSISTANT]\n"
+                "[THINK]\n"
+                "The definition of addition recurses on the second argument, so 0+n requires induction or a lemma. \n"
+                "`simp` uses Nat.zero_add to solve this.\n"
+                "[/THINK]\n"
+                f"<{FIM_CODE_TAG}>\n"
+                "  simp\n"
+                f"</{FIM_CODE_TAG}>\n\n"
+                "Example (full):\n\n"
+                "[USER]\n"
+                "theorem add_zero_triv (n : ℕ) : n + 0 = n :=\n\n"
+                "[ASSISTANT]\n"
+                "[THINK]\n"
+                "Addition is defined by recursion on the second argument. \n"
+                "Therefore, `n + 0 = n` is true by definition (reflexivity).\n"
+                "[/THINK]\n"
+                f"<{FULL_CODE_TAG}>\n"
+                "by\n"
+                "  rfl\n"
+                f"</{FULL_CODE_TAG}>"
+            )
             
             messages = [
                 {
                     "role": "system",
-                    "content": "You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.",
+                    "content": system_prompt,
                 },
                 {"role": "user", "content": user_content},
             ]
@@ -208,6 +253,7 @@ def build_dynamic_transform(tokenizer, curriculum):
             "fim_prefix": fim_prefixes,
             "fim_suffix": fim_suffixes,
             "theorem_id": theorem_ids,
+            "task_type": task_types,
         }
 
     return dynamic_transform
@@ -216,13 +262,47 @@ def build_dynamic_transform(tokenizer, curriculum):
 def lean_validity_reward_factory(verifier, curriculum):
     """Creates reward function for Lean verification."""
     
-    def lean_validity_reward(completions, fim_prefix, fim_suffix, theorem_id, **kwargs):
+    def _extract_tagged_code(text: str, tag: str) -> str | None:
+        if not text:
+            return None
+        start = text.find(f"<{tag}>")
+        if start == -1:
+            return None
+        start += len(f"<{tag}>")
+        end = text.find(f"</{tag}>", start)
+        if end == -1:
+            return None
+        return text[start:end].strip()
+
+    def _strip_markdown_fences(text: str) -> str:
+        if not text:
+            return text
+        lines = text.splitlines()
+        cleaned = [line for line in lines if not line.strip().startswith("```")]
+        return "\n".join(cleaned).strip()
+
+    def lean_validity_reward(completions, fim_prefix, fim_suffix, theorem_id, task_type=None, **kwargs):
         """Verify completed Lean code and update curriculum."""
         
         # Prepare verification inputs
         verification_inputs = []
-        for generated_text, prefix, suffix in zip(completions, fim_prefix, fim_suffix):
-            full_code = (prefix or "") + generated_text + (suffix or "")
+        for idx, (generated_text, prefix, suffix) in enumerate(zip(completions, fim_prefix, fim_suffix)):
+            task = None
+            if task_type is not None and idx < len(task_type):
+                task = task_type[idx]
+
+            if task == "fim":
+                extracted = _extract_tagged_code(generated_text, FIM_CODE_TAG)
+            elif task == "full":
+                extracted = _extract_tagged_code(generated_text, FULL_CODE_TAG)
+            else:
+                extracted = None
+
+            if extracted is None:
+                extracted = generated_text
+
+            extracted = _strip_markdown_fences(extracted)
+            full_code = (prefix or "") + extracted + (suffix or "")
             verification_inputs.append(full_code if full_code.strip() else None)
 
         # Parallel verification
