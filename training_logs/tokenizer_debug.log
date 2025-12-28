@@ -1,0 +1,37 @@
+=== TOKENIZER DEEP DEBUG ===
+
+tokenizer type: <class 'transformers.models.pixtral.processing_pixtral.PixtralProcessor'>
+actual_tokenizer type: <class 'transformers.models.llama.tokenization_llama.LlamaTokenizer'>
+actual_tokenizer class name: LlamaTokenizer
+actual_tokenizer MRO: ['LlamaTokenizer', 'TokenizersBackend', 'PreTrainedTokenizerBase', 'PushToHubMixin', 'object']
+
+Has byte_decoder: False
+
+Sample completion_ids[0][:20]: [34, 1784, 6255, 1395, 1317, 16123, 1455, 3988, 1307, 6967, 8091, 1395, 92153, 2277, 1044, 1623, 4185, 3109, 2000, 1097]
+
+Individual token decodes:
+  ID 34 -> '[THINK]'
+  ID 1784 -> 'The'
+  ID 6255 -> 'Ġtask'
+  ID 1395 -> 'Ġis'
+  ID 1317 -> 'Ġto'
+  ID 16123 -> 'Ġprove'
+  ID 1455 -> 'Ġthat'
+  ID 3988 -> 'Ġaddition'
+  ID 1307 -> 'Ġof'
+  ID 6967 -> 'Ġnatural'
+
+convert_ids_to_tokens: ['[THINK]', 'The', 'Ġtask', 'Ġis', 'Ġto', 'Ġprove', 'Ġthat', 'Ġaddition', 'Ġof', 'Ġnatural']
+
+convert_tokens_to_string result: '[THINK]TheĠtaskĠisĠtoĠproveĠthatĠadditionĠofĠnatural'
+convert_tokens_to_string has artifacts: True
+
+batch_decode result[0][:200]: 'TheĠtaskĠisĠtoĠproveĠthatĠadditionĠofĠnaturalĠnumbersĠisĠcommutative,Ġi.e.,Ġ`aĠ+ĠbĠ=ĠbĠ+Ġa`.ĠTheĠgivenĠproofĠoutlineĠusesĠinductionĠonĠ`a`ĠwithĠtheĠinductionĠhypothesisĠ`ih`.ĊĊ###ĠAnalysisĠofĠtheĠGive'
+batch_decode has artifacts: True
+
+Has _tekken: False
+Has sp_model: False
+Has backend_tokenizer: True
+Has vocab: True
+
+=== END DEEP DEBUG ===

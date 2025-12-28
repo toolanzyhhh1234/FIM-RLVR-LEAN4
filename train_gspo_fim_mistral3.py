@@ -276,6 +276,45 @@ def lean_validity_reward_factory(verifier, curriculum, tokenizer):
     else:
         actual_tokenizer = tokenizer
 
+    # Build GPT-2 style byte decoder for fixing BPE artifacts
+    # This maps Unicode chars like Ġ (U+0120) back to bytes like space (0x20)
+    def _build_byte_decoder():
+        """Build the inverse of GPT-2's bytes_to_unicode mapping."""
+        # GPT-2 byte encoder: maps bytes 0-255 to Unicode chars
+        # Printable ASCII stays as-is, others get shifted to U+0100+ range
+        bs = list(range(ord("!"), ord("~") + 1))  # 33-126
+        bs += list(range(ord("¡"), ord("¬") + 1))  # 161-172
+        bs += list(range(ord("®"), ord("ÿ") + 1))  # 174-255
+        cs = bs[:]
+        n = 0
+        for b in range(256):
+            if b not in bs:
+                bs.append(b)
+                cs.append(256 + n)
+                n += 1
+        byte_encoder = dict(zip(bs, cs))
+        return {chr(v): k for k, v in byte_encoder.items()}
+
+    _byte_decoder = _build_byte_decoder()
+
+    def _fix_bpe_artifacts(text: str) -> str:
+        """Convert GPT-2 BPE byte representations back to actual UTF-8 text."""
+        if not text:
+            return text
+        # Convert each character through byte_decoder, collect bytes
+        byte_list = []
+        for char in text:
+            if char in _byte_decoder:
+                byte_list.append(_byte_decoder[char])
+            else:
+                # Regular character - encode to UTF-8 bytes
+                byte_list.extend(char.encode('utf-8'))
+        # Decode collected bytes as UTF-8
+        try:
+            return bytes(byte_list).decode('utf-8', errors='replace')
+        except Exception:
+            return text  # Fallback to original if decode fails
+
     def _decode_completions(completions, **kwargs):
         """Decode completions from token IDs to avoid BPE artifacts.
 
@@ -297,9 +336,82 @@ def lean_validity_reward_factory(verifier, curriculum, tokenizer):
                 clean_up_tokenization_spaces=False,
             )
 
-            # Warn if artifacts still present (shouldn't happen with proper decode)
+            # === DEEP DEBUG: Log tokenizer details once ===
+            if not hasattr(_decode_completions, "_deep_debug_done"):
+                _decode_completions._deep_debug_done = True
+                os.makedirs(LOG_DIR, exist_ok=True)
+                with open(os.path.join(LOG_DIR, "tokenizer_debug.log"), "w", encoding="utf-8") as f:
+                    f.write("=== TOKENIZER DEEP DEBUG ===\n\n")
+                    f.write(f"tokenizer type: {type(tokenizer)}\n")
+                    f.write(f"actual_tokenizer type: {type(actual_tokenizer)}\n")
+                    f.write(f"actual_tokenizer class name: {actual_tokenizer.__class__.__name__}\n")
+                    f.write(f"actual_tokenizer MRO: {[c.__name__ for c in actual_tokenizer.__class__.__mro__]}\n\n")
+
+                    # Check for vocab/byte decoder
+                    if hasattr(actual_tokenizer, 'byte_decoder'):
+                        f.write(f"Has byte_decoder: True\n")
+                        f.write(f"byte_decoder sample: {dict(list(actual_tokenizer.byte_decoder.items())[:10])}\n\n")
+                    else:
+                        f.write(f"Has byte_decoder: False\n\n")
+
+                    # Sample completion_ids
+                    if completion_ids and len(completion_ids) > 0:
+                        sample_ids = completion_ids[0][:20] if len(completion_ids[0]) > 20 else completion_ids[0]
+                        f.write(f"Sample completion_ids[0][:20]: {sample_ids}\n\n")
+
+                        # Decode each token individually
+                        f.write("Individual token decodes:\n")
+                        for tid in sample_ids[:10]:
+                            try:
+                                single = actual_tokenizer.decode([tid], skip_special_tokens=False)
+                                f.write(f"  ID {tid} -> {repr(single)}\n")
+                            except Exception as e:
+                                f.write(f"  ID {tid} -> ERROR: {e}\n")
+                        f.write("\n")
+
+                        # Try convert_ids_to_tokens
+                        if hasattr(actual_tokenizer, 'convert_ids_to_tokens'):
+                            tokens = actual_tokenizer.convert_ids_to_tokens(sample_ids[:10])
+                            f.write(f"convert_ids_to_tokens: {tokens}\n\n")
+
+                        # Try convert_tokens_to_string
+                        if hasattr(actual_tokenizer, 'convert_tokens_to_string') and hasattr(actual_tokenizer, 'convert_ids_to_tokens'):
+                            tokens = actual_tokenizer.convert_ids_to_tokens(sample_ids[:10])
+                            try:
+                                string = actual_tokenizer.convert_tokens_to_string(tokens)
+                                f.write(f"convert_tokens_to_string result: {repr(string)}\n")
+                                has_artifacts = ("Ġ" in string) or ("Ċ" in string)
+                                f.write(f"convert_tokens_to_string has artifacts: {has_artifacts}\n\n")
+                            except Exception as e:
+                                f.write(f"convert_tokens_to_string error: {e}\n\n")
+
+                    # batch_decode result
+                    if texts:
+                        f.write(f"batch_decode result[0][:200]: {repr(texts[0][:200])}\n")
+                        has_artifacts = ("Ġ" in texts[0]) or ("Ċ" in texts[0])
+                        f.write(f"batch_decode has artifacts: {has_artifacts}\n\n")
+
+                    # Check for _tekken or special attributes
+                    for attr in ['_tekken', 'sp_model', 'backend_tokenizer', 'vocab']:
+                        f.write(f"Has {attr}: {hasattr(actual_tokenizer, attr)}\n")
+
+                    # Test BPE fix
+                    if texts:
+                        fixed_sample = _fix_bpe_artifacts(texts[0][:200])
+                        f.write(f"\nAfter _fix_bpe_artifacts[0][:200]: {repr(fixed_sample)}\n")
+                        has_artifacts_after = ("Ġ" in fixed_sample) or ("Ċ" in fixed_sample)
+                        f.write(f"After fix has artifacts: {has_artifacts_after}\n")
+
+                    f.write("\n=== END DEEP DEBUG ===\n")
+                print("[DEBUG] Tokenizer deep debug written to training_logs/tokenizer_debug.log")
+            # === END DEEP DEBUG ===
+
+            # Apply BPE byte decoding fix to all texts
+            texts = [_fix_bpe_artifacts(t) for t in texts]
+
+            # Verify fix worked
             if texts and (("Ġ" in texts[0]) or ("Ċ" in texts[0])):
-                print("[WARN] Decoded completions still contain Ġ/Ċ artifacts after batch_decode!")
+                print("[WARN] BPE artifacts still present after _fix_bpe_artifacts!")
 
             return texts
 
