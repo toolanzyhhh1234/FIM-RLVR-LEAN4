@@ -1,0 +1,12 @@
+=== REWARD FUNCTION DEBUG INFO ===
+kwargs.keys(): ['prompts', 'completion_ids', 'trainer_state']
+completions type: <class 'list'>
+completions length: 2
+completions[0] type: <class 'str'>
+completions[0] preview: 'TheĠtaskĠisĠtoĠproveĠthatĠadditionĠofĠnaturalĠnumbersĠisĠcommutative,Ġi.e.,Ġ`aĠ+ĠbĠ=ĠbĠ+Ġa`.ĠTheĠgivenĠproofĠoutlineĠusesĠinductionĠonĠ`a`ĠwithĠtheĠinductionĠhypothesisĠ`ih`.ĊĊ###ĠAnalysisĠofĠtheĠGivenĠProofĠOutlineĊĊ1.Ġ**BaseĠCaseĠ(`|Ġzero`)**:ĊĠĠĠ-ĠTheĠbaseĠcaseĠisĠwhenĠ`aĠ=Ġ0`.ĠTheĠproofĠusesĠ`si'
+Has BPE artifacts (Ġ/Ċ): True
+Found token ID key: completion_ids
+  Type: <class 'list'>
+  Length: 2
+=== END DEBUG INFO ===
+

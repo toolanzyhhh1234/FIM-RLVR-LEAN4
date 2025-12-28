@@ -261,9 +261,58 @@ def build_dynamic_transform(tokenizer, curriculum):
     return dynamic_transform
 
 
-def lean_validity_reward_factory(verifier, curriculum):
-    """Creates reward function for Lean verification."""
-    
+def lean_validity_reward_factory(verifier, curriculum, tokenizer):
+    """Creates reward function for Lean verification.
+
+    Args:
+        verifier: LeanVerifier instance
+        curriculum: CurriculumManager instance
+        tokenizer: The tokenizer/processor used by the model (needed to decode completion_ids)
+    """
+
+    # Get the actual tokenizer if wrapped in a processor (e.g., PixtralProcessor)
+    if hasattr(tokenizer, 'tokenizer'):
+        actual_tokenizer = tokenizer.tokenizer
+    else:
+        actual_tokenizer = tokenizer
+
+    def _decode_completions(completions, **kwargs):
+        """Decode completions from token IDs to avoid BPE artifacts.
+
+        TRL passes completion_ids in kwargs which we can decode properly,
+        avoiding the Ġ/Ċ byte-level BPE artifacts that appear in the
+        pre-decoded completions string.
+        """
+        completion_ids = kwargs.get("completion_ids")
+
+        if completion_ids is not None:
+            # Handle torch tensors
+            if hasattr(completion_ids, "tolist"):
+                completion_ids = completion_ids.tolist()
+
+            # Decode using the tokenizer
+            texts = actual_tokenizer.batch_decode(
+                completion_ids,
+                skip_special_tokens=True,
+                clean_up_tokenization_spaces=False,
+            )
+
+            # Warn if artifacts still present (shouldn't happen with proper decode)
+            if texts and (("Ġ" in texts[0]) or ("Ċ" in texts[0])):
+                print("[WARN] Decoded completions still contain Ġ/Ċ artifacts after batch_decode!")
+
+            return texts
+
+        # Fallback: chat-format completions [[{"content": "..."}], ...]
+        if completions and isinstance(completions[0], list) and completions[0] and isinstance(completions[0][0], dict):
+            return [c[0].get("content", "") for c in completions]
+
+        # Fallback: use raw completions (may have artifacts)
+        if completions and isinstance(completions[0], str) and (("Ġ" in completions[0]) or ("Ċ" in completions[0])):
+            print("[WARN] Using raw completions with BPE artifacts - completion_ids not available!")
+
+        return completions
+
     def _extract_tagged_code(text: str, tag: str) -> str | None:
         if not text:
             return None
@@ -285,11 +334,14 @@ def lean_validity_reward_factory(verifier, curriculum):
 
     def lean_validity_reward(completions, fim_prefix, fim_suffix, theorem_id, task_type=None, **kwargs):
         """Verify completed Lean code and update curriculum."""
-        
+
+        # Decode completions from token IDs to avoid BPE artifacts (Ġ/Ċ)
+        decoded_completions = _decode_completions(completions, **kwargs)
+
         # Prepare verification inputs
         verification_inputs = []
         raw_logs = []
-        for idx, (generated_text, prefix, suffix) in enumerate(zip(completions, fim_prefix, fim_suffix)):
+        for idx, (generated_text, prefix, suffix) in enumerate(zip(decoded_completions, fim_prefix, fim_suffix)):
             task = None
             if task_type is not None and idx < len(task_type):
                 task = task_type[idx]
@@ -445,7 +497,7 @@ def main():
     trainer = GRPOTrainer(
         model=model,
         processing_class=tokenizer,
-        reward_funcs=[lean_validity_reward_factory(verifier, curriculum)],
+        reward_funcs=[lean_validity_reward_factory(verifier, curriculum, tokenizer)],
         args=training_args,
         train_dataset=dataset,
     )
