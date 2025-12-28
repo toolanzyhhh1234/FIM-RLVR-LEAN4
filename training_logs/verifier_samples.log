@@ -838,3 +838,63 @@ theorem add_comm (a b : ℕ) : a + b = b + a := by
 ```leanĊtheoremĠadd_commĠ(aĠbĠ:ĠâĦķ)Ġ:ĠaĠ+ĠbĠ=ĠbĠ+ĠaĠ:=ĠbyĊĠĠcasesĠaĠwithĊĠĠĠĠ|ĠzeroĠ=>ĠsimpĊĠĠĠĠ|ĠsuccĠaĠihĠ=>ĠsimpĠ[Nat.succ_add_comm,Ġih]Ċ```  | zero => simp
   | succ a ih => simp [Nat.succ_add, ih]
 ---
+[verify] success=False th=sample_1 gen_len=42
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+ĊĠĠinductionĠ_;ĠgoalĊ  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]
+---
+[verify] success=False th=sample_1 gen_len=49
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+ĊĠĠi.eadĠNat.induction_caseĊ  | succ a ih => simp [Nat.succ_add, ih]
+---
+[verify] success=False th=sample_1 gen_len=522
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+ĊĠĠnorm_numĊ  | succ a ih => simp [Nat.succ_add, ih]
+---
+[verify] success=False th=sample_1 gen_len=560
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+ĊĠĠĠĠ|ĠiĠ:Ġ{ĠbĠ:ĠâĦķĠ|ĠNat.succ_addĠ(ihĠb)Ġ(succĠaĠi)}ĊĠĠĠĠĠĠ--ĠBaseĠcaseĊĠĠĠĠĠĠhaveĠ:Ġ0Ġ+ĠbĠ=ĠbĠ+ĊĠĠĠĠĠĠĠĠbyĠsimpĊĠĠĠĠĠĠ--ĠInductiveĠstepĊĠĠĠĠĠĠexactĠihĠ{ĠihĠ:=ĠthisĠ}Ċ  | succ a ih => simp [Nat.succ_add, ih]
+---
+[verify] success=False th=sample_1 gen_len=42
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+ĊĠĠinductionĠ_;ĠgoalĊ  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih]
+---
+[verify] success=False th=sample_1 gen_len=49
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+ĊĠĠi.eadĠNat.induction_caseĊ  | succ a ih => simp [Nat.succ_add, ih]
+---
+[verify] success=False th=sample_1 gen_len=522
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+ĊĠĠnorm_numĊ  | succ a ih => simp [Nat.succ_add, ih]
+---
+[verify] success=False th=sample_1 gen_len=560
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+ĊĠĠĠĠ|ĠiĠ:Ġ{ĠbĠ:ĠâĦķĠ|ĠNat.succ_addĠ(ihĠb)Ġ(succĠaĠi)}ĊĠĠĠĠĠĠ--ĠBaseĠcaseĊĠĠĠĠĠĠhaveĠ:Ġ0Ġ+ĠbĠ=ĠbĠ+ĊĠĠĠĠĠĠĠĠbyĠsimpĊĠĠĠĠĠĠ--ĠInductiveĠstepĊĠĠĠĠĠĠexactĠihĠ{ĠihĠ:=ĠthisĠ}Ċ  | succ a ih => simp [Nat.succ_add, ih]
+---
+[verify] success=False th=sample_1 gen_len=3311
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+ĊToĠproveĠ`add_comm`ĠinductionĠonĠ`a`,ĠweĠhandleĠtheĠbasisĠandĠsuccessorĠcases.Ċ-ĠForĠ**IZero**Ġ(aĠ=Ġ0),ĠbyĠreflexivityĠandĠ`Nat.zero_add`:ĊĠĠ```leanĊĠĠ-ĠsimpĠ[Nat.plus_zero,Ġih]ĊĠĠ-ĠrflĊĠĠ```Ċ-ĠForĠ**successorĠ(aĠ=ĠsuccĠa')**,ĠuseĠtheĠinductiveĠhypothesisĠ(`ih`)ĠplusĠtheĠLeibnizĠidentityĠ`Nat.plus_succ`:ĊĠĠ```leanĊĠĠsubstĠihĊĠĠsi...
+---
+[verify] success=False th=sample_1 gen_len=1169
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+ĊĠĠcasesĠbĠwithĊĠĠĠĠ|ĠzeroĠ=>ĠsimpĠ[Nat.zero_add]ĊĠĠĠĠ|ĠsuccĠbĠih'Ġ=>ĠbyĠrflĠ[(Nat.succ_addĠbĠih')]Ċ  | succ a ih => simp [Nat.succ_add, ih]
+---
+[verify] success=False th=sample_1 gen_len=2756
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+ĊTheĠtaskĠisĠtoĠsolveĠtheĠ`add_comm`ĠtheoremĠforĠ`Nat`,ĠwhereĠadditionĠisĠcommutativeĠbyĠinductionĠonĠ`a`.ĠHereâĢĻsĠtheĠreasoningĠstep-by-step:ĊĊ1.Ġ**BaseĠcaseĠ(aĠ=Ġ0):**ĊĠĠĠByĠdirectĠapplicationĠofĠ`Nat.zero_add`,ĠaddingĠ`b`ĠtoĠ`0`ĠsimplyĠgivesĠ`b`,ĠmatchingĠ`bĠ+Ġ0`ĠbyĠ`Nat.add_zero`.ĊĊ2.Ġ**InductiveĠstepĠ(aĠ=ĠsuccĠa,ĠusingĠtheĠh...
+---
+[verify] success=False th=sample_1 gen_len=3552
+theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+ĊĠĠinductionĠbĠwithĊĠĠ|Ġzero_bhbĠ=>ĠrflĊĠĠ|Ġsucc_bĠihbĠ=>ĊĠĠĠĠhaveĠgoalĠ:=Ġ(succĠbĠ+ĠsuccĠa)Ġ=Ġ(succĠa)Ġ+Ġ(succĠb)ĊĠĠĠĠhaveĠ{byĠrwĠ[succ_add,ĠaĠ:=Ġ(Nat.recOnĠa)]Ġ;ĠapplyĠihĠ:ĠsuccĠaĠ+ĠsuccĠbĠ=ĠsuccĠbĠ+ĠsuccĠaĠ+Ġ1}ĊĠĠĠĠhaveĠ{byĠrwĠ[one_add_one]}Ġ;ĠrflĊĊĠĠ#simpĠgoalĊĠĠĠĠ#Ġ[succ_add,Ġih,Ġone_add_one]Ċ  | succ a ih => simp [Nat.succ_a...
+---

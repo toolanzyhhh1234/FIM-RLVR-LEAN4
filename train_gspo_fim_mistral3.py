@@ -62,6 +62,8 @@ DEFAULT_VERIFIERS = max(1, (os.cpu_count() or 4) - 1)
 MAX_VERIFIERS = int(os.environ.get("FIM_MAX_VERIFIERS", str(DEFAULT_VERIFIERS)))
 LOG_VERIFICATION = bool(int(os.environ.get("FIM_LOG_VERIFICATION", "1")))
 LOG_VERIFICATION_LIMIT = int(os.environ.get("FIM_LOG_VERIFICATION_LIMIT", "3"))
+LOG_RAW = bool(int(os.environ.get("FIM_LOG_RAW", "1")))
+LOG_RAW_LIMIT = int(os.environ.get("FIM_LOG_RAW_LIMIT", "3"))
 LOG_DIR = "training_logs"
 LOG_PROMPTS = bool(int(os.environ.get("FIM_LOG_PROMPTS", "1")))
 LOG_PROMPTS_LIMIT = int(os.environ.get("FIM_LOG_PROMPTS_LIMIT", "3"))
@@ -286,10 +288,18 @@ def lean_validity_reward_factory(verifier, curriculum):
         
         # Prepare verification inputs
         verification_inputs = []
+        raw_logs = []
         for idx, (generated_text, prefix, suffix) in enumerate(zip(completions, fim_prefix, fim_suffix)):
             task = None
             if task_type is not None and idx < len(task_type):
                 task = task_type[idx]
+
+            if LOG_RAW and len(raw_logs) < LOG_RAW_LIMIT:
+                raw_logs.append({
+                    "theorem_id": theorem_id[idx] if idx < len(theorem_id) else "unknown",
+                    "task_type": task or "unknown",
+                    "raw_completion": generated_text,
+                })
 
             if task == "fim":
                 extracted = _extract_tagged_code(generated_text, FIM_CODE_TAG)
@@ -304,6 +314,10 @@ def lean_validity_reward_factory(verifier, curriculum):
             extracted = _strip_markdown_fences(extracted)
             full_code = (prefix or "") + extracted + (suffix or "")
             verification_inputs.append(full_code if full_code.strip() else None)
+
+            if LOG_RAW and len(raw_logs) <= LOG_RAW_LIMIT:
+                raw_logs[-1]["extracted_code"] = extracted
+                raw_logs[-1]["verifier_input"] = full_code if full_code.strip() else "<empty>"
 
         # Parallel verification
         def verify_single(code):
@@ -342,6 +356,23 @@ def lean_validity_reward_factory(verifier, curriculum):
                 for entry in logs:
                     f.write(f"[verify] success={entry['success']} th={entry['theorem_id']} "
                            f"gen_len={entry['gen_len']}\n{entry['code_preview']}\n---\n")
+
+        if LOG_RAW and raw_logs:
+            os.makedirs(LOG_DIR, exist_ok=True)
+            with open(os.path.join(LOG_DIR, "raw_completions.log"), "a", encoding="utf-8") as f:
+                for entry in raw_logs:
+                    f.write(
+                        "[raw]\n"
+                        f"th={entry['theorem_id']} task={entry['task_type']}\n"
+                        f"{entry['raw_completion']}\n"
+                        "---\n"
+                        "[extracted]\n"
+                        f"{entry.get('extracted_code','')}\n"
+                        "---\n"
+                        "[verifier_input]\n"
+                        f"{entry.get('verifier_input','')}\n"
+                        "===\n"
+                    )
 
         return scores
 
