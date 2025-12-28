@@ -154,3 +154,1011 @@ Calls to these tools must go to the commentary channel: 'functions'.<|end|><|sta
 You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.<|end|><|start|>user<|message|>[MISSING_BLOCK]
 <|end|><|start|>assistant
 ---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.20
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.20
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.20
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.20
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.20
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.20
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.20
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.20
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.20
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.20
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.20
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.20
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.20
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+[MISSING_BLOCK]
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+  induction a with
+  | zero => simp
+[MISSING_BLOCK]
+[/INST]
+---
+[prompt] th=sample_1 ratio=0.20
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
+[prompt] th=sample_1 ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. Output ONLY the missing code.[/SYSTEM_PROMPT][INST]theorem add_comm (a b : ℕ) : a + b = b + a := by
+[MISSING_BLOCK]
+  | zero => simp
+  | succ a ih => simp [Nat.succ_add, ih][/INST]
+---
