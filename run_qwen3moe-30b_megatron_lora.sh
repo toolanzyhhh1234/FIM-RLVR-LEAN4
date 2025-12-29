@@ -50,9 +50,9 @@ DATA=(
 MODEL=(
     actor_rollout_ref.model.path=Qwen/Qwen3-30B-A3B-Instruct-2507
     actor_rollout_ref.model.use_fused_kernels=True
-    actor_rollout_ref.model.lora.rank=32
-    actor_rollout_ref.model.lora.alpha=64
-    actor_rollout_ref.model.lora.lora_A_init_method=kaiming
+    +actor_rollout_ref.model.lora.rank=32
+    +actor_rollout_ref.model.lora.alpha=64
+    +actor_rollout_ref.model.lora.lora_A_init_method=kaiming
     # # Optional: Use canonical LoRA
     # actor_rollout_ref.model.lora.type="canonical_lora"
     # actor_rollout_ref.model.lora.target_modules='["linear_q","linear_k","linear_v","linear_proj","linear_fc1_up","linear_fc1_gate","linear_fc2"]'
