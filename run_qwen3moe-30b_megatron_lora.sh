@@ -89,6 +89,8 @@ ROLLOUT=(
     actor_rollout_ref.rollout.tensor_model_parallel_size=8
     actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=4
     actor_rollout_ref.rollout.log_prob_use_dynamic_bsz=True
+    # Rollout quantization: FP8 for vLLM rollout server
+    +actor_rollout_ref.rollout.quantization=fp8
     actor_rollout_ref.rollout.name=${rollout_name}
     actor_rollout_ref.rollout.gpu_memory_utilization=0.25
     actor_rollout_ref.rollout.enforce_eager=True
