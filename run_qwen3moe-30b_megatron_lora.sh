@@ -93,7 +93,11 @@ ROLLOUT=(
     # Rollout quantization: FP8 for vLLM rollout server
     +actor_rollout_ref.rollout.quantization=fp8
     actor_rollout_ref.rollout.name=${rollout_name}
-    actor_rollout_ref.rollout.gpu_memory_utilization=0.4
+    # Lower vLLM memory usage to fit single GPU
+    actor_rollout_ref.rollout.gpu_memory_utilization=0.2
+    actor_rollout_ref.rollout.max_num_batched_tokens=4096
+    actor_rollout_ref.rollout.max_num_seqs=256
+    actor_rollout_ref.rollout.max_model_len=4096
     actor_rollout_ref.rollout.enforce_eager=True
     actor_rollout_ref.rollout.free_cache_engine=True
     actor_rollout_ref.rollout.n=2
