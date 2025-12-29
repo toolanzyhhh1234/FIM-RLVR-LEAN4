@@ -81,7 +81,6 @@ ACTOR=(
     # CPU offloading for memory efficiency on single GPU
     actor_rollout_ref.actor.fsdp_config.param_offload=True
     actor_rollout_ref.actor.fsdp_config.optimizer_offload=True
-    actor_rollout_ref.actor.fsdp_config.grad_offload=True
 )
 
 ROLLOUT=(
