@@ -79,9 +79,9 @@ ACTOR=(
     actor_rollout_ref.actor.clip_ratio_low=0.2
     actor_rollout_ref.actor.clip_ratio_high=0.28
     # CPU offloading for memory efficiency on single GPU
-    +actor_rollout_ref.actor.fsdp_config.param_offload=True
-    +actor_rollout_ref.actor.fsdp_config.optimizer_offload=True
-    +actor_rollout_ref.actor.fsdp_config.grad_offload=True
+    actor_rollout_ref.actor.fsdp_config.param_offload=True
+    actor_rollout_ref.actor.fsdp_config.optimizer_offload=True
+    actor_rollout_ref.actor.fsdp_config.grad_offload=True
 )
 
 ROLLOUT=(
@@ -101,7 +101,7 @@ REF=(
     actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=1
     actor_rollout_ref.ref.log_prob_use_dynamic_bsz=True
     # Use FSDP for ref model as well
-    +actor_rollout_ref.ref.fsdp_config.param_offload=${ALL_OFFLOAD}
+    actor_rollout_ref.ref.fsdp_config.param_offload=${ALL_OFFLOAD}
 )
 
 ALGORITHM=(
