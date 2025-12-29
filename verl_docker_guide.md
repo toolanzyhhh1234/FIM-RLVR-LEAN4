@@ -68,6 +68,16 @@ Launch the desired Docker image and attach into it:
 docker create --runtime=nvidia --gpus all --net=host --shm-size="10g" --cap-add=SYS_ADMIN -v .:/workspace/verl --name verl <image:tag> sleep infinity
 docker start verl
 docker exec -it verl bash
+
+Project-specific notes for this repo:
+- Mount the host repo into the container so changes persist. On the VM the repo is
+  /root/FIM-RLVR-LEAN4, and inside the container it should be /workspace/verl.
+  Example: -v /root/FIM-RLVR-LEAN4:/workspace/verl
+- Lean4 must be installed inside the container (elan + lake) because verification
+  runs in-container. Recommended install prefix: /root/.elan and ensure
+  /root/.elan/bin is on PATH.
+- Set --shm-size based on host RAM. For H200 machines, a common setting is 120g
+  (about half of typical system RAM). Increase if you see shared-memory issues.
 If you use the images provided, you only need to install verl itself without dependencies:
 
 # install the nightly version (recommended)

@@ -16,13 +16,14 @@ class LeanVerifier:
 
         self.uuid_module = uuid  # Keep reference
 
-    def verify(self, full_code: str) -> Tuple[bool, str]:
+    def verify(self, full_code: str, timeout: float | None = None) -> Tuple[bool, str]:
         """
         Verifies a Lean 4 proof by compiling it.
         Supports parallel execution by using unique temporary files.
 
         Args:
             full_code: The complete Lean source code (imports + theorem + proof).
+            timeout: Optional timeout in seconds for the Lean process.
 
         Returns:
             (success, output):
@@ -52,6 +53,7 @@ class LeanVerifier:
                 capture_output=True,
                 text=True,
                 check=False,
+                timeout=timeout,
             )
         except FileNotFoundError:
             # Clean up
@@ -61,6 +63,13 @@ class LeanVerifier:
                 except:
                     pass
             return False, "Error: 'lake' command not found. Is Lean 4 installed?"
+        except subprocess.TimeoutExpired:
+            if os.path.exists(file_path):
+                try:
+                    os.remove(file_path)
+                except:
+                    pass
+            return False, f"Error: Lean verification timed out after {timeout} seconds"
 
         # 3. Clean up the temporary file
         if os.path.exists(file_path):

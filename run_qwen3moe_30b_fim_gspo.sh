@@ -23,8 +23,8 @@ exp_name='qwen3_30b_fim_gspo'
 adv_estimator=grpo
 
 # FIM-RLVR-LEAN4 data paths - using HuggingFace dataset
-fim_train_path=hf://datasets/AI-MO/NuminaMath-LEAN/train.parquet
-fim_test_path=hf://datasets/AI-MO/NuminaMath-LEAN/test.parquet
+fim_train_path=hf://datasets/AI-MO/NuminaMath-LEAN/data/train-00000-of-00001.parquet
+fim_test_path=hf://datasets/AI-MO/NuminaMath-LEAN/data/train-00000-of-00001.parquet
 
 ########################### Parameter Arrays ###########################
 
