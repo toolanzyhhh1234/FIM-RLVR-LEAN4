@@ -40,7 +40,7 @@ wandb/training_logs/
 exports/
 
 # External libraries
-verl/
+# verl/ is now tracked as git subtree
 apex/
 .claude/.mcp.json
 docs/codex_session_dump/
