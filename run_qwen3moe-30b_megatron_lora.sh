@@ -70,9 +70,8 @@ ACTOR=(
     actor_rollout_ref.actor.strategy=fsdp
     actor_rollout_ref.actor.use_dynamic_bsz=True
     # KL loss configuration
-    actor_rollout_ref.actor.use_kl_loss=True
-    actor_rollout_ref.actor.kl_loss_coef=0.001
-    actor_rollout_ref.actor.kl_loss_type=low_var_kl
+    actor_rollout_ref.actor.use_kl_loss=False
+    actor_rollout_ref.actor.kl_loss_coef=0.0
     actor_rollout_ref.actor.entropy_coeff=0
     # GSPO configuration (sequence-level importance sampling)
     actor_rollout_ref.actor.policy_loss.loss_mode=gspo
