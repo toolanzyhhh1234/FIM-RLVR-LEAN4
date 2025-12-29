@@ -76,8 +76,13 @@ Project-specific notes for this repo:
 - Lean4 must be installed inside the container (elan + lake) because verification
   runs in-container. Recommended install prefix: /root/.elan and ensure
   /root/.elan/bin is on PATH.
+- Megatron + LoRA requires Megatron-Bridge (mbridge). This is not mentioned in the
+  upstream install guide because it is only required for PEFT/LoRA via Megatron.
 - Set --shm-size based on host RAM. For H200 machines, a common setting is 120g
   (about half of typical system RAM). Increase if you see shared-memory issues.
+- Be prepared for source builds when installing Megatron-Bridge: pip may compile
+  wheels for packages like causal-conv1d, mamba-ssm, nv-grouped-gemm, and
+  transformer_engine_torch (can take a while on fresh nodes).
 If you use the images provided, you only need to install verl itself without dependencies:
 
 # install the nightly version (recommended)
