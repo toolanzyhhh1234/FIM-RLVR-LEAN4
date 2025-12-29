@@ -21,24 +21,25 @@ ALL_OFFLOAD=${ALL_OFFLOAD:-True}
 
 
 rollout_name="vllm"
-project_name='verl_grpo_example_gsm8k_math'
-exp_name='qwen3_30b_a3b_megatron_lora'
+project_name='fim_rlvr_lean4'
+exp_name='qwen3_30b_megatron_lora_fim'
 adv_estimator=grpo
 
-gsm8k_train_path=$HOME/data/gsm8k/train.parquet
-gsm8k_test_path=$HOME/data/gsm8k/test.parquet
+# FIM-RLVR-LEAN4 data paths - using HuggingFace dataset
+fim_train_path=hf://datasets/AI-MO/NuminaMath-LEAN/train.parquet
+fim_test_path=hf://datasets/AI-MO/NuminaMath-LEAN/test.parquet
 
 ########################### Parameter Arrays ###########################
 
 DATA=(
-    data.train_files=${gsm8k_train_path}
-    data.val_files=${gsm8k_test_path}
-    data.train_batch_size=128
-    data.max_prompt_length=1024
+    data.train_files=${fim_train_path}
+    data.val_files=${fim_test_path}
+    data.train_batch_size=64
+    data.max_prompt_length=2048
     data.max_response_length=1024
     data.truncation='error'
     data.filter_overlong_prompts=True
-    data.shuffle=False
+    data.shuffle=True
 )
 
 MODEL=(
@@ -57,7 +58,7 @@ MODEL=(
 )
 
 ACTOR=(
-    actor_rollout_ref.actor.optim.lr=3e-6
+    actor_rollout_ref.actor.optim.lr=1e-6
     actor_rollout_ref.actor.ppo_mini_batch_size=16
     actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=2
     actor_rollout_ref.actor.megatron.use_mbridge=True
@@ -67,6 +68,10 @@ ACTOR=(
     actor_rollout_ref.actor.kl_loss_coef=0.001
     actor_rollout_ref.actor.kl_loss_type=low_var_kl
     actor_rollout_ref.actor.entropy_coeff=0
+    # GSPO configuration (sequence-level importance sampling)
+    actor_rollout_ref.actor.policy_loss.loss_mode=gspo
+    actor_rollout_ref.actor.clip_ratio_low=0.2
+    actor_rollout_ref.actor.clip_ratio_high=0.28
     actor_rollout_ref.actor.megatron.tensor_model_parallel_size=${TP}
     actor_rollout_ref.actor.megatron.pipeline_model_parallel_size=${PP}
     actor_rollout_ref.actor.megatron.expert_model_parallel_size=${EP}
@@ -106,16 +111,23 @@ ALGORITHM=(
     algorithm.adv_estimator=${adv_estimator}
 )
 
+REWARD=(
+    reward_model.reward_manager=lean_verifier
+    +reward_model.reward_kwargs.lean_env_path=/home/admin1/CodeProjects/FIM-RLVR-LEAN4/verification_env
+    +reward_model.reward_kwargs.verification_timeout=30
+    +reward_model.reward_kwargs.parallel_workers=4
+)
+
 TRAINER=(
     trainer.critic_warmup=0
     trainer.logger='["console","wandb"]'
     trainer.project_name=${project_name}
     trainer.experiment_name=${exp_name}
-    trainer.n_gpus_per_node=8
+    trainer.n_gpus_per_node=1
     trainer.nnodes=1
-    trainer.save_freq=20
+    trainer.save_freq=10
     trainer.test_freq=5
-    trainer.total_epochs=15
+    trainer.total_epochs=10
 )
 
 ########################### Launch ###########################
@@ -129,5 +141,6 @@ python3 -m verl.trainer.main_ppo \
     "${ROLLOUT[@]}" \
     "${ACTOR[@]}" \
     "${REF[@]}" \
+    "${REWARD[@]}" \
     "${TRAINER[@]}" \
     "$@"
