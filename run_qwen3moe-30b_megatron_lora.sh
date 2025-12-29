@@ -81,6 +81,9 @@ ACTOR=(
     # CPU offloading for memory efficiency on single GPU
     actor_rollout_ref.actor.fsdp_config.param_offload=True
     actor_rollout_ref.actor.fsdp_config.optimizer_offload=True
+    # Use bf16 so Flash Attention 2 is supported
+    actor_rollout_ref.actor.fsdp_config.model_dtype=bfloat16
+    actor_rollout_ref.actor.fsdp_config.dtype=bfloat16
 )
 
 ROLLOUT=(
@@ -101,6 +104,8 @@ REF=(
     actor_rollout_ref.ref.log_prob_use_dynamic_bsz=True
     # Use FSDP for ref model as well
     actor_rollout_ref.ref.fsdp_config.param_offload=${ALL_OFFLOAD}
+    actor_rollout_ref.ref.fsdp_config.model_dtype=bfloat16
+    actor_rollout_ref.ref.fsdp_config.dtype=bfloat16
 )
 
 ALGORITHM=(
