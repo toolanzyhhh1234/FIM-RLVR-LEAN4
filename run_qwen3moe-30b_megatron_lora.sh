@@ -89,14 +89,18 @@ ROLLOUT=(
     actor_rollout_ref.rollout.tensor_model_parallel_size=1
     actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=1
     actor_rollout_ref.rollout.log_prob_use_dynamic_bsz=True
-    # Rollout quantization: FP8 for vLLM rollout server
-    +actor_rollout_ref.rollout.quantization=fp8
+    # Disable FP8 quantization to avoid vLLM fp8 utils mismatch
+    actor_rollout_ref.rollout.quantization=null
     actor_rollout_ref.rollout.name=${rollout_name}
-    # Lower vLLM memory usage to fit single GPU
-    actor_rollout_ref.rollout.gpu_memory_utilization=0.2
-    actor_rollout_ref.rollout.max_num_batched_tokens=4096
-    actor_rollout_ref.rollout.max_num_seqs=256
-    actor_rollout_ref.rollout.max_model_len=4096
+    # vLLM memory allocation - needs enough for model structure + KV cache
+    # 30B MoE model requires significant memory even with dummy weights
+    # With H200 (143GB), 0.6 gives ~86GB for vLLM
+    actor_rollout_ref.rollout.gpu_memory_utilization=0.6
+    # Reduce batched tokens and model len to lower KV cache memory
+    actor_rollout_ref.rollout.max_num_batched_tokens=2048
+    actor_rollout_ref.rollout.max_num_seqs=64
+    # max_model_len = max_prompt_length + max_response_length = 1024 + 512 = 1536
+    actor_rollout_ref.rollout.max_model_len=1536
     actor_rollout_ref.rollout.enforce_eager=True
     actor_rollout_ref.rollout.free_cache_engine=True
     actor_rollout_ref.rollout.n=2
