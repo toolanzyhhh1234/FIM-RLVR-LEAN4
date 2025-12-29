@@ -322,7 +322,26 @@ def process_weights_after_loading_for_vllm11(self, layer) -> None:
 
     del layer.weight_scale_inv
 
-    maybe_post_process_fp8_weight_block(layer)
+    # vLLM API drift: some versions require an extra cutlass_block_fp8_supported arg.
+    try:
+        import inspect
+
+        param_count = len(inspect.signature(maybe_post_process_fp8_weight_block).parameters)
+        if param_count <= 1:
+            maybe_post_process_fp8_weight_block(layer)
+        else:
+            try:
+                from vllm.model_executor.layers.quantization.utils.fp8_utils import (
+                    is_cutlass_block_fp8_supported,
+                )
+
+                cutlass_block_fp8_supported = is_cutlass_block_fp8_supported()
+            except Exception:
+                cutlass_block_fp8_supported = False
+            maybe_post_process_fp8_weight_block(layer, cutlass_block_fp8_supported)
+    except Exception:
+        # Fall back to the legacy call; let vLLM raise if it's incompatible.
+        maybe_post_process_fp8_weight_block(layer)
 
 
 def process_weights_after_loading_moe_for_vllm10(self, layer) -> None:
