@@ -6,13 +6,23 @@ set -euo pipefail
 #
 # Usage:
 #   ./scripts/run_train_with_logs.sh [log_dir] [interval_seconds] -- <train_command...>
-# Example:
+#   ./scripts/run_train_with_logs.sh [log_dir] [interval_seconds] --host -- <train_command...>
+# Example (default runs inside container):
 #   ./scripts/run_train_with_logs.sh /tmp/train_logs 1 -- bash run_qwen3moe-30b_megatron_lora.sh
+# Example (host run):
+#   ./scripts/run_train_with_logs.sh /tmp/train_logs 1 --host -- bash run_qwen3moe-30b_megatron_lora.sh
 
 LOG_DIR=${1:-/tmp/train_logs}
 INTERVAL=${2:-1}
 
 shift 2 || true
+
+RUN_IN_CONTAINER=1
+if [ "${1:-}" = "--host" ]; then
+  RUN_IN_CONTAINER=0
+  shift 1
+fi
+
 if [ "${1:-}" != "--" ]; then
   echo "ERROR: expected -- before the training command."
   exit 1
@@ -44,7 +54,17 @@ cleanup() {
 trap cleanup EXIT
 
 set +e
-("$@") 2>&1 | tee "${TRAIN_LOG}"
+if [ "${RUN_IN_CONTAINER}" -eq 1 ]; then
+  if [ "${1}" = "docker" ]; then
+    "$@" 2>&1 | tee "${TRAIN_LOG}"
+  else
+    CMD_STR=$(printf '%q ' "$@")
+    docker exec -i verl bash -lc "export PATH=/root/.elan/bin:\$PATH && cd /workspace/verl && ${CMD_STR}" \
+      2>&1 | tee "${TRAIN_LOG}"
+  fi
+else
+  "$@" 2>&1 | tee "${TRAIN_LOG}"
+fi
 EXIT_CODE=${PIPESTATUS[0]}
 set -e
 
