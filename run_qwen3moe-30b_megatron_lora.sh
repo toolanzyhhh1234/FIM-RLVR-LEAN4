@@ -117,7 +117,7 @@ REWARD=(
     reward_model.reward_manager=lean_verifier
     +reward_model.reward_kwargs.lean_env_path=/home/admin1/CodeProjects/FIM-RLVR-LEAN4/verification_env
     +reward_model.reward_kwargs.verification_timeout=30
-    +reward_model.reward_kwargs.parallel_workers=4
+    +reward_model.reward_kwargs.parallel_workers=20
 )
 
 TRAINER=(
