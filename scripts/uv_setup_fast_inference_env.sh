@@ -22,6 +22,9 @@ fi
 # Install using pip to avoid uv's resolver/compatibility checks.
 python -m pip install --no-deps -r ministral-training-requirements.txt
 
+# vLLM runtime expects pydantic; install it with dependencies.
+python -m pip install pydantic
+
 # vLLM often conflicts with other pins; install it without resolving deps.
 uv pip install --no-deps vllm --torch-backend=auto
 
