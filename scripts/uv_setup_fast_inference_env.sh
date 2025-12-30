@@ -14,10 +14,11 @@ uv venv "${venv_dir}"
 # shellcheck disable=SC1090
 source "${venv_dir}/bin/activate"
 
-uv pip install -r ministral-training-requirements.txt
+# Install using pip to avoid uv's resolver/compatibility checks.
+python -m pip install --no-deps -r ministral-training-requirements.txt
 
 # vLLM often conflicts with other pins; install it without resolving deps.
-uv pip install --no-deps vllm --torch-backend=auto
+python -m pip install --no-deps vllm
 
 echo
 echo "Done."
