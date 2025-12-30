@@ -33,9 +33,12 @@ MODEL_NAME = os.environ.get(
 )
 OUTPUT_DIR = "outputs_fim_grpo_mistral3"
 CURRICULUM_STATE_PATH = os.path.join(OUTPUT_DIR, "curriculum_state.json")
-DATA_PARQUET = os.environ.get(
-    "FIM_PARQUET_PATH",
-    "data/fim_fresh.jsonl",  # Default to local JSONL if available
+DATA_DIR = os.environ.get("FIM_DATA_DIR", "/data")
+DATA_PARQUET = os.environ.get("FIM_PARQUET_PATH", "")
+HF_DATASET_REPO = os.environ.get("FIM_HF_DATASET", "AI-MO/NuminaMath-LEAN")
+HF_DATASET_FILE = os.environ.get(
+    "FIM_HF_DATASET_FILE",
+    "data/train-00000-of-00001.parquet",
 )
 
 def _int_env(name, default):
@@ -64,7 +67,7 @@ LOG_VERIFICATION = bool(int(os.environ.get("FIM_LOG_VERIFICATION", "1")))
 LOG_VERIFICATION_LIMIT = int(os.environ.get("FIM_LOG_VERIFICATION_LIMIT", "3"))
 LOG_RAW = bool(int(os.environ.get("FIM_LOG_RAW", "1")))
 LOG_RAW_LIMIT = int(os.environ.get("FIM_LOG_RAW_LIMIT", "3"))
-LOG_DIR = "training_logs"
+LOG_DIR = os.environ.get("FIM_LOG_DIR", "training_logs")
 LOG_PROMPTS = bool(int(os.environ.get("FIM_LOG_PROMPTS", "1")))
 LOG_PROMPTS_LIMIT = int(os.environ.get("FIM_LOG_PROMPTS_LIMIT", "3"))
 TRUST_REMOTE_CODE = _bool_env("FIM_TRUST_REMOTE_CODE", True)
@@ -85,41 +88,52 @@ def _ensure_transformers_compat(model_name: str) -> None:
             )
 
 
-def load_training_dataset(data_path: str) -> Dataset:
+def _find_local_parquet(data_dir: str) -> str | None:
+    if not data_dir or not os.path.isdir(data_dir):
+        return None
+    candidates = [
+        os.path.join(data_dir, name)
+        for name in os.listdir(data_dir)
+        if name.endswith(".parquet")
+    ]
+    if not candidates:
+        return None
+    candidates.sort()
+    return candidates[0]
+
+
+def _download_hf_parquet(data_dir: str) -> str:
+    from huggingface_hub import hf_hub_download
+
+    os.makedirs(data_dir, exist_ok=True)
+    return hf_hub_download(
+        repo_id=HF_DATASET_REPO,
+        filename=HF_DATASET_FILE,
+        repo_type="dataset",
+        local_dir=data_dir,
+        local_dir_use_symlinks=False,
+    )
+
+
+def resolve_parquet_path() -> str:
+    if DATA_PARQUET:
+        if os.path.exists(DATA_PARQUET):
+            return DATA_PARQUET
+        print(f"Warning: FIM_PARQUET_PATH not found at {DATA_PARQUET}; falling back.")
+
+    local_path = _find_local_parquet(DATA_DIR)
+    if local_path:
+        return local_path
+
+    print(f"No parquet found in {DATA_DIR}; downloading from Hugging Face.")
+    return _download_hf_parquet(DATA_DIR)
+
+
+def load_training_dataset(parquet_path: str) -> Dataset:
     """
-    Load training data from JSONL or Parquet with Lean code.
+    Load training data from Parquet with Lean code.
     """
-    if data_path.endswith('.jsonl'):
-        # Load JSONL format
-        import json
-        data = []
-        try:
-            with open(data_path, 'r', encoding='utf-8') as f:
-                for line in f:
-                    if line.strip():
-                        data.append(json.loads(line))
-        except FileNotFoundError:
-            print(f"Warning: {data_path} not found, creating minimal sample dataset")
-            # Create minimal sample for testing
-            data = [
-                {
-                    "formal_ground_truth": """theorem add_comm (a b : ℕ) : a + b = b + a := by
-  induction a with
-  | zero => simp
-  | succ a ih => simp [Nat.succ_add, ih]""",
-                    "uuid": "sample_1"
-                },
-                {
-                    "formal_ground_truth": """theorem zero_add (n : ℕ) : 0 + n = n := by
-  rfl""",
-                    "uuid": "sample_2"
-                }
-            ]
-        
-        df = pl.DataFrame(data)
-    else:
-        # Load Parquet format
-        df = pl.read_parquet(data_path)
+    df = pl.read_parquet(parquet_path)
     
     cols = set(df.columns)
     if "formal_ground_truth" not in cols:
@@ -568,8 +582,9 @@ def main():
     )
 
     # Load dataset
-    print(f"Loading dataset from {DATA_PARQUET}")
-    dataset = load_training_dataset(DATA_PARQUET)
+    data_path = resolve_parquet_path()
+    print(f"Loading dataset from {data_path}")
+    dataset = load_training_dataset(data_path)
     dataset = filter_valid_rows(dataset)
 
     # Initialize verifier and curriculum
