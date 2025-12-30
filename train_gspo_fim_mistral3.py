@@ -638,11 +638,15 @@ def main():
 
     print(f"Loading model: {MODEL_NAME}")
     _ensure_transformers_compat(MODEL_NAME)
-    model, tokenizer = FastVisionModel.from_pretrained(
-        model_name=MODEL_NAME,
-        max_seq_length=MAX_SEQ_LENGTH,
-        load_in_4bit=LOAD_IN_4BIT,  # False for 16-bit LoRA
-    )
+    load_kwargs = {
+        "model_name": MODEL_NAME,
+        "max_seq_length": MAX_SEQ_LENGTH,
+        "load_in_4bit": LOAD_IN_4BIT,  # False for 16-bit LoRA
+    }
+    if FAST_INFERENCE:
+        # Enables vLLM backend inside Unsloth.
+        load_kwargs["fast_inference"] = True
+    model, tokenizer = FastVisionModel.from_pretrained(**load_kwargs)
 
     # Add LoRA adapters (matching Unsloth example setup)
     model = FastVisionModel.get_peft_model(
