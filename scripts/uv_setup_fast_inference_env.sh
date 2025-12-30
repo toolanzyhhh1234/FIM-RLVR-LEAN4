@@ -19,10 +19,10 @@ if ! python -m pip --version >/dev/null 2>&1; then
   python -m ensurepip --upgrade
 fi
 
-# Install base deps with pip (no dependency resolution).
-python -m pip install --no-deps -r ministral-training-requirements.txt
+# Install base deps (with dependencies).
+python -m pip install -r ministral-training-requirements.txt
 
-# Install Unsloth via pip (brings its dependencies).
+# Install Unsloth via pip (brings its dependencies, may override some pins).
 python -m pip install unsloth
 
 # vLLM often conflicts with other pins; install it without resolving deps.
