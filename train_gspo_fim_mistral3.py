@@ -50,6 +50,15 @@ def _int_env(name, default):
     except ValueError:
         return default
 
+def _float_env(name, default: float) -> float:
+    val = os.environ.get(name, "")
+    if val.strip() == "":
+        return default
+    try:
+        return float(val)
+    except ValueError:
+        return default
+
 def _bool_env(name, default: bool) -> bool:
     val = os.environ.get(name, "")
     if val.strip() == "":
@@ -73,6 +82,8 @@ LOG_PROMPTS_LIMIT = int(os.environ.get("FIM_LOG_PROMPTS_LIMIT", "3"))
 LOG_PROMPTS_MAX_CHARS = int(os.environ.get("FIM_LOG_PROMPTS_MAX_CHARS", "0"))
 FIM_NO_SORRIES = _bool_env("FIM_NO_SORRIES", True)
 FIM_EXCLUDE_SORRY = _bool_env("FIM_EXCLUDE_SORRY", True)
+FIM_TAG_REWARD = _float_env("FIM_TAG_REWARD", 0.05)
+FIM_LEAN_SUCCESS_REWARD = _float_env("FIM_LEAN_SUCCESS_REWARD", 2.0)
 
 _PROMPT_LOG_SEEN: set[str] = set()
 TRUST_REMOTE_CODE = _bool_env("FIM_TRUST_REMOTE_CODE", True)
@@ -484,6 +495,7 @@ def lean_validity_reward_factory(verifier, curriculum, tokenizer):
 
         # Prepare verification inputs
         verification_inputs = []
+        tag_ok_list = []
         raw_logs = []
         for idx, (generated_text, prefix, suffix) in enumerate(zip(decoded_completions, fim_prefix, fim_suffix)):
             task = None
@@ -497,15 +509,23 @@ def lean_validity_reward_factory(verifier, curriculum, tokenizer):
                     "raw_completion": generated_text,
                 })
 
+            extracted = None
             if task == "fim":
                 extracted = _extract_tagged_code(generated_text, FIM_CODE_TAG)
             elif task == "full":
                 extracted = _extract_tagged_code(generated_text, FULL_CODE_TAG)
-            else:
-                extracted = None
 
-            if extracted is None:
-                extracted = generated_text
+            tag_ok = extracted is not None and extracted.strip() != ""
+            tag_ok_list.append(tag_ok)
+
+            # If tags are missing (or empty), do NOT fall back to raw completion.
+            # Treat it as invalid formatting and skip Lean verification.
+            if not tag_ok:
+                verification_inputs.append(None)
+                if LOG_RAW and len(raw_logs) <= LOG_RAW_LIMIT:
+                    raw_logs[-1]["extracted_code"] = ""
+                    raw_logs[-1]["verifier_input"] = "<skipped: missing/empty tag>"
+                continue
 
             extracted = _strip_markdown_fences(extracted)
             full_code = (prefix or "") + extracted + (suffix or "")
@@ -532,7 +552,8 @@ def lean_validity_reward_factory(verifier, curriculum, tokenizer):
         
         for idx, (success, th_id) in enumerate(zip(results, theorem_id)):
             curriculum.update_outcome(th_id, success)
-            scores.append(2.0 if success else 0.0)
+            tag_bonus = FIM_TAG_REWARD if (idx < len(tag_ok_list) and tag_ok_list[idx]) else 0.0
+            scores.append((FIM_LEAN_SUCCESS_REWARD if success else 0.0) + tag_bonus)
 
             if LOG_VERIFICATION and len(logs) < LOG_VERIFICATION_LIMIT:
                 preview = verification_inputs[idx] or "<empty>"
