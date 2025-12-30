@@ -18,7 +18,7 @@ source "${venv_dir}/bin/activate"
 python -m pip install --no-deps -r ministral-training-requirements.txt
 
 # vLLM often conflicts with other pins; install it without resolving deps.
-python -m pip install --no-deps vllm
+uv pip install --no-deps vllm --torch-backend=auto
 
 echo
 echo "Done."
