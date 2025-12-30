@@ -14,6 +14,11 @@ uv venv "${venv_dir}"
 # shellcheck disable=SC1090
 source "${venv_dir}/bin/activate"
 
+# Ensure pip exists inside the venv (uv venv may omit it).
+if ! python -m pip --version >/dev/null 2>&1; then
+  python -m ensurepip --upgrade
+fi
+
 # Install using pip to avoid uv's resolver/compatibility checks.
 python -m pip install --no-deps -r ministral-training-requirements.txt
 
