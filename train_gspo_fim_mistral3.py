@@ -478,7 +478,9 @@ def lean_validity_reward_factory(verifier, curriculum, tokenizer):
         end = text.find(f"</{tag}>", start)
         if end == -1:
             return None
-        return text[start:end].strip()
+        # Preserve leading indentation inside the tag (important for Lean layout).
+        # Only trim surrounding newlines.
+        return text[start:end].strip("\n")
 
     def _strip_markdown_fences(text: str) -> str:
         if not text:
@@ -486,6 +488,33 @@ def lean_validity_reward_factory(verifier, curriculum, tokenizer):
         lines = text.splitlines()
         cleaned = [line for line in lines if not line.strip().startswith("```")]
         return "\n".join(cleaned).strip()
+
+    def _infer_block_indent(prefix: str | None, suffix: str | None) -> str:
+        # Prefer the suffix indentation (it is adjacent to the hole).
+        for candidate in (suffix, prefix):
+            if not candidate:
+                continue
+            for line in candidate.splitlines():
+                if line.strip() == "":
+                    continue
+                m = re.match(r"^[ \t]*", line)
+                if m:
+                    return m.group(0)
+        return "  "
+
+    def _stitch_code(prefix: str | None, middle: str | None, suffix: str | None) -> str:
+        parts: list[str] = []
+        if prefix:
+            parts.append(prefix)
+        if middle:
+            if parts and (not parts[-1].endswith("\n")) and (not middle.startswith("\n")):
+                parts.append("\n")
+            parts.append(middle)
+        if suffix:
+            if parts and (not parts[-1].endswith("\n")) and (not suffix.startswith("\n")):
+                parts.append("\n")
+            parts.append(suffix)
+        return "".join(parts)
 
     def lean_validity_reward(completions, fim_prefix, fim_suffix, theorem_id, task_type=None, **kwargs):
         """Verify completed Lean code and update curriculum."""
@@ -528,7 +557,15 @@ def lean_validity_reward_factory(verifier, curriculum, tokenizer):
                 continue
 
             extracted = _strip_markdown_fences(extracted)
-            full_code = (prefix or "") + extracted + (suffix or "")
+            # If the model dropped indentation, re-indent the whole block so Lean layout doesn't break.
+            indent = _infer_block_indent(prefix, suffix)
+            if extracted and (not extracted.startswith((" ", "\t"))):
+                extracted = "\n".join(
+                    (indent + line if line.strip() != "" else line)
+                    for line in extracted.splitlines()
+                )
+
+            full_code = _stitch_code(prefix, extracted, suffix)
             verification_inputs.append(full_code if full_code.strip() else None)
 
             if LOG_RAW and len(raw_logs) <= LOG_RAW_LIMIT:
