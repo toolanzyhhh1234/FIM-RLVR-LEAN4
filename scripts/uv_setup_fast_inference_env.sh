@@ -19,11 +19,12 @@ if ! python -m pip --version >/dev/null 2>&1; then
   python -m ensurepip --upgrade
 fi
 
-# Install base deps (with dependencies).
-python -m pip install -r ministral-training-requirements.txt
-
-# Install Unsloth via pip (brings its dependencies, may override some pins).
+# Install Unsloth via pip (brings its dependencies).
 python -m pip install unsloth
+
+# Install pinned transformers from git without resolving deps.
+python -m pip install --no-deps \
+  git+https://github.com/huggingface/transformers.git@a7f29523361b2cc12e51c1f5133d95f122f6f45c
 
 # vLLM often conflicts with other pins; install it without resolving deps.
 uv pip install --no-deps vllm --torch-backend=auto
