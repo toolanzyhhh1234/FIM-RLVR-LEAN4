@@ -70,6 +70,9 @@ LOG_RAW_LIMIT = int(os.environ.get("FIM_LOG_RAW_LIMIT", "3"))
 LOG_DIR = os.environ.get("FIM_LOG_DIR", "training_logs")
 LOG_PROMPTS = bool(int(os.environ.get("FIM_LOG_PROMPTS", "1")))
 LOG_PROMPTS_LIMIT = int(os.environ.get("FIM_LOG_PROMPTS_LIMIT", "3"))
+LOG_PROMPTS_MAX_CHARS = int(os.environ.get("FIM_LOG_PROMPTS_MAX_CHARS", "0"))
+
+_PROMPT_LOG_SEEN: set[str] = set()
 TRUST_REMOTE_CODE = _bool_env("FIM_TRUST_REMOTE_CODE", True)
 
 FIM_CODE_TAG = "FIM_CODE"
@@ -258,11 +261,21 @@ def build_dynamic_transform(tokenizer, curriculum):
             # Optional logging
             if LOG_PROMPTS and logged < LOG_PROMPTS_LIMIT:
                 os.makedirs(LOG_DIR, exist_ok=True)
-                with open(os.path.join(LOG_DIR, "prompt_samples.log"), "a", encoding="utf-8") as f:
-                    preview = text_prompt[:800] + "..." if len(text_prompt) > 800 else text_prompt
-                    f.write(f"[prompt] th={th_name} ratio={ratio:.2f}\n{preview}\n---\n")
-                print(f"[prompt-log] th={th_name} ratio={ratio:.2f}")
-                logged += 1
+                log_key = f"{th_name}|{ratio:.4f}|{hash(text_prompt)}"
+                if log_key not in _PROMPT_LOG_SEEN:
+                    _PROMPT_LOG_SEEN.add(log_key)
+                    with open(os.path.join(LOG_DIR, "prompt_samples.log"), "a", encoding="utf-8") as f:
+                        if LOG_PROMPTS_MAX_CHARS > 0:
+                            preview = (
+                                text_prompt[:LOG_PROMPTS_MAX_CHARS] + "..."
+                                if len(text_prompt) > LOG_PROMPTS_MAX_CHARS
+                                else text_prompt
+                            )
+                        else:
+                            preview = text_prompt
+                        f.write(f"[prompt] th={th_name} ratio={ratio:.2f}\n{preview}\n---\n")
+                    print(f"[prompt-log] th={th_name} ratio={ratio:.2f}")
+                    logged += 1
 
         return {
             "prompt": prompts,
