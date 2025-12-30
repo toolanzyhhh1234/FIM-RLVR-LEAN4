@@ -19,11 +19,11 @@ if ! python -m pip --version >/dev/null 2>&1; then
   python -m ensurepip --upgrade
 fi
 
-# Install using pip to avoid uv's resolver/compatibility checks.
+# Install base deps with pip (no dependency resolution).
 python -m pip install --no-deps -r ministral-training-requirements.txt
 
-# vLLM runtime expects pydantic; install it with dependencies.
-python -m pip install pydantic
+# Install Unsloth via pip (brings its dependencies).
+python -m pip install unsloth
 
 # vLLM often conflicts with other pins; install it without resolving deps.
 uv pip install --no-deps vllm --torch-backend=auto
