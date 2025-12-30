@@ -35,6 +35,7 @@ checkpoints/
 *.bin
 *.safetensors
 wandb/training_logs/
+training_logs/
 .kiro/settings/mcp.json
 .kiro/verl-investigation
 outputs_fim_grpo_mistral3/

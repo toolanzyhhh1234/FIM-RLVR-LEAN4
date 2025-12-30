@@ -4,14 +4,16 @@ from typing import Tuple
 
 
 class LeanVerifier:
-    def __init__(self, project_dir: str):
+    def __init__(self, project_dir: str, *, no_sorries: bool = False):
         """
         Initializes the LeanVerifier.
 
         Args:
             project_dir: Path to the Lean 4 project directory (should contain lakefile.lean).
+            no_sorries: If True, fail verification when the file contains `sorry`.
         """
         self.project_dir = os.path.abspath(project_dir)
+        self.no_sorries = bool(no_sorries)
         import uuid
 
         self.uuid_module = uuid  # Keep reference
@@ -42,12 +44,16 @@ class LeanVerifier:
         except IOError as e:
             return False, f"Failed to write to verification file: {e}"
 
-        # 2. Run 'lake env lean <file>'
+        # 2. Run 'lake env lean [--no-sorries] <file>'
         # This parses and checks the file using the project's environment (imports etc.)
         # but does not require the file to be listed in lakefile.lean.
         try:
+            cmd = ["lake", "env", "lean"]
+            if self.no_sorries:
+                cmd.append("--no-sorries")
+            cmd.append(file_path)
             result = subprocess.run(
-                ["lake", "env", "lean", file_path],
+                cmd,
                 cwd=self.project_dir,
                 capture_output=True,
                 text=True,

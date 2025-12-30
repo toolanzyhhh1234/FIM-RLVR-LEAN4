@@ -71,6 +71,8 @@ LOG_DIR = os.environ.get("FIM_LOG_DIR", "training_logs")
 LOG_PROMPTS = bool(int(os.environ.get("FIM_LOG_PROMPTS", "1")))
 LOG_PROMPTS_LIMIT = int(os.environ.get("FIM_LOG_PROMPTS_LIMIT", "3"))
 LOG_PROMPTS_MAX_CHARS = int(os.environ.get("FIM_LOG_PROMPTS_MAX_CHARS", "0"))
+FIM_NO_SORRIES = _bool_env("FIM_NO_SORRIES", True)
+FIM_EXCLUDE_SORRY = _bool_env("FIM_EXCLUDE_SORRY", True)
 
 _PROMPT_LOG_SEEN: set[str] = set()
 TRUST_REMOTE_CODE = _bool_env("FIM_TRUST_REMOTE_CODE", True)
@@ -160,6 +162,9 @@ def filter_valid_rows(dataset: Dataset) -> Dataset:
         txt = example["prompt"]
         if not txt or len(txt.strip()) < 50:
             return False
+        if FIM_EXCLUDE_SORRY:
+            if re.search(r"\bsorry\b", txt) or re.search(r"\badmit\b", txt):
+                return False
         return ("theorem" in txt) or ("lemma" in txt) or ("def" in txt)
 
     before = len(dataset)
@@ -601,7 +606,7 @@ def main():
     dataset = filter_valid_rows(dataset)
 
     # Initialize verifier and curriculum
-    verifier = LeanVerifier("./verification_env")
+    verifier = LeanVerifier("./verification_env", no_sorries=FIM_NO_SORRIES)
     
     if os.path.exists(CURRICULUM_STATE_PATH):
         print(f"Loading curriculum from {CURRICULUM_STATE_PATH}")

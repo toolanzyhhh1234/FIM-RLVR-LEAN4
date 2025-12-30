@@ -29,6 +29,35 @@ def apply_dynamic_mask(full_code, ratio):
     Returns (prefix, suffix, middle_truth).
     """
     lines = full_code.splitlines(keepends=True)
+
+    # Normalize `:= by <proof>` when the proof is on the same line (e.g. `:= by sorry`).
+    # Many datasets use this compact form; without normalization the "proof lines" slice can be empty,
+    # causing us to leave `sorry` in the prefix and append the model output after it.
+    normalized: list[str] = []
+    for line in lines:
+        marker = ":= by"
+        idx = line.find(marker)
+        if idx == -1:
+            normalized.append(line)
+            continue
+
+        split_at = idx + len(marker)
+        tail = line[split_at:]
+        if tail.strip() == "":
+            normalized.append(line)
+            continue
+
+        # Keep header ending at `:= by`, then move the tail into the first proof line.
+        header = line[:split_at].rstrip()
+        if not header.endswith(marker):
+            # Defensive: if rstrip removed spacing in unexpected ways, keep the original.
+            header = line[:split_at]
+        normalized.append(header + "\n")
+
+        tail_content = tail.strip()
+        normalized.append("  " + tail_content + "\n")
+
+    lines = normalized
     total_lines = len(lines)
 
     # Identify the proof block (simple heuristic: after := by)
