@@ -7,7 +7,7 @@ actual_tokenizer MRO: ['LlamaTokenizer', 'TokenizersBackend', 'PreTrainedTokeniz
 
 Has byte_decoder: False
 
-Sample completion_ids[0][:20]: [34, 1784, 6255, 1395, 1317, 16123, 1455, 3988, 1307, 6967, 8091, 1395, 92153, 2277, 1044, 1623, 4185, 3109, 2000, 1097]
+Sample completion_ids[0][:20]: [34, 1784, 6255, 1395, 1317, 28882, 1278, 4265, 2541, 9510, 1088, 12927, 2203, 1261, 112576, 1032, 1052, 29752, 1044, 31073]
 
 Individual token decodes:
   ID 34 -> '[THINK]'
@@ -15,18 +15,18 @@ Individual token decodes:
   ID 6255 -> 'Ġtask'
   ID 1395 -> 'Ġis'
   ID 1317 -> 'Ġto'
-  ID 16123 -> 'Ġprove'
-  ID 1455 -> 'Ġthat'
-  ID 3988 -> 'Ġaddition'
-  ID 1307 -> 'Ġof'
-  ID 6967 -> 'Ġnatural'
+  ID 28882 -> 'Ġtranslate'
+  ID 1278 -> 'Ġthe'
+  ID 4265 -> 'Ġgiven'
+  ID 2541 -> 'ĠLa'
+  ID 9510 -> 'Te'
 
-convert_ids_to_tokens: ['[THINK]', 'The', 'Ġtask', 'Ġis', 'Ġto', 'Ġprove', 'Ġthat', 'Ġaddition', 'Ġof', 'Ġnatural']
+convert_ids_to_tokens: ['[THINK]', 'The', 'Ġtask', 'Ġis', 'Ġto', 'Ġtranslate', 'Ġthe', 'Ġgiven', 'ĠLa', 'Te']
 
-convert_tokens_to_string result: '[THINK]TheĠtaskĠisĠtoĠproveĠthatĠadditionĠofĠnatural'
+convert_tokens_to_string result: '[THINK]TheĠtaskĠisĠtoĠtranslateĠtheĠgivenĠLaTe'
 convert_tokens_to_string has artifacts: True
 
-batch_decode result[0][:200]: 'TheĠtaskĠisĠtoĠproveĠthatĠadditionĠofĠnaturalĠnumbersĠisĠcommutative,Ġi.e.,Ġ`aĠ+ĠbĠ=ĠbĠ+Ġa`.ĠTheĠgivenĠproofĠoutlineĠusesĠinductionĠonĠ`a`ĠwithĠtheĠinductionĠhypothesisĠ`ih`.ĊĊ###ĠAnalysisĠofĠtheĠGive'
+batch_decode result[0][:200]: 'TheĠtaskĠisĠtoĠtranslateĠtheĠgivenĠLaTeXĠequationĠintoĠaĠLeanĠ4Ġtheorem,ĠfillingĠinĠtheĠmissingĠblockĠwhereĠ`sorry`ĠisĠplaced.ĠTheĠequationĠprovidedĠinĠLaTeXĠis:ĊĊ23.Ġ$x^{2}+2ĠxĠ\\sinĠxĠy+1=0$.ĊĊFirst,'
 batch_decode has artifacts: True
 
 Has _tekken: False
@@ -34,7 +34,7 @@ Has sp_model: False
 Has backend_tokenizer: True
 Has vocab: True
 
-After _fix_bpe_artifacts[0][:200]: 'The task is to prove that addition of natural numbers is commutative, i.e., `a + b = b + a`. The given proof outline uses induction on `a` with the induction hypothesis `ih`.\n\n### Analysis of the Give'
+After _fix_bpe_artifacts[0][:200]: 'The task is to translate the given LaTeX equation into a Lean 4 theorem, filling in the missing block where `sorry` is placed. The equation provided in LaTeX is:\n\n23. $x^{2}+2 x \\sin x y+1=0$.\n\nFirst,'
 After fix has artifacts: False
 
 === END DEEP DEBUG ===

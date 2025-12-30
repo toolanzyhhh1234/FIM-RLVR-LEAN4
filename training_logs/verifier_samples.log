@@ -1114,3 +1114,27 @@ theorem add_comm (a b : ℕ) : a + b = b + a := by
   induction a with
 | 0 => rfl  | succ a ih => simp [Nat.succ_add, ih]
 ---
+[verify] success=False th=b1253ff4-12a0-5ba2-81c4-204de38fa3fe gen_len=2802
+import Mathlib
+
+/- 23. $x^{2}+2 x \sin x y+1=0$.
+
+Translate the text above into English, keeping the original text's line breaks and format, and output the translation result directly.
+
+23. $x^{2}+2 x \sin x y+1=0$. -/
+theorem algebra_189293 :
+    {(x, y) : ℝ × ℝ | x^2 + 2 * x * Real.sin (x * y) + 1 = 0} =
+    {(1, -Real.pi / 2 + 2 * Real.pi * k) | k : ℤ} ∪ {(-1, -Real.pi / 2 + 2 * Real.pi * k) | ...
+---
+[verify] success=False th=b1253ff4-12a0-5ba2-81c4-204de38fa3fe gen_len=2079
+import Mathlib
+
+/- 23. $x^{2}+2 x \sin x y+1=0$.
+
+Translate the text above into English, keeping the original text's line breaks and format, and output the translation result directly.
+
+23. $x^{2}+2 x \sin x y+1=0$. -/
+theorem algebra_189293 :
+    {(x, y) : ℝ × ℝ | x^2 + 2 * x * Real.sin (x * y) + 1 = 0} =
+    {(1, -Real.pi / 2 + 2 * Real.pi * k) | k : ℤ} ∪ {(-1, -Real.pi / 2 + 2 * Real.pi * k) | ...
+---

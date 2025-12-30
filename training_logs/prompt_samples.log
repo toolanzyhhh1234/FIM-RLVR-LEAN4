@@ -3086,3 +3086,159 @@ Example (full):
 [USER]
 theorem add_zero_triv (n...
 ---
+[prompt] th=b1253ff4-12a0-5ba2-81c4-204de38fa3fe ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Solve the task strictly following this format:
+1) First write your reasoning inside [THINK]...[/THINK].
+2) Then output ONLY the code inside <FIM_CODE>...</FIM_CODE> for fill-in-the-middle tasks, or <FULL_CODE>...</FULL_CODE> for full solutions.
+3) Do NOT include markdown fences or extra text outside the tags.
+4) The tagged code must be valid Lean 4.
+If the user includes [FULL-SOLUTION-REQUIRED], output a full solution in <FULL_CODE>.
+
+[USER]
+theorem simple_add (n : ℕ) : 0 + n = n := by
+  [MISSING_BLOCK]
+
+[ASSISTANT]
+[THINK]
+The definition of addition recurses on the second argument, so 0+n requires induction or a lemma. 
+`simp` uses Nat.zero_add to solve this.
+[/THINK]
+<FIM_CODE>
+  simp
+</FIM_CODE>
+
+Example (full):
+
+[USER]
+theorem add_zero_triv (n...
+---
+[prompt] th=b1253ff4-12a0-5ba2-81c4-204de38fa3fe ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Solve the task strictly following this format:
+1) First write your reasoning inside [THINK]...[/THINK].
+2) Then output ONLY the code inside <FIM_CODE>...</FIM_CODE> for fill-in-the-middle tasks, or <FULL_CODE>...</FULL_CODE> for full solutions.
+3) Do NOT include markdown fences or extra text outside the tags.
+4) The tagged code must be valid Lean 4.
+If the user includes [FULL-SOLUTION-REQUIRED], output a full solution in <FULL_CODE>.
+
+[USER]
+theorem simple_add (n : ℕ) : 0 + n = n := by
+  [MISSING_BLOCK]
+
+[ASSISTANT]
+[THINK]
+The definition of addition recurses on the second argument, so 0+n requires induction or a lemma. 
+`simp` uses Nat.zero_add to solve this.
+[/THINK]
+<FIM_CODE>
+  simp
+</FIM_CODE>
+
+Example (full):
+
+[USER]
+theorem add_zero_triv (n...
+---
+[prompt] th=62c6643f-7cbe-5c3c-a15b-b2048fe130fd ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Solve the task strictly following this format:
+1) First write your reasoning inside [THINK]...[/THINK].
+2) Then output ONLY the code inside <FIM_CODE>...</FIM_CODE> for fill-in-the-middle tasks, or <FULL_CODE>...</FULL_CODE> for full solutions.
+3) Do NOT include markdown fences or extra text outside the tags.
+4) The tagged code must be valid Lean 4.
+If the user includes [FULL-SOLUTION-REQUIRED], output a full solution in <FULL_CODE>.
+
+[USER]
+theorem simple_add (n : ℕ) : 0 + n = n := by
+  [MISSING_BLOCK]
+
+[ASSISTANT]
+[THINK]
+The definition of addition recurses on the second argument, so 0+n requires induction or a lemma. 
+`simp` uses Nat.zero_add to solve this.
+[/THINK]
+<FIM_CODE>
+  simp
+</FIM_CODE>
+
+Example (full):
+
+[USER]
+theorem add_zero_triv (n...
+---
+[prompt] th=62c6643f-7cbe-5c3c-a15b-b2048fe130fd ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Solve the task strictly following this format:
+1) First write your reasoning inside [THINK]...[/THINK].
+2) Then output ONLY the code inside <FIM_CODE>...</FIM_CODE> for fill-in-the-middle tasks, or <FULL_CODE>...</FULL_CODE> for full solutions.
+3) Do NOT include markdown fences or extra text outside the tags.
+4) The tagged code must be valid Lean 4.
+If the user includes [FULL-SOLUTION-REQUIRED], output a full solution in <FULL_CODE>.
+
+[USER]
+theorem simple_add (n : ℕ) : 0 + n = n := by
+  [MISSING_BLOCK]
+
+[ASSISTANT]
+[THINK]
+The definition of addition recurses on the second argument, so 0+n requires induction or a lemma. 
+`simp` uses Nat.zero_add to solve this.
+[/THINK]
+<FIM_CODE>
+  simp
+</FIM_CODE>
+
+Example (full):
+
+[USER]
+theorem add_zero_triv (n...
+---
+[prompt] th=f505a884-f3f0-52bf-96e7-a6272bf925cf ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Solve the task strictly following this format:
+1) First write your reasoning inside [THINK]...[/THINK].
+2) Then output ONLY the code inside <FIM_CODE>...</FIM_CODE> for fill-in-the-middle tasks, or <FULL_CODE>...</FULL_CODE> for full solutions.
+3) Do NOT include markdown fences or extra text outside the tags.
+4) The tagged code must be valid Lean 4.
+If the user includes [FULL-SOLUTION-REQUIRED], output a full solution in <FULL_CODE>.
+
+[USER]
+theorem simple_add (n : ℕ) : 0 + n = n := by
+  [MISSING_BLOCK]
+
+[ASSISTANT]
+[THINK]
+The definition of addition recurses on the second argument, so 0+n requires induction or a lemma. 
+`simp` uses Nat.zero_add to solve this.
+[/THINK]
+<FIM_CODE>
+  simp
+</FIM_CODE>
+
+Example (full):
+
+[USER]
+theorem add_zero_triv (n...
+---
+[prompt] th=f505a884-f3f0-52bf-96e7-a6272bf925cf ratio=0.10
+<s>[SYSTEM_PROMPT]You are a Lean 4 expert. Solve the task strictly following this format:
+1) First write your reasoning inside [THINK]...[/THINK].
+2) Then output ONLY the code inside <FIM_CODE>...</FIM_CODE> for fill-in-the-middle tasks, or <FULL_CODE>...</FULL_CODE> for full solutions.
+3) Do NOT include markdown fences or extra text outside the tags.
+4) The tagged code must be valid Lean 4.
+If the user includes [FULL-SOLUTION-REQUIRED], output a full solution in <FULL_CODE>.
+
+[USER]
+theorem simple_add (n : ℕ) : 0 + n = n := by
+  [MISSING_BLOCK]
+
+[ASSISTANT]
+[THINK]
+The definition of addition recurses on the second argument, so 0+n requires induction or a lemma. 
+`simp` uses Nat.zero_add to solve this.
+[/THINK]
+<FIM_CODE>
+  simp
+</FIM_CODE>
+
+Example (full):
+
+[USER]
+theorem add_zero_triv (n...
+---
