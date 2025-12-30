@@ -22,15 +22,12 @@ fi
 # Install Unsloth via pip (brings its dependencies).
 python -m pip install unsloth
 
-# Install pinned transformers from git without resolving deps.
+# vLLM needs its dependencies; install with deps via uv.
+uv pip install vllm --torch-backend=auto
+
+# Install pinned transformers from git without resolving deps (last).
 python -m pip install --no-deps \
   git+https://github.com/huggingface/transformers.git@a7f29523361b2cc12e51c1f5133d95f122f6f45c
-
-# Ensure huggingface_hub is new enough for transformers (is_offline_mode).
-python -m pip install --upgrade "huggingface_hub>=0.23.0"
-
-# vLLM often conflicts with other pins; install it without resolving deps.
-uv pip install --no-deps vllm --torch-backend=auto
 
 echo
 echo "Done."
