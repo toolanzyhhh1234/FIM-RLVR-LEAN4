@@ -108,3 +108,39 @@ The `_4bit_no_vllm` variant is for when vLLM + 4-bit quantization conflicts (com
 | `fim_rlvr_lean4/masking.py` | FIM mask generation | 4th |
 
 Everything else is supporting infrastructure.
+
+---
+
+## GPT-5.2 Recommendation
+
+Framework choice (80/20) comes down to one question: **what is the “tight loop” you’ll run 1000× while iterating?**
+Pick the stack that makes that loop fastest and least fragile on your hardware.
+
+- If you’re mostly doing **single-node RL fine-tuning with long contexts + tight VRAM**, prefer **Unsloth + TRL (GRPO/GSPO)**: fast path to “works”, easy 4-bit, and good memory levers (e.g., `UNSLOTH_VLLM_STANDBY`).
+- If you need **more distributed / system-heavy RL infra (multi-node rollout engines, scaling knobs)** and are willing to pay complexity, consider the repo’s **verl-focused** track.
+
+### The 80/20 Concepts to Grasp in This Repo
+
+- **Data → prompt builder**: what text/messages you feed the model, and what fields you preserve.
+- **Policy sampling**: where completions are generated (HF `generate` vs vLLM) and the exploration knobs (temperature/top-p/max tokens/stops).
+- **Verifier boundary**: the single most important interface—what you send to Lean, how it’s normalized, and how reward is computed.
+- **Trainer update rule**: GRPO/GSPO specifics (advantages/baselines, clipping, KL/entropy penalties).
+- **Memory/perf levers**: 4-bit load, LoRA targets, context length, KV cache behavior, batching, verifier throughput (often the real bottleneck).
+
+### On Logging Prompt/Completion/Verifier Messages
+
+Yes—capturing **prompt + raw completion + exact verifier input** is high-leverage. It’s essentially the RL “trajectory”, and it enables:
+
+- Debugging reward/formatting issues and “reward hacking”.
+- Analysis features (what token patterns correlate with proof success).
+- Dataset distillation / preference mining.
+- Verifier caching (big speedups if repeats occur).
+
+Practical defaults that keep it useful without becoming engineering debt:
+
+- Log a structured record per sample:
+  - `prompt_id`, `prompt_text` (or hash), `completion_text`, `verifier_input`
+  - `verifier_output`, `reward`, `timings`, `seed`, `model_revision`
+- Make it toggleable (env var) and cheap by default (store hashes/lengths; write full text only when enabled).
+- Store both pre- and post-processing variants (so you can tell whether success comes from extraction/normalization vs model behavior).
+- If using vLLM/standby/4-bit: prioritize determinism knobs (seed, sampling params, stop strings) so logs are comparable across runs.
