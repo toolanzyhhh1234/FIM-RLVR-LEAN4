@@ -24,6 +24,21 @@ from fim_rlvr_lean4.lean_verifier import LeanVerifier
 from fim_rlvr_lean4.curriculum import CurriculumManager
 from fim_rlvr_lean4.masking import apply_dynamic_mask
 
+os.environ["UNSLOTH_VLLM_STANDBY"] = "1"  # Unsloth standby saves 30%+ memory for RL
+# Standby mode is incompatible with expandable_segments; strip it if present.
+_alloc_conf = os.environ.get("PYTORCH_ALLOC_CONF", "")
+if "expandable_segments:True" in _alloc_conf:
+    parts = [p for p in _alloc_conf.split(",") if p.strip() != "expandable_segments:True"]
+    os.environ["PYTORCH_ALLOC_CONF"] = ",".join(p.strip() for p in parts if p.strip())
+_cuda_alloc_conf = os.environ.get("PYTORCH_CUDA_ALLOC_CONF", "")
+if "expandable_segments:True" in _cuda_alloc_conf:
+    parts = [p for p in _cuda_alloc_conf.split(",") if p.strip() != "expandable_segments:True"]
+    os.environ["PYTORCH_CUDA_ALLOC_CONF"] = ",".join(p.strip() for p in parts if p.strip())
+_hip_alloc_conf = os.environ.get("PYTORCH_HIP_ALLOC_CONF", "")
+if "expandable_segments:True" in _hip_alloc_conf:
+    parts = [p for p in _hip_alloc_conf.split(",") if p.strip() != "expandable_segments:True"]
+    os.environ["PYTORCH_HIP_ALLOC_CONF"] = ",".join(p.strip() for p in parts if p.strip())
+
 # Configuration
 MAX_SEQ_LENGTH = 16384
 LORA_RANK = 16
