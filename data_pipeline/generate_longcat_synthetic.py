@@ -184,9 +184,12 @@ def main() -> None:
 
     input_path = _default_parquet_path()
     output_path = os.environ.get("LONGCAT_OUTPUT_PATH", "data/longcat_synthetic.parquet")
-    target_samples = int(os.environ.get("LONGCAT_TARGET_SAMPLES", "1000"))
     mask_ratio = float(os.environ.get("FIM_MASK_RATIO", "0.15"))
     exclude_sorry = _bool_env("FIM_EXCLUDE_SORRY", True)
+    dry_run = _bool_env("LONGCAT_DRY_RUN", False)
+    dry_run_path = os.environ.get("LONGCAT_DRY_RUN_PATH", "data/longcat_synthetic_dryrun.jsonl")
+    target_default = "5" if dry_run else "1000"
+    target_samples = int(os.environ.get("LONGCAT_TARGET_SAMPLES", target_default))
 
     api_key = os.environ.get("LONGCAT_API_KEY")
     if not api_key:
@@ -218,6 +221,11 @@ def main() -> None:
     writer_state = {"writer": None, "schema": None, "buffer": [], "fallback": False}
     generated = 0
 
+    dry_handle = None
+    if dry_run:
+        os.makedirs(os.path.dirname(dry_run_path) or ".", exist_ok=True)
+        dry_handle = open(dry_run_path, "w", encoding="utf-8")
+
     for row in _iter_rows(df):
         if generated >= target_samples:
             break
@@ -246,7 +254,9 @@ def main() -> None:
         if not generated_middle.strip():
             continue
 
-        full_generated = f"{prefix}{generated_middle}\n{suffix}" if suffix else f"{prefix}{generated_middle}"
+        full_generated = (
+            f"{prefix}{generated_middle}\n{suffix}" if suffix else f"{prefix}{generated_middle}"
+        )
 
         record = {
             "formal_ground_truth": full_generated,
@@ -259,11 +269,30 @@ def main() -> None:
             "model": LONGCAT_MODEL,
         }
 
-        _write_parquet_row(writer_state, record, output_path)
+        if dry_run and dry_handle is not None:
+            import json
+
+            dry_handle.write(
+                json.dumps(
+                    {
+                        "prompt": f"{prefix}<MISSING_BLOCK>{suffix}",
+                        "raw_response": content,
+                        "generated_middle": generated_middle,
+                        "record": record,
+                    }
+                )
+                + "\n"
+            )
+        else:
+            _write_parquet_row(writer_state, record, output_path)
         generated += 1
 
-    _finalize_writer(writer_state, output_path)
-    print(f"Wrote {generated} synthetic samples to {output_path}")
+    if dry_handle is not None:
+        dry_handle.close()
+        print(f"Wrote {generated} dry-run samples to {dry_run_path}")
+    else:
+        _finalize_writer(writer_state, output_path)
+        print(f"Wrote {generated} synthetic samples to {output_path}")
 
 
 if __name__ == "__main__":
