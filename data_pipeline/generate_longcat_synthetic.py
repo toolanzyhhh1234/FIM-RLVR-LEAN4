@@ -7,6 +7,7 @@ from typing import Any, Dict, Iterable, Optional
 
 import polars as pl
 import requests
+from tqdm import tqdm
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
@@ -71,21 +72,16 @@ def _is_valid_lean_sample(txt: str, exclude_sorry: bool) -> bool:
 def _build_system_prompt() -> str:
     return (
         "You are a Lean 4 expert. Solve the task strictly following this format:\n"
-        "1) First write your reasoning inside [THINK]...[/THINK].\n"
-        f"2) Then output ONLY the code inside <{FIM_CODE_TAG}>...</{FIM_CODE_TAG}> "
+        f"1) Output ONLY the code inside <{FIM_CODE_TAG}>...</{FIM_CODE_TAG}> "
         f"for fill-in-the-middle tasks, or <{FULL_CODE_TAG}>...</{FULL_CODE_TAG}> "
         "for full solutions.\n"
-        "3) Do NOT include markdown fences or extra text outside the tags.\n"
-        "4) The tagged code must be valid Lean 4.\n"
+        "2) Do NOT include markdown fences or extra text outside the tags.\n"
+        "3) The tagged code must be valid Lean 4.\n"
         "If the user includes [FULL-SOLUTION-REQUIRED], output a full solution in <FULL_CODE>.\n\n"
         "[USER]\n"
         "theorem simple_add (n : ℕ) : 0 + n = n := by\n"
         "  [MISSING_BLOCK]\n\n"
         "[ASSISTANT]\n"
-        "[THINK]\n"
-        "The definition of addition recurses on the second argument, so 0+n requires induction or a lemma. \n"
-        "`simp` uses Nat.zero_add to solve this.\n"
-        "[/THINK]\n"
         f"<{FIM_CODE_TAG}>\n"
         "  simp\n"
         f"</{FIM_CODE_TAG}>\n\n"
@@ -93,10 +89,6 @@ def _build_system_prompt() -> str:
         "[USER]\n"
         "theorem add_zero_triv (n : ℕ) : n + 0 = n :=\n\n"
         "[ASSISTANT]\n"
-        "[THINK]\n"
-        "Addition is defined by recursion on the second argument. \n"
-        "Therefore, `n + 0 = n` is true by definition (reflexivity).\n"
-        "[/THINK]\n"
         f"<{FULL_CODE_TAG}>\n"
         "by\n"
         "  rfl\n"
@@ -226,6 +218,7 @@ def main() -> None:
         os.makedirs(os.path.dirname(dry_run_path) or ".", exist_ok=True)
         dry_handle = open(dry_run_path, "w", encoding="utf-8")
 
+    progress = tqdm(total=target_samples, desc="LongCat generated", unit="sample")
     for row in _iter_rows(df):
         if generated >= target_samples:
             break
@@ -246,7 +239,7 @@ def main() -> None:
             "model": LONGCAT_MODEL,
             "messages": messages,
             "max_tokens": int(os.environ.get("LONGCAT_MAX_TOKENS", "1024")),
-            "temperature": float(os.environ.get("LONGCAT_TEMPERATURE", "0.2")),
+            "temperature": float(os.environ.get("LONGCAT_TEMPERATURE", "1")),
         }
 
         content = _request_with_retries(url, headers, payload)
@@ -286,6 +279,7 @@ def main() -> None:
         else:
             _write_parquet_row(writer_state, record, output_path)
         generated += 1
+        progress.update(1)
 
     if dry_handle is not None:
         dry_handle.close()
@@ -293,6 +287,7 @@ def main() -> None:
     else:
         _finalize_writer(writer_state, output_path)
         print(f"Wrote {generated} synthetic samples to {output_path}")
+    progress.close()
 
 
 if __name__ == "__main__":
