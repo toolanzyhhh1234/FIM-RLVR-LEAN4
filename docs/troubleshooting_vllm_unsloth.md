@@ -32,6 +32,12 @@ FIM_MAX_STEPS=1
 python train_gspo_fim_20b.py
 ```
 
+**Important note about `FIM_NUM_GENERATIONS=1`**
+In TRL's `GRPOTrainer`, advantages are computed by normalizing rewards within each prompt's
+group of size `num_generations` (subtracting the per-group mean reward). With
+`num_generations=1`, this makes advantages identically ~0, so policy-gradient updates can stall.
+Use `FIM_NUM_GENERATIONS=1` only for smoke/debug runs, not for real training.
+
 ## 3) vLLM fails with MKL threading layer error
 
 **Symptom**
