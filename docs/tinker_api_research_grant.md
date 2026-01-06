@@ -27,7 +27,6 @@ Tinker abstracts away infrastructure management with usage-based pricing:
 - **Fine-tune 30B model**: ~$0.62 for ~3M tokens ([source](https://recapio.com/digest/fine-tune-a-30b-model-for-0-62-prompt-distillation-with-tinker-by-llm-implementation))
 - **Supports large MoE models**: Qwen3-235B-A22B, Llama 70B via LoRA
 - **No infrastructure overhead**: Distributed training handled automatically
-- **$150 free credits** during waitlist phase
 
 ### Tinker Features Relevant to Our Project
 
