@@ -34,16 +34,25 @@ This repository implements a **FIM + GSPO** pipeline designed to bootstrap forma
 - [Lean 4 toolchain](https://leanprover.github.io/lean4/doc/setup.html) (v4.15.0)
 - CUDA-compatible GPU (recommended for training)
 
-## Status: Proof-of-Concept / Verification Mode
+## Status: Transitioning to Tinker API
 
-**The code is functional and the training loop is working.**
+**The training pipeline is functional, but we've identified key scaling insights.**
 
-We have successfully implemented:
-- **Lean 4 Verification Pipeline**: A robust, thread-safe verifier that compiles generated code against a pinned Lean environment.
-- **Parallel Verification**: Optimized logic achieving >2x speedup by verifying multiple candidates simultaneously.
-- **GRPO Training Loop**: Integrated with Unsloth and TRL for efficient training.
+**What works:**
+- **Lean 4 Verification Pipeline**: Robust, thread-safe verifier with parallel verification (>2x speedup)
+- **GRPO Training Loop**: Integrated with Unsloth + TRL (`train_gspo_fim_mistral3.py`, `train_gspo_fim_qwen3-vl-8b.py` on `further-investigation-on-unsloth` branch)
 
-However, we are currently operating on **limited compute resources** (running verification loops on local hardware with small models like `Qwen2.5-0.5B` to ensure the pipeline logic is sound). We are attempting to scale up to the `gpt-oss-20b` base model within our current budget, though the extent of training validation we can achieve remains uncertain.
+**What we learned:**
+- **Dense models are inefficient**: High active parameters but performance similar to sparse MoE models of comparable size. Training cost scales poorly.
+- **Small models struggle**: <14B models fail to adhere to FIM answer format and reason inefficiently. Would require SFT to bootstrap, adding cost/complexity.
+- **Large MoE models excel**: Initial evaluation of `gpt-oss-120b` shows ~60% accuracy out-of-box with proper format compliance.
+
+**Why Tinker:**
+- Custom infrastructure for 120B models is prohibitively expensive (cost scales with total parameters for GPU rental)
+- Tinker's billing scales with **active parameters**—making ultra-sparse MoE like `gpt-oss-120b` cost-effective
+- Easier to iterate and debug without managing distributed training infrastructure
+
+**Current focus**: Applying for Tinker research grant to train `gpt-oss-120b` with CISPO.
 
 ## � Training SInfrastructure: Tinker API
 
