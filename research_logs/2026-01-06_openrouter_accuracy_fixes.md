@@ -76,7 +76,36 @@ if formal and prefix and formal.startswith(prefix):
 - Sample 4 had empty `middle_truth` (edge case in masking)
 - Model still diverges on some complex proofs
 
+## FIM Token Format Experiment
+
+Tested standard FIM tokens (`<|fim_prefix|>`, `<|fim_suffix|>`, `<|fim_middle|>`) as an alternative prompt format.
+
+### Initial Issue: Empty Responses
+
+First run with FIM tokens returned empty `content` fields. Investigation revealed:
+- Model returns `reasoning` trace showing it understands the task
+- But `content` was empty with `finish_reason: "length"`
+- The model's internal reasoning consumed all tokens (default 1024) before generating output
+
+### Fix: Increased Token Limit
+
+Increased `max_tokens` from 1024 to 4096 to accommodate reasoning overhead.
+
+### Results Comparison
+
+| Format | Lean Pass | Avg Similarity | Notes |
+|--------|-----------|----------------|-------|
+| Custom `[MISSING_BLOCK]` | 3/5 (60%) | 0.55 | Clear instructions, suffix-aware example |
+| FIM tokens `<\|fim_*\|>` | 0/5 (0%) | 0.12 | Inconsistent, some empty outputs |
+
+### Conclusion
+
+The custom prompt format with `[MISSING_BLOCK]` significantly outperforms standard FIM tokens for `gpt-oss-120b:free`. This model wasn't trained on FIM special tokens and struggles to interpret them consistently. The explicit instructions and examples in the custom format provide better guidance.
+
+**Recommendation**: Use the custom `[MISSING_BLOCK]` format for OpenRouter models unless the specific model is known to support FIM tokens natively.
+
 ## Files Changed
 
 - `data_pipeline/test_openrouter_accuracy.py`: Fixed middle_truth extraction, updated system prompt
 - `data_pipeline/generate_openrouter_synthetic.py`: Fixed formal_ground_truth storage, updated system prompt
+- `data_pipeline/test_openrouter_accuracy_fim_tokens.py`: New script for FIM token format testing
