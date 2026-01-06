@@ -45,6 +45,21 @@ We have successfully implemented:
 
 However, we are currently operating on **limited compute resources** (running verification loops on local hardware with small models like `Qwen2.5-0.5B` to ensure the pipeline logic is sound). We are attempting to scale up to the `gpt-oss-20b` base model within our current budget, though the extent of training validation we can achieve remains uncertain.
 
+## � Training SInfrastructure: Tinker API
+
+This project uses [Tinker API](https://tinker-docs.thinkingmachines.ai/) by Thinking Machines Lab for scalable RL training on large MoE models.
+
+**Why Tinker?**
+- **Cost-effective MoE training**: Token-based pricing scales with active parameters, not total parameters
+- **Native CISPO support**: Clipped Importance Sampling Policy Optimization—stable for MoE architectures where GRPO fails
+- **No infrastructure overhead**: Distributed training handled automatically
+
+**Primary model**: `gpt-oss-120b` (ultra-sparse MoE, ~60% accuracy on our task out-of-box)
+
+📄 **[Full Tinker Integration Plan & Research Grant Proposal](docs/tinker_api_research_grant.md)**
+
+---
+
 ## 🚀 Call for Sponsorship & Collaboration
 
 **We are seeking support to scale this research.**
@@ -57,6 +72,16 @@ This project is currently running on a small personal budget. To fully validate 
 **If you are interested in the results of this research or would like to sponsor the compute required to push this project to the next level, please reach out!** Your support would be extremely helpful in allowing us to continue iterating and potentially finding strong evidence for the efficacy of verification-driven RL in formal mathematics.
 
 **Contact:** ifchou@student.unimelb.edu.au or open a GitHub issue.
+
+## Open Source Commitment
+
+All artifacts from this project will be open-sourced:
+- Training code and Tinker integration
+- Verification data and Lean4 compiler results  
+- Model weights (LoRA adapters)
+- Research logs (`research_logs/`)
+
+---
 
 ## Contributing
 
