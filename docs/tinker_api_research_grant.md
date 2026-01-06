@@ -247,12 +247,11 @@ Smaller models fail to follow the structured FIM format required for Lean4 proof
 
 ## Next Steps
 
-1. [ ] Apply for Tinker waitlist access (get $150 free credits)
-2. [ ] Submit research grant application (~$5,000)
-3. [ ] Clone tinker-cookbook and study `math_env.py` as reference
-4. [ ] Implement `Lean4FIMEnv` extending Tinker's `Env` interface
-5. [ ] Adapt `CurriculumEnvGroupBuilder` for mastery-based progression
-6. [ ] Validate 120B model (`gpt-oss-120b`) performance on larger sample set
+1. [ ] Submit research grant application (~$5,000)
+2. [ ] Clone tinker-cookbook and study `math_env.py` as reference
+3. [ ] Implement `Lean4FIMEnv` extending Tinker's `Env` interface
+4. [ ] Adapt `CurriculumEnvGroupBuilder` for mastery-based progression
+5. [ ] Validate 120B model (`gpt-oss-120b`) performance on larger sample set
 
 ---
 

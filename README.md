@@ -39,7 +39,7 @@ This repository implements a **FIM + GSPO** pipeline designed to bootstrap forma
 **The training pipeline is functional, but we've identified key scaling insights.**
 
 **What works:**
-- **Lean 4 Verification Pipeline**: Robust, thread-safe verifier with parallel verification (>2x speedup)
+- **Lean 4 Verification Pipeline**: Robust, thread-safe verifier with parallel verification (linear speedup with cpu core counts)
 - **GRPO Training Loop**: Integrated with Unsloth + TRL (`train_gspo_fim_mistral3.py`, `train_gspo_fim_qwen3-vl-8b.py` on `further-investigation-on-unsloth` branch)
 
 **What we learned:**
