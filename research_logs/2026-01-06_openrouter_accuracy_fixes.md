@@ -93,10 +93,12 @@ Increased `max_tokens` from 1024 to 4096 to accommodate reasoning overhead.
 
 ### Results Comparison
 
-| Format | Lean Pass | Avg Similarity | Notes |
-|--------|-----------|----------------|-------|
-| Custom `[MISSING_BLOCK]` | 3/5 (60%) | 0.55 | Clear instructions, suffix-aware example |
-| FIM tokens `<\|fim_*\|>` | 0/5 (0%) | 0.12 | Inconsistent, some empty outputs |
+| Format | Lean Pass | Avg Similarity | max_tokens | Notes |
+|--------|-----------|----------------|------------|-------|
+| Custom `[MISSING_BLOCK]` | 3/5 (60%) | 0.55 | 1024 | More token-efficient |
+| FIM tokens `<\|fim_*\|>` | 0/5 (0%) | 0.12 | 4096 | Required 4x tokens, still failed |
+
+The custom format is significantly more token-efficient: it achieves 60% pass rate with 1024 tokens while FIM tokens fail even with 4096 tokens. This suggests the model responds better to explicit natural language instructions than special tokens it wasn't trained on.
 
 ### Conclusion
 
