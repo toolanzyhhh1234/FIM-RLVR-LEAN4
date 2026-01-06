@@ -75,7 +75,19 @@ def _build_system_prompt() -> str:
         "for full solutions.\n"
         "2) Do NOT include markdown fences or extra text outside the tags.\n"
         "3) The tagged code must be valid Lean 4.\n"
+        "4) For fill-in-the-middle: [MISSING_BLOCK] marks a gap. Output ONLY the missing code. "
+        "Do NOT repeat code that appears after [MISSING_BLOCK] in the prompt.\n"
         "If the user includes [FULL-SOLUTION-REQUIRED], output a full solution in <FULL_CODE>.\n\n"
+        "Example (fill-in-the-middle with suffix):\n\n"
+        "[USER]\n"
+        "theorem example (n : ℕ) : n + 0 = n := by\n"
+        "  [MISSING_BLOCK]\n"
+        "  rfl\n\n"
+        "[ASSISTANT]\n"
+        f"<{FIM_CODE_TAG}>\n"
+        "  simp only [Nat.add_zero]\n"
+        f"</{FIM_CODE_TAG}>\n\n"
+        "Example (fill-in-the-middle, no suffix):\n\n"
         "[USER]\n"
         "theorem simple_add (n : ℕ) : 0 + n = n := by\n"
         "  [MISSING_BLOCK]\n\n"
@@ -83,7 +95,7 @@ def _build_system_prompt() -> str:
         f"<{FIM_CODE_TAG}>\n"
         "  simp\n"
         f"</{FIM_CODE_TAG}>\n\n"
-        "Example (full):\n\n"
+        "Example (full solution):\n\n"
         "[USER]\n"
         "theorem add_zero_triv (n : ℕ) : n + 0 = n :=\n\n"
         "[ASSISTANT]\n"
@@ -261,7 +273,7 @@ def main() -> None:
         )
 
         record = {
-            "formal_ground_truth": full_generated,
+            "formal_ground_truth": full_code,  # Original proof, not model reconstruction
             "fim_prefix": prefix,
             "fim_suffix": suffix,
             "generated_middle": generated_middle,
