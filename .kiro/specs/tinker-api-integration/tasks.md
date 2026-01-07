@@ -12,8 +12,8 @@ This implementation plan adapts the existing Lean4 FIM + RLVR project to use Tin
   - Create `__init__.py` with public exports
   - _Requirements: 4.1, 4.5_
 
-- [ ] 2. Implement FIM Prompt Formatter
-  - [ ] 2.1 Create `tinker_integration/prompt_formatter.py`
+- [x] 2. Implement FIM Prompt Formatter
+  - [x] 2.1 Create `tinker_integration/prompt_formatter.py`
     - Implement `PromptTemplate` dataclass
     - Implement `FIMPromptFormatter` class with `format()` method
     - Handle empty suffix case (100% masking)
