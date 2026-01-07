@@ -24,8 +24,8 @@ This implementation plan adapts the existing Lean4 FIM + RLVR project to use Tin
     - **Property 1: FIM Prompt Construction Preserves Content**
     - **Validates: Requirements 1.2, 2.1, 2.5**
 
-- [ ] 3. Implement Lean4FIMEnv (Tinker Environment)
-  - [ ] 3.1 Create `tinker_integration/lean_env.py`
+- [-] 3. Implement Lean4FIMEnv (Tinker Environment)
+  - [x] 3.1 Create `tinker_integration/lean_env.py`
     - Implement `Observation`, `StopCondition`, `StepResult` dataclasses
     - Implement `Lean4FIMEnv` class with `initial_observation()` and `step()`
     - Integrate with existing `LeanVerifier` for reward computation
