@@ -39,6 +39,15 @@ __all__ = [
     "TheoremDataset",
     # Async verification
     "AsyncVerifier",
+    # Training client
+    "TinkerTrainingClient",
+    "create_training_client",
+    "create_training_client_sync",
+    "ClientConfig",
+    "LoRAConfig",
+    "TinkerClientError",
+    "TinkerAuthenticationError",
+    "TinkerModelNotAvailableError",
     # Training loop
     "CISPOTrainingLoop",
     # Configuration
@@ -72,6 +81,19 @@ def __getattr__(name: str):
         elif name == "AsyncVerifier":
             from .async_verifier import AsyncVerifier
             return AsyncVerifier
+        elif name in (
+            "TinkerTrainingClient", "create_training_client", 
+            "create_training_client_sync", "ClientConfig", "LoRAConfig",
+            "TinkerClientError", "TinkerAuthenticationError", 
+            "TinkerModelNotAvailableError"
+        ):
+            from .client import (
+                TinkerTrainingClient, create_training_client,
+                create_training_client_sync, ClientConfig, LoRAConfig,
+                TinkerClientError, TinkerAuthenticationError,
+                TinkerModelNotAvailableError
+            )
+            return locals()[name]
         elif name == "CISPOTrainingLoop":
             from .training_loop import CISPOTrainingLoop
             return CISPOTrainingLoop

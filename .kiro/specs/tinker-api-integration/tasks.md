@@ -131,8 +131,8 @@ This implementation plan adapts the existing Lean4 FIM + RLVR project to use Tin
     - **Property 8: Checkpoint State Round-Trip**
     - **Validates: Requirements 9.2, 9.4**
 
-- [ ] 12. Implement Tinker Training Client Setup
-  - [ ] 12.1 Create `tinker_integration/client.py`
+- [x] 12. Implement Tinker Training Client Setup
+  - [x] 12.1 Create `tinker_integration/client.py`
     - Implement `create_training_client()` factory function
     - Configure for `gpt-oss-120b` with LoRA
     - Add API credential validation
