@@ -1,0 +1,15 @@
+# Tinker API Integration Dependencies
+# Install with: pip install -r tinker_integration/requirements.txt
+
+# Tinker API client
+# Note: tinker-api is the official package from Thinking Machines Lab
+# Install from PyPI or their private index as per their documentation
+tinker-api>=0.1.0
+
+# Core dependencies (may already be installed from main requirements)
+pyyaml>=6.0
+polars>=1.0.0
+aiohttp>=3.8.0
+
+# Optional: Weights & Biases integration
+# wandb>=0.15.0
