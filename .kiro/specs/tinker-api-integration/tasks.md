@@ -36,8 +36,8 @@ This implementation plan adapts the existing Lean4 FIM + RLVR project to use Tin
     - **Property 2: Proof Reconstruction Round-Trip**
     - **Validates: Requirements 1.3**
 
-- [ ] 4. Implement AsyncVerifier
-  - [ ] 4.1 Create `tinker_integration/async_verifier.py`
+- [x] 4. Implement AsyncVerifier
+  - [x] 4.1 Create `tinker_integration/async_verifier.py`
     - Wrap `LeanVerifier` with async/await interface
     - Implement semaphore-based concurrency control
     - Add timeout handling with configurable duration
