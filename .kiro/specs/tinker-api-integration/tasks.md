@@ -144,8 +144,8 @@ This implementation plan adapts the existing Lean4 FIM + RLVR project to use Tin
     - Test model configuration
     - _Requirements: 4.5, 4.6_
 
-- [ ] 13. Implement CISPO Training Loop
-  - [ ] 13.1 Create `tinker_integration/training_loop.py`
+- [-] 13. Implement CISPO Training Loop
+  - [x] 13.1 Create `tinker_integration/training_loop.py`
     - Implement `CISPOTrainingLoop` class
     - Implement `train()` async method with main loop
     - Implement `_sample_completions()` using Tinker sampler
