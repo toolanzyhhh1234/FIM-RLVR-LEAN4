@@ -88,8 +88,8 @@ This implementation plan adapts the existing Lean4 FIM + RLVR project to use Tin
     - **Property 10: Configuration Defaults**
     - **Validates: Requirements 10.4**
 
-- [ ] 8. Implement MetricsLogger
-  - [ ] 8.1 Create `tinker_integration/metrics.py`
+- [-] 8. Implement MetricsLogger
+  - [x] 8.1 Create `tinker_integration/metrics.py`
     - Implement `TrainingMetrics` dataclass
     - Implement `MetricsLogger` with JSONL output
     - Add verification latency tracking
