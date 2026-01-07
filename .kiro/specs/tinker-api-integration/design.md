@@ -773,7 +773,7 @@ from typing import Optional, Dict, Any
 
 class CheckpointManager:
     """
-    Manages checkpointing of training state.
+    Manages checkpointing of training state to local filesystem.
     
     Saves:
     - LoRA weights (via Tinker API)
@@ -786,16 +786,14 @@ class CheckpointManager:
         checkpoint_dir: str,
         training_client,  # Tinker TrainingClient
         curriculum_manager: "CurriculumManager",
-        s3_bucket: Optional[str] = None,
     ):
         self.checkpoint_dir = Path(checkpoint_dir)
         self.checkpoint_dir.mkdir(parents=True, exist_ok=True)
         self.client = training_client
         self.curriculum = curriculum_manager
-        self.s3_bucket = s3_bucket
     
     async def save(self, step: int):
-        """Save checkpoint at given step."""
+        """Save checkpoint at given step to local filesystem."""
         checkpoint_path = self.checkpoint_dir / f"checkpoint_{step}"
         checkpoint_path.mkdir(exist_ok=True)
         
@@ -815,10 +813,6 @@ class CheckpointManager:
         metadata_path = checkpoint_path / "metadata.json"
         with open(metadata_path, "w") as f:
             json.dump(metadata, f)
-        
-        # 4. Optionally upload to S3
-        if self.s3_bucket:
-            await self._upload_to_s3(checkpoint_path)
     
     async def load(self, checkpoint_name: str) -> int:
         """
@@ -845,10 +839,20 @@ class CheckpointManager:
         
         return metadata["step"]
     
-    async def _upload_to_s3(self, local_path: Path):
-        """Upload checkpoint to S3 (placeholder for S3 integration)."""
-        # Implementation would use boto3 or similar
-        pass
+    def list_checkpoints(self) -> list:
+        """List available checkpoints in the checkpoint directory."""
+        checkpoints = []
+        for path in self.checkpoint_dir.iterdir():
+            if path.is_dir() and path.name.startswith("checkpoint_"):
+                metadata_path = path / "metadata.json"
+                if metadata_path.exists():
+                    checkpoints.append(path.name)
+        return sorted(checkpoints, key=lambda x: int(x.split("_")[1]))
+    
+    def get_latest_checkpoint(self) -> Optional[str]:
+        """Get the most recent checkpoint name, or None if no checkpoints exist."""
+        checkpoints = self.list_checkpoints()
+        return checkpoints[-1] if checkpoints else None
 ```
 
 
@@ -1040,8 +1044,7 @@ logging:
   wandb_project: null  # Optional: W&B project name
 
 checkpointing:
-  checkpoint_dir: "checkpoints"
-  s3_bucket: null  # Optional: S3 bucket for cloud storage
+  checkpoint_dir: "checkpoints"  # Local filesystem directory for checkpoints
 ```
 
 

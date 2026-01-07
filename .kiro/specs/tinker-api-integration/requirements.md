@@ -136,7 +136,7 @@ The core value proposition is replacing expensive self-managed GPU infrastructur
 2. THE Checkpoint_Manager SHALL save `CurriculumManager` state (per-theorem levels and history)
 3. THE Checkpoint_Manager SHALL save training step count and optimizer state
 4. WHEN resuming, THE Checkpoint_Manager SHALL restore all state and continue from the last checkpoint
-5. THE Checkpoint_Manager SHALL support saving to local filesystem or cloud storage (S3-compatible)
+5. THE Checkpoint_Manager SHALL save checkpoints to a configurable local filesystem directory
 
 ### Requirement 10: Configuration Management
 
