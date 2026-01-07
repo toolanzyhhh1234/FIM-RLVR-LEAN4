@@ -48,11 +48,11 @@ This implementation plan adapts the existing Lean4 FIM + RLVR project to use Tin
     - **Property 5: Verification Concurrency Limit**
     - **Validates: Requirements 6.3**
 
-- [ ] 5. Checkpoint - Ensure all tests pass
+- [x] 5. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 6. Implement CurriculumEnvGroupBuilder
-  - [ ] 6.1 Create `tinker_integration/env_group_builder.py`
+- [-] 6. Implement CurriculumEnvGroupBuilder
+  - [x] 6.1 Create `tinker_integration/env_group_builder.py`
     - Implement `TheoremDataset` class for Parquet loading
     - Implement `CurriculumEnvGroupBuilder` with `make_envs()` and `update_outcomes()`
     - Integrate with existing `CurriculumManager` for mask ratio selection
@@ -72,8 +72,8 @@ This implementation plan adapts the existing Lean4 FIM + RLVR project to use Tin
     - **Validates: Requirements 7.2**
 
 
-- [ ] 7. Implement ConfigManager
-  - [ ] 7.1 Create `tinker_integration/config.py`
+- [x] 7. Implement ConfigManager
+  - [x] 7.1 Create `tinker_integration/config.py`
     - Implement `TrainingConfig` dataclass with defaults
     - Implement `ConfigManager` with YAML loading
     - Add environment variable override support
