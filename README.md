@@ -114,8 +114,13 @@ cd verification_env && lake update && cd ..
 
 #### 2. Configure Tinker API Key
 
+You can set your API key in a `.env` file (recommended) or as an environment variable:
+
 ```bash
-# Set your Tinker API key (required)
+# Option A: Create a .env file in the project root
+echo 'TINKER_API_KEY=your-api-key-here' >> .env
+
+# Option B: Export as environment variable
 export TINKER_API_KEY="your-api-key-here"
 
 # Get your API key from: https://tinker.thinkingmachines.ai/

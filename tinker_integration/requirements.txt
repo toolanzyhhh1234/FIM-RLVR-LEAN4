@@ -10,6 +10,7 @@ tinker-api>=0.1.0
 pyyaml>=6.0
 polars>=1.0.0
 aiohttp>=3.8.0
+python-dotenv>=1.0.0  # For loading .env files
 
 # Optional: Weights & Biases integration
 # wandb>=0.15.0

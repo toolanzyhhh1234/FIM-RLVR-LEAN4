@@ -16,13 +16,16 @@ Usage:
     python train_tinker_fim.py --config configs/tinker_training.yaml --max-steps 500
 
 Environment Variables:
-    TINKER_API_KEY: Required. Your Tinker API key.
+    TINKER_API_KEY: Required. Your Tinker API key (can be set in .env file).
     FIM_MODEL_NAME: Override model name from config.
     FIM_MAX_STEPS: Override max training steps.
     FIM_CHECKPOINT_DIR: Override checkpoint directory.
     FIM_LOG_DIR: Override log directory.
     FIM_DATASET_PATH: Override dataset path.
     WANDB_PROJECT: Enable W&B logging with this project name.
+
+    Note: Environment variables can be set in a .env file in the project root.
+    The script will automatically load it if python-dotenv is installed.
 
 Requirements:
     - All requirements from requirements.md
@@ -39,6 +42,13 @@ import signal
 import sys
 from pathlib import Path
 from typing import Optional
+
+# Load .env file before anything else
+try:
+    from dotenv import load_dotenv
+    load_dotenv()  # Loads from .env in current directory
+except ImportError:
+    pass  # python-dotenv not installed, rely on shell environment
 
 # Configure logging early
 logging.basicConfig(
