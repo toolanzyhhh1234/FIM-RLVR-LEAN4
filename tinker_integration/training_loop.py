@@ -84,6 +84,7 @@ class CISPOTrainingLoop:
         checkpoint_manager: "CheckpointManager",
         error_handler: Optional["ErrorHandler"] = None,
         start_step: int = 0,
+        debug_log_dir: Optional[str] = None,
     ):
         """
         Initialize the CISPO training loop.
@@ -98,6 +99,7 @@ class CISPOTrainingLoop:
             checkpoint_manager: CheckpointManager for saving state.
             error_handler: Optional ErrorHandler for robust error handling.
             start_step: Starting step number (for resuming from checkpoint).
+            debug_log_dir: Directory for debug logs (samples, verifications).
         """
         self.service_client = service_client
         self.training_client = training_client
@@ -109,6 +111,11 @@ class CISPOTrainingLoop:
         self.error_handler = error_handler
         self.step_count = start_step
         
+        # Debug logging
+        self.debug_log_dir = debug_log_dir or config.log_dir
+        self._debug_log_file = None
+        self._init_debug_log()
+        
         # Track training state
         self._running = False
         self._should_stop = False
@@ -119,6 +126,22 @@ class CISPOTrainingLoop:
         self._total_tokens_generated = 0
         self._total_verifications = 0
         self._total_successes = 0
+    
+    def _init_debug_log(self):
+        """Initialize debug log file for samples and verifications."""
+        import os
+        os.makedirs(self.debug_log_dir, exist_ok=True)
+        debug_path = os.path.join(self.debug_log_dir, "debug_samples.jsonl")
+        self._debug_log_file = open(debug_path, "a")
+        logger.info(f"Debug log initialized: {debug_path}")
+    
+    def _log_debug(self, data: Dict[str, Any]):
+        """Write a debug entry to the log file."""
+        import json
+        import time
+        data["timestamp"] = time.time()
+        self._debug_log_file.write(json.dumps(data, ensure_ascii=False) + "\n")
+        self._debug_log_file.flush()
     
     async def train(self) -> Dict[str, Any]:
         """
@@ -210,6 +233,11 @@ class CISPOTrainingLoop:
         # 1. Create environment group
         envs = self.env_builder.make_envs()
         
+        # Capture theorem info for logging
+        current_theorem_id = self.env_builder.get_current_theorem_id()
+        current_mask_ratio = self.env_builder.get_current_mask_ratio()
+        logger.debug(f"Step {step}: theorem={current_theorem_id}, mask_ratio={current_mask_ratio}")
+        
         # 2. Save weights and create sampling client
         save_future = await self.training_client.save_weights_for_sampler_async(
             name=f"step_{step:06d}"
@@ -252,13 +280,37 @@ class CISPOTrainingLoop:
                 # Decode completion and verify with Lean
                 completion_text = self.tokenizer.decode(completion_tokens, skip_special_tokens=True)
                 
+                # Log sample for debugging (randomly sample ~10% to avoid spam)
+                import random
+                if random.random() < 0.1 or step < 3:  # Always log first 3 steps
+                    logger.info(f"[Step {step}] Sample ({len(completion_tokens)} tokens):")
+                    logger.info(f"  Prompt: {prompt_text[:100]}...")
+                    logger.info(f"  Completion: {completion_text[:200]}...")
+                
                 # Run verification
                 try:
                     result = await self._verify_completion(env, completion_text)
                     reward = result.reward
+                    verification_output = getattr(result, 'output', '')
                 except Exception as e:
                     logger.warning(f"Verification error: {e}")
                     reward = 0.0
+                    verification_output = str(e)
+                
+                # Log full debug info to file
+                full_code = env.prefix + completion_text + env.suffix
+                self._log_debug({
+                    "step": step,
+                    "theorem_id": current_theorem_id,
+                    "mask_ratio": current_mask_ratio,
+                    "prompt": prompt_text,
+                    "completion": completion_text,
+                    "full_code_sent_to_lean": full_code,
+                    "reward": reward,
+                    "verification_success": reward > 0.5,
+                    "verification_output": verification_output,
+                    "num_completion_tokens": len(completion_tokens),
+                })
                 
                 self._total_verifications += 1
                 if reward > 0.5:
@@ -366,23 +418,31 @@ class CISPOTrainingLoop:
             completion_text: The decoded completion text.
             
         Returns:
-            StepResult with reward.
+            StepResult with reward and verification output.
         """
         from .lean_env import StepResult
         
         try:
-            # Use the environment's step method with the completion
-            result = env.step_with_text(completion_text)
-            if asyncio.iscoroutine(result):
-                result = await result
+            # Reconstruct full code
+            full_code = env.prefix + completion_text + env.suffix
+            
+            # Verify with Lean4
+            success, output = env.verifier.verify(full_code)
+            
+            # Create result with output attached
+            result = StepResult(reward=1.0 if success else 0.0, episode_done=True)
+            result.output = output  # Attach verification output
             return result
+            
         except asyncio.TimeoutError:
             logger.warning("Verification timed out")
             if self.error_handler:
                 self.error_handler.handle_timeout(
                     self.env_builder.get_current_theorem_id()
                 )
-            return StepResult(reward=0.0, episode_done=True)
+            result = StepResult(reward=0.0, episode_done=True)
+            result.output = "TIMEOUT"
+            return result
         except Exception as e:
             logger.error(f"Verification error: {e}")
             if self.error_handler:
@@ -390,7 +450,9 @@ class CISPOTrainingLoop:
                     self.env_builder.get_current_theorem_id() or "unknown",
                     str(e)
                 )
-            return StepResult(reward=0.0, episode_done=True)
+            result = StepResult(reward=0.0, episode_done=True)
+            result.output = f"ERROR: {e}"
+            return result
     
     def _log_step_metrics(self, step_metrics: Dict[str, Any], step: int) -> None:
         """Log training metrics for a step."""
@@ -431,6 +493,10 @@ class CISPOTrainingLoop:
     
     def _get_training_summary(self) -> Dict[str, Any]:
         """Get summary statistics for the training run."""
+        # Close debug log file
+        if self._debug_log_file:
+            self._debug_log_file.close()
+            
         return {
             "final_step": self.step_count,
             "total_tokens_generated": self._total_tokens_generated,

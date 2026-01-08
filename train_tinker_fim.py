@@ -400,7 +400,7 @@ async def main_async(args: argparse.Namespace) -> int:
     
     # Run training
     logger.info("Starting training...")
-    logger.info(f"  Model: {training_client.model_name}")
+    logger.info(f"  Model: {config.model_name}")
     logger.info(f"  Max steps: {config.max_steps}")
     logger.info(f"  Group size: {config.group_size}")
     logger.info(f"  Learning rate: {config.learning_rate}")
