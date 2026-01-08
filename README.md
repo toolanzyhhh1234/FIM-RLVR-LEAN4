@@ -98,20 +98,172 @@ Contributions and collaborators are welcome! If you share an interest in formal 
 
 ## Usage
 
-1. **Setup**:
-   ```bash
-   # Install dependencies (Unsloth, TRL, etc.)
-   pip install unsloth trl
-   
-   # Setup Lean 4 environment
-   cd verification_env && lake update
-   ```
+### Option 1: Tinker API Training (Recommended for Large Models)
 
-2. **Run Training**:
-   ```bash
-   python3 train_grpo_fim.py
-   ```
-   *Note: Currently configured for local testing with `unsloth/Qwen2.5-0.5B-Instruct`.*
+This is the recommended approach for training large MoE models like `gpt-oss-120b`.
+
+#### 1. Setup
+
+```bash
+# Install dependencies
+pip install -r tinker_integration/requirements.txt
+
+# Setup Lean 4 verification environment
+cd verification_env && lake update && cd ..
+```
+
+#### 2. Configure Tinker API Key
+
+```bash
+# Set your Tinker API key (required)
+export TINKER_API_KEY="your-api-key-here"
+
+# Get your API key from: https://tinker.thinkingmachines.ai/
+```
+
+#### 3. Prepare Dataset
+
+Ensure you have a theorem dataset in Parquet format with the required fields:
+- `theorem_id` (or `id`): Unique identifier for each theorem
+- `prefix`: Code before the masked region
+- `suffix`: Code after the masked region  
+- `middle`: The ground truth for the masked region
+
+Example datasets are available in `data/`:
+```bash
+# NuminaMath-LEAN dataset
+data/NuminaMath-LEAN/data/train-00000-of-00001.parquet
+
+# LeanDojoBench dataset
+data/LeanDojoBench/data/train-00000-of-00001.parquet
+```
+
+#### 4. Run Training
+
+```bash
+# Basic training with default config
+python train_tinker_fim.py --config configs/tinker_training.yaml
+
+# Resume from checkpoint
+python train_tinker_fim.py --config configs/tinker_training.yaml --resume
+
+# Override specific settings
+python train_tinker_fim.py --config configs/tinker_training.yaml \
+    --max-steps 500 \
+    --learning-rate 0.0001 \
+    --group-size 8
+
+# Dry run (validate config without training)
+python train_tinker_fim.py --config configs/tinker_training.yaml --dry-run
+```
+
+#### Configuration Options
+
+The configuration file (`configs/tinker_training.yaml`) supports the following options:
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `model_name` | `openai/gpt-oss-120b` | Primary model for training |
+| `fallback_model` | `Qwen/Qwen3-235B-A22B` | Fallback if primary unavailable |
+| `lora_rank` | `16` | LoRA fine-tuning rank |
+| `max_steps` | `1000` | Maximum training steps |
+| `learning_rate` | `0.00005` | Learning rate for LoRA updates |
+| `temperature` | `0.8` | Sampling temperature |
+| `group_size` | `4` | Completions per theorem (CISPO) |
+| `max_concurrent_verifications` | `8` | Parallel Lean4 verifications |
+| `verification_timeout` | `60.0` | Timeout per verification (seconds) |
+| `checkpoint_interval` | `100` | Steps between checkpoints |
+| `logging_steps` | `10` | Steps between metric logs |
+
+#### Environment Variable Overrides
+
+Most settings can be overridden via environment variables:
+
+```bash
+export TINKER_API_KEY="your-api-key"      # Required
+export FIM_MODEL_NAME="Qwen/Qwen3-235B-A22B"
+export FIM_MAX_STEPS="500"
+export FIM_LEARNING_RATE="0.0001"
+export FIM_CHECKPOINT_DIR="checkpoints/my_run"
+export FIM_LOG_DIR="logs/my_run"
+export FIM_DATASET_PATH="data/my_dataset.parquet"
+export WANDB_PROJECT="my-project"         # Enable W&B logging
+```
+
+#### Command Line Options
+
+```
+usage: train_tinker_fim.py [-h] [--config CONFIG] [--resume] [--resume-from CHECKPOINT]
+                           [--max-steps N] [--checkpoint-dir DIR] [--log-dir DIR]
+                           [--dataset PATH] [--model NAME] [--group-size N]
+                           [--learning-rate LR] [--verification-env PATH]
+                           [--no-sorries] [--verbose] [--quiet] [--dry-run]
+
+Options:
+  --config, -c          Path to YAML configuration file
+  --resume              Resume from latest checkpoint
+  --resume-from         Resume from specific checkpoint (e.g., checkpoint_100)
+  --max-steps           Override max training steps
+  --checkpoint-dir      Override checkpoint directory
+  --log-dir             Override log directory
+  --dataset             Override dataset path
+  --model               Override model name
+  --group-size          Override group size for CISPO
+  --learning-rate       Override learning rate
+  --verification-env    Path to Lean4 verification environment (default: verification_env)
+  --no-sorries          Fail verification when file contains sorry
+  --verbose, -v         Enable verbose logging
+  --quiet, -q           Suppress non-error output
+  --dry-run             Validate configuration without starting training
+```
+
+---
+
+### Option 2: Local Training (Unsloth + TRL)
+
+For smaller models or local experimentation:
+
+```bash
+# Install dependencies (Unsloth, TRL, etc.)
+pip install unsloth trl
+
+# Setup Lean 4 environment
+cd verification_env && lake update
+
+# Run local training
+python3 train_grpo_fim_local.py
+```
+
+*Note: Local training is configured for testing with smaller models like `unsloth/Qwen2.5-0.5B-Instruct`.*
+
+---
+
+## Tinker Integration Architecture
+
+The Tinker integration consists of the following components:
+
+```
+tinker_integration/
+├── __init__.py              # Public exports
+├── async_verifier.py        # Async wrapper for LeanVerifier
+├── checkpoint.py            # Checkpoint save/load management
+├── client.py                # Tinker API client setup
+├── config.py                # YAML configuration management
+├── env_group_builder.py     # Curriculum-aware environment builder
+├── error_handler.py         # Retry logic and error aggregation
+├── lean_env.py              # Tinker Env interface for Lean4
+├── metrics.py               # Training metrics and logging
+├── prompt_formatter.py      # FIM prompt construction
+├── training_loop.py         # CISPO training loop
+└── requirements.txt         # Tinker-specific dependencies
+```
+
+**Key Features:**
+- **CISPO Loss**: Clipped Importance Sampling Policy Optimization—stable for MoE models
+- **Curriculum Learning**: Progressive difficulty from 10% to 100% proof masking
+- **Async Verification**: Parallel Lean4 verification with configurable concurrency
+- **Checkpointing**: Save/resume training state including curriculum progress
+- **Metrics**: JSONL logging with optional Weights & Biases integration
 
 ## License
 MIT

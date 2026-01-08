@@ -175,14 +175,14 @@ This implementation plan adapts the existing Lean4 FIM + RLVR project to use Tin
     - Include sensible defaults for Lean4 FIM task
     - _Requirements: 10.1, 10.4_
 
-- [ ] 16. Integration testing and documentation
+- [-] 16. Integration testing and documentation
   - [ ]* 16.1 Write integration test for end-to-end flow
     - Test 10 training steps with mock Tinker client
     - Verify curriculum updates
     - Verify checkpoint save/load
     - _Requirements: All_
 
-  - [ ] 16.2 Update README with Tinker integration instructions
+  - [x] 16.2 Update README with Tinker integration instructions
     - Add setup instructions for Tinker API key
     - Add example training command
     - Document configuration options
