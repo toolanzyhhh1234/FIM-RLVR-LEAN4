@@ -265,6 +265,52 @@ class Lean4FIMEnv:
         """
         return self.ground_truth
     
+    def get_fim_prompt(self) -> str:
+        """
+        Get the FIM prompt as text (not tokenized).
+        
+        Returns:
+            The formatted FIM prompt string.
+        """
+        return self.formatter.format(self.prefix, self.suffix)
+    
+    def step_with_text(self, completion_text: str) -> StepResult:
+        """
+        Process a text completion (already decoded) and return verification reward.
+        
+        This is a convenience method that skips the tokenization step,
+        useful when the completion has already been decoded.
+        
+        Args:
+            completion_text: The decoded completion text.
+        
+        Returns:
+            StepResult with reward based on verification.
+        """
+        if not self._episode_started:
+            # Auto-start episode if not started
+            self._episode_started = True
+        
+        if self._episode_done:
+            raise RuntimeError("Episode already done. Create new environment for next episode.")
+        
+        # Mark episode as done
+        self._episode_done = True
+        
+        # Reconstruct full proof
+        full_code = self.prefix + completion_text + self.suffix
+        
+        # Verify with Lean4
+        success, output = self.verifier.verify(full_code)
+        
+        # Return reward based on verification result
+        return StepResult(
+            reward=1.0 if success else 0.0,
+            episode_done=True,
+            next_observation=None,
+            next_stop_condition=None
+        )
+    
     def get_debug_info(self) -> dict:
         """
         Get debug information about the environment state.

@@ -155,6 +155,7 @@ class TinkerTrainingClient:
         """
         self.config = config
         self._client = _tinker_client
+        self._service_client = None  # ServiceClient for creating training/sampling clients
         self._model_name = config.model_name
         self._initialized = False
     
@@ -236,12 +237,18 @@ class TinkerTrainingClient:
         except ImportError:
             raise  # Re-raise to be caught by caller
         
+        # Create the ServiceClient first (uses TINKER_API_KEY env var automatically)
+        try:
+            self._service_client = tinker.ServiceClient()
+        except tinker.AuthenticationError as e:
+            raise TinkerAuthenticationError(
+                f"Tinker API authentication failed. Please check your API key. Error: {e}"
+            )
+        
         try:
             # Try primary model first (Requirement 4.1)
             try:
                 self._client = await self._create_lora_client(
-                    tinker, 
-                    api_key, 
                     self.config.model_name
                 )
                 self._model_name = self.config.model_name
@@ -261,8 +268,6 @@ class TinkerTrainingClient:
             # Try fallback model (Requirement 4.4)
             try:
                 self._client = await self._create_lora_client(
-                    tinker,
-                    api_key,
                     self.config.fallback_model
                 )
                 self._model_name = self.config.fallback_model
@@ -275,26 +280,22 @@ class TinkerTrainingClient:
                 
         except TinkerAuthenticationError:
             raise  # Re-raise our own auth errors
+        except TinkerModelNotAvailableError:
+            raise  # Re-raise model errors
         except Exception as e:
+            import tinker
             # Check if it's a tinker authentication error
-            if hasattr(tinker, 'AuthenticationError') and isinstance(e, tinker.AuthenticationError):
+            if isinstance(e, tinker.AuthenticationError):
                 raise TinkerAuthenticationError(
                     f"Tinker API authentication failed. Please check your API key. Error: {e}"
                 )
             raise
     
-    async def _create_lora_client(
-        self, 
-        tinker_module: Any, 
-        api_key: str, 
-        model_name: str
-    ) -> Any:
+    async def _create_lora_client(self, model_name: str) -> Any:
         """
         Create a LoRA training client for the specified model.
         
         Args:
-            tinker_module: The imported tinker module
-            api_key: API key for authentication
             model_name: Name of the model to use
             
         Returns:
@@ -302,14 +303,11 @@ class TinkerTrainingClient:
         """
         lora_config = self.config.lora_config
         
-        # Create LoRA training client (Requirement 4.2)
-        client = await tinker_module.create_lora_training_client_async(
-            api_key=api_key,
-            model=model_name,
-            lora_rank=lora_config.rank,
-            lora_alpha=lora_config.alpha,
-            lora_dropout=lora_config.dropout,
-            target_modules=lora_config.target_modules,
+        # Create LoRA training client via ServiceClient (Requirement 4.2)
+        # The SDK uses create_lora_training_client_async on the ServiceClient
+        client = await self._service_client.create_lora_training_client_async(
+            base_model=model_name,
+            rank=lora_config.rank,
         )
         
         return client

@@ -36,19 +36,6 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
-class ModelInput:
-    """
-    Input format for Tinker's forward_backward.
-    
-    Attributes:
-        tokens: List of token IDs (prompt + completion).
-        length: Total length of the sequence.
-    """
-    tokens: List[int]
-    length: int
-
-
-@dataclass
 class SampleResult:
     """
     Result from Tinker's sample() call.
@@ -58,7 +45,7 @@ class SampleResult:
         logprobs: Log probabilities for each generated token.
     """
     tokens: List[int]
-    logprobs: np.ndarray
+    logprobs: List[float]
 
 
 @dataclass
@@ -67,15 +54,15 @@ class Trajectory:
     Complete trajectory for one episode.
     
     Attributes:
-        observation_tokens: Token IDs of the initial observation (prompt).
-        action_tokens: Token IDs of the model's completion.
+        prompt_tokens: Token IDs of the prompt.
+        completion_tokens: Token IDs of the model's completion.
         reward: Reward from verification (1.0 for success, 0.0 for failure).
-        logprobs: Log probabilities of the action tokens.
+        logprobs: Log probabilities of the completion tokens.
     """
-    observation_tokens: List[int]
-    action_tokens: List[int]
+    prompt_tokens: List[int]
+    completion_tokens: List[int]
     reward: float
-    logprobs: np.ndarray
+    logprobs: List[float]
 
 
 class CISPOTrainingLoop:
@@ -83,40 +70,14 @@ class CISPOTrainingLoop:
     RLVR training loop using Tinker API with CISPO loss.
     
     Implements the core RL loop for training large MoE models on Lean4
-    proof infilling tasks:
-    
-    1. Sample completions from policy (Requirement 5.1)
-    2. Verify with Lean4 and compute rewards (Requirement 5.2)
-    3. Update policy with CISPO loss (Requirements 5.3, 5.4)
-    4. Log metrics and checkpoint periodically (Requirements 5.6, 5.7)
-    
-    The loop uses group-relative advantage computation, where the baseline
-    is the mean reward within each group of completions for the same theorem.
-    This is essential for stable CISPO training.
-    
-    Example:
-        >>> loop = CISPOTrainingLoop(
-        ...     training_client=client,
-        ...     env_group_builder=builder,
-        ...     config=config,
-        ...     metrics_logger=metrics,
-        ...     checkpoint_manager=checkpointer,
-        ... )
-        >>> await loop.train()
-    
-    Attributes:
-        client: Tinker TrainingClient for model operations.
-        env_builder: CurriculumEnvGroupBuilder for creating environments.
-        config: TrainingConfig with hyperparameters.
-        metrics: MetricsLogger for tracking progress.
-        checkpointer: CheckpointManager for saving state.
-        error_handler: Optional ErrorHandler for robust error handling.
-        step_count: Current training step.
+    proof infilling tasks using the correct Tinker API signatures.
     """
     
     def __init__(
         self,
+        service_client: Any,
         training_client: Any,
+        tokenizer: Any,
         env_group_builder: "CurriculumEnvGroupBuilder",
         config: "TrainingConfig",
         metrics_logger: "MetricsLogger",
@@ -128,7 +89,9 @@ class CISPOTrainingLoop:
         Initialize the CISPO training loop.
         
         Args:
+            service_client: Tinker ServiceClient for creating samplers.
             training_client: Tinker TrainingClient for model operations.
+            tokenizer: Tokenizer from training_client.get_tokenizer().
             env_group_builder: CurriculumEnvGroupBuilder for creating environments.
             config: TrainingConfig with hyperparameters.
             metrics_logger: MetricsLogger for tracking progress.
@@ -136,7 +99,9 @@ class CISPOTrainingLoop:
             error_handler: Optional ErrorHandler for robust error handling.
             start_step: Starting step number (for resuming from checkpoint).
         """
-        self.client = training_client
+        self.service_client = service_client
+        self.training_client = training_client
+        self.tokenizer = tokenizer
         self.env_builder = env_group_builder
         self.config = config
         self.metrics = metrics_logger
@@ -147,7 +112,8 @@ class CISPOTrainingLoop:
         # Track training state
         self._running = False
         self._should_stop = False
-        self._current_sampler = None
+        self._current_sampling_client = None
+        self._sampler_checkpoint_path = None
         
         # Statistics
         self._total_tokens_generated = 0
@@ -158,21 +124,30 @@ class CISPOTrainingLoop:
         """
         Run the training loop for configured number of steps.
         
-        Implements Requirements 5.1-5.7:
-        - Samples completions using Tinker's sample() primitive
-        - Computes rewards via Lean4 verification
-        - Updates policy with CISPO loss
-        - Logs metrics every logging_steps
-        - Checkpoints every checkpoint_interval
-        
         Returns:
             Dictionary containing training summary statistics.
-            
-        Raises:
-            RuntimeError: If critical error threshold is exceeded.
         """
+        import tinker
+        from tinker import types
+        
         self._running = True
         self._should_stop = False
+        
+        # Set up Adam optimizer params
+        adam_params = types.AdamParams(
+            learning_rate=self.config.learning_rate,
+            beta1=0.9,
+            beta2=0.95,
+            eps=1e-8,
+        )
+        
+        # Sampling params
+        sampling_params = tinker.SamplingParams(
+            max_tokens=512,
+            temperature=self.config.temperature,
+            top_p=0.95,
+            top_k=50,
+        )
         
         logger.info(
             f"Starting CISPO training loop: "
@@ -190,7 +165,7 @@ class CISPOTrainingLoop:
                 self.step_count = step
                 
                 # Execute one training step
-                step_metrics = await self._train_step(step)
+                step_metrics = await self._train_step(step, adam_params, sampling_params)
                 
                 # Log metrics periodically (Requirement 5.6)
                 if step % self.config.logging_steps == 0:
@@ -206,6 +181,8 @@ class CISPOTrainingLoop:
             
         except Exception as e:
             logger.error(f"Training error at step {self.step_count}: {e}")
+            import traceback
+            traceback.print_exc()
             # Try to save emergency checkpoint
             try:
                 await self._save_checkpoint(self.step_count, emergency=True)
@@ -216,247 +193,207 @@ class CISPOTrainingLoop:
             self._running = False
         
         return self._get_training_summary()
+
     
-    async def _train_step(self, step: int) -> Dict[str, Any]:
-        """
-        Execute a single training step.
+    async def _train_step(
+        self, 
+        step: int, 
+        adam_params: Any,
+        sampling_params: Any,
+    ) -> Dict[str, Any]:
+        """Execute a single training step."""
+        import tinker
+        from tinker import types
+        from tinker.types.tensor_data import TensorData
+        import torch
         
-        Args:
-            step: Current step number.
-            
-        Returns:
-            Dictionary containing step metrics.
-        """
-        # 1. Create environment group (Requirement 5.1)
+        # 1. Create environment group
         envs = self.env_builder.make_envs()
         
-        # 2. Get initial observations
-        observations = []
-        stop_conditions = []
-        for env in envs:
-            obs, stop = env.initial_observation()
-            observations.append(obs)
-            stop_conditions.append(stop)
+        # 2. Save weights and create sampling client
+        save_future = await self.training_client.save_weights_for_sampler_async(
+            name=f"step_{step:06d}"
+        )
+        save_result = save_future.result()
+        sampling_path = save_result.path
+        self._sampler_checkpoint_path = sampling_path
         
-        # 3. Sample completions from policy (Requirement 5.1)
-        completions = await self._sample_completions(
-            observations,
-            stop_conditions,
-            step
+        sampling_client = self.service_client.create_sampling_client(
+            model_path=sampling_path
+        )
+        self._current_sampling_client = sampling_client
+        
+        # 3. Sample completions for each environment
+        all_trajectories: List[Trajectory] = []
+        all_rewards: List[float] = []
+        
+        for env in envs:
+            # Get the FIM prompt tokens
+            prompt_text = env.get_fim_prompt()
+            prompt_tokens = self.tokenizer.encode(prompt_text)
+            
+            # Sample G completions for this environment
+            model_input = types.ModelInput.from_ints(tokens=prompt_tokens)
+            
+            sample_future = sampling_client.sample(
+                prompt=model_input,
+                num_samples=1,  # One sample per env, env_builder creates group_size envs
+                sampling_params=sampling_params,
+            )
+            sample_result = sample_future.result()
+            
+            # Process each sample
+            for seq in sample_result.sequences:
+                completion_tokens = seq.tokens
+                completion_logprobs = list(seq.logprobs) if seq.logprobs else [0.0] * len(completion_tokens)
+                
+                self._total_tokens_generated += len(completion_tokens)
+                
+                # Decode completion and verify with Lean
+                completion_text = self.tokenizer.decode(completion_tokens, skip_special_tokens=True)
+                
+                # Run verification
+                try:
+                    result = await self._verify_completion(env, completion_text)
+                    reward = result.reward
+                except Exception as e:
+                    logger.warning(f"Verification error: {e}")
+                    reward = 0.0
+                
+                self._total_verifications += 1
+                if reward > 0.5:
+                    self._total_successes += 1
+                
+                trajectory = Trajectory(
+                    prompt_tokens=prompt_tokens,
+                    completion_tokens=completion_tokens,
+                    reward=reward,
+                    logprobs=completion_logprobs,
+                )
+                all_trajectories.append(trajectory)
+                all_rewards.append(reward)
+        
+        # 4. Update curriculum based on outcomes
+        rewards_array = np.array(all_rewards)
+        outcomes = [r > 0.5 for r in all_rewards]
+        self.env_builder.update_outcomes_from_list(outcomes)
+        
+        # 5. Compute advantages (group-relative baseline)
+        mean_reward = rewards_array.mean()
+        advantages = rewards_array - mean_reward
+        
+        # Skip update if all advantages are zero
+        if np.allclose(advantages, 0.0):
+            logger.debug(f"Step {step}: Skipping update - all advantages are zero")
+            return {
+                "rewards": rewards_array,
+                "pass_rate": float((rewards_array > 0.5).mean()),
+                "reward_mean": float(mean_reward),
+                "reward_std": float(rewards_array.std()),
+                "skipped": True,
+            }
+        
+        # 6. Build training datums
+        datums: List[types.Datum] = []
+        
+        for trajectory, advantage in zip(all_trajectories, advantages):
+            # Full sequence: prompt + completion
+            all_tokens = trajectory.prompt_tokens + trajectory.completion_tokens
+            
+            # input_tokens are all but last, target_tokens are all but first
+            input_tokens = all_tokens[:-1]
+            target_tokens = all_tokens[1:]
+            
+            # Pad logprobs and advantages for prompt tokens
+            ob_len = len(trajectory.prompt_tokens) - 1
+            padded_logprobs = [0.0] * ob_len + trajectory.logprobs
+            padded_advantages = [0.0] * ob_len + [float(advantage)] * (len(input_tokens) - ob_len)
+            
+            # Ensure lengths match
+            if len(padded_logprobs) != len(input_tokens):
+                # Truncate or pad as needed
+                padded_logprobs = padded_logprobs[:len(input_tokens)]
+                padded_logprobs.extend([0.0] * (len(input_tokens) - len(padded_logprobs)))
+            
+            if len(padded_advantages) != len(input_tokens):
+                padded_advantages = padded_advantages[:len(input_tokens)]
+                padded_advantages.extend([0.0] * (len(input_tokens) - len(padded_advantages)))
+            
+            datum = types.Datum(
+                model_input=types.ModelInput.from_ints(tokens=input_tokens),
+                loss_fn_inputs={
+                    "target_tokens": TensorData.from_torch(torch.tensor(target_tokens)),
+                    "logprobs": TensorData.from_torch(torch.tensor(padded_logprobs)),
+                    "advantages": TensorData.from_torch(torch.tensor(padded_advantages)),
+                },
+            )
+            datums.append(datum)
+        
+        # 7. Forward-backward with CISPO loss
+        fb_future = self.training_client.forward_backward(
+            data=datums,
+            loss_fn="cispo",  # Use CISPO for MoE stability
         )
         
-        # 4. Execute steps and get rewards (Requirement 5.2)
-        results = []
-        trajectories = []
-        for env, obs, completion in zip(envs, observations, completions):
-            result = await self._execute_step(env, completion)
-            results.append(result)
-            
-            # Build trajectory for policy update
-            trajectory = Trajectory(
-                observation_tokens=obs.tokens,
-                action_tokens=completion.tokens,
-                reward=result.reward,
-                logprobs=completion.logprobs,
-            )
-            trajectories.append(trajectory)
+        # 8. Optimizer step
+        optim_future = self.training_client.optim_step(adam_params)
         
-        # 5. Update curriculum based on outcomes
-        self.env_builder.update_outcomes(results)
+        # Wait for both
+        fb_result = fb_future.result()
+        optim_result = optim_future.result()
         
-        # 6. Compute advantages and update policy (Requirements 5.3, 5.4)
-        rewards = np.array([r.reward for r in results])
-        await self._update_policy(trajectories, rewards)
-        
-        # Track statistics
-        self._total_verifications += len(results)
-        self._total_successes += int(rewards.sum())
+        # Extract loss from result
+        loss = fb_result.metrics.get("loss:sum", 0.0) if fb_result.metrics else 0.0
         
         return {
-            "rewards": rewards,
-            "pass_rate": float((rewards > 0.5).mean()),
-            "reward_mean": float(rewards.mean()),
-            "reward_std": float(rewards.std()),
+            "rewards": rewards_array,
+            "pass_rate": float((rewards_array > 0.5).mean()),
+            "reward_mean": float(mean_reward),
+            "reward_std": float(rewards_array.std()),
+            "loss": loss,
             "theorem_id": self.env_builder.get_current_theorem_id(),
             "mask_ratio": self.env_builder.get_current_mask_ratio(),
+            "skipped": False,
         }
+
     
-    async def _sample_completions(
-        self,
-        observations: List[Any],
-        stop_conditions: List[Any],
-        step: int,
-    ) -> List[SampleResult]:
+    async def _verify_completion(self, env: "Lean4FIMEnv", completion_text: str) -> "StepResult":
         """
-        Sample completions using Tinker's sampling client.
-        
-        Implements Requirement 5.1: Sample G completions per environment.
+        Verify a completion using the environment's verifier.
         
         Args:
-            observations: List of Observation objects with tokenized prompts.
-            stop_conditions: List of StopCondition objects with max_tokens.
-            step: Current training step (used for checkpoint naming).
+            env: The Lean4FIMEnv instance.
+            completion_text: The decoded completion text.
             
         Returns:
-            List of SampleResult objects with generated tokens and logprobs.
+            StepResult with reward.
         """
-        # Get sampling client from training client
-        # This saves current weights and returns a client configured with them
-        sampler = await self.client.save_weights_and_get_sampling_client_async(
-            f"step_{step}"
-        )
-        self._current_sampler = sampler
+        from .lean_env import StepResult
         
-        completions = []
-        for obs, stop in zip(observations, stop_conditions):
-            result = await sampler.sample_async(
-                prompt_tokens=obs.tokens,
-                max_tokens=stop.max_tokens,
-                temperature=self.config.temperature,
-            )
-            
-            # Convert to SampleResult if needed
-            if isinstance(result, SampleResult):
-                completions.append(result)
-            else:
-                # Handle different result formats from Tinker API
-                completions.append(SampleResult(
-                    tokens=result.tokens if hasattr(result, 'tokens') else list(result),
-                    logprobs=result.logprobs if hasattr(result, 'logprobs') else np.zeros(len(result.tokens)),
-                ))
-            
-            # Track token usage
-            self._total_tokens_generated += len(completions[-1].tokens)
-            self.metrics.log_token_usage(len(completions[-1].tokens))
-        
-        return completions
-    
-    async def _execute_step(
-        self,
-        env: "Lean4FIMEnv",
-        completion: SampleResult,
-    ) -> "StepResult":
-        """
-        Execute environment step with error handling.
-        
-        Args:
-            env: Lean4FIMEnv instance.
-            completion: SampleResult with generated tokens.
-            
-        Returns:
-            StepResult from the environment.
-        """
         try:
-            result = await asyncio.wait_for(
-                self._async_step(env, completion.tokens),
-                timeout=self.config.verification_timeout + 10  # Extra buffer
-            )
+            # Use the environment's step method with the completion
+            result = env.step_with_text(completion_text)
+            if asyncio.iscoroutine(result):
+                result = await result
             return result
         except asyncio.TimeoutError:
-            logger.warning("Environment step timed out")
+            logger.warning("Verification timed out")
             if self.error_handler:
                 self.error_handler.handle_timeout(
                     self.env_builder.get_current_theorem_id()
                 )
-            # Return failure result
-            from .lean_env import StepResult
             return StepResult(reward=0.0, episode_done=True)
         except Exception as e:
-            logger.error(f"Environment step error: {e}")
+            logger.error(f"Verification error: {e}")
             if self.error_handler:
                 self.error_handler.handle_verification_crash(
                     self.env_builder.get_current_theorem_id() or "unknown",
                     str(e)
                 )
-            from .lean_env import StepResult
             return StepResult(reward=0.0, episode_done=True)
     
-    async def _async_step(
-        self,
-        env: "Lean4FIMEnv",
-        action_tokens: List[int],
-    ) -> "StepResult":
-        """
-        Async wrapper for environment step.
-        
-        The environment's step() method may be sync or async depending
-        on the verifier implementation.
-        """
-        result = env.step(action_tokens)
-        if asyncio.iscoroutine(result):
-            return await result
-        return result
-    
-    async def _update_policy(
-        self,
-        trajectories: List[Trajectory],
-        rewards: np.ndarray,
-    ) -> None:
-        """
-        Update policy using CISPO loss.
-        
-        Implements Requirements 5.3 and 5.4:
-        - Calls forward_backward() with CISPO loss
-        - Calls optim_step() to update LoRA weights
-        
-        Uses group-relative baseline for advantage computation:
-        advantage_i = reward_i - mean(rewards)
-        
-        Args:
-            trajectories: List of Trajectory objects with tokens and logprobs.
-            rewards: Array of rewards for each trajectory.
-        """
-        # Compute advantages (group-relative baseline)
-        baseline = rewards.mean()
-        advantages = rewards - baseline
-        
-        # Prepare training data for CISPO
-        for trajectory, advantage in zip(trajectories, advantages):
-            # Build model input with completion tokens
-            model_input = self._build_model_input(trajectory)
-            
-            # Call forward_backward with CISPO loss (Requirement 5.3)
-            # Advantages are per-token, so we broadcast the trajectory advantage
-            token_advantages = np.full(len(trajectory.action_tokens), advantage)
-            
-            await self.client.forward_backward_async(
-                data=[model_input],
-                advantages=token_advantages,
-                ref_logprobs=trajectory.logprobs,
-            )
-        
-        # Optimizer step (Requirement 5.4)
-        await self.client.optim_step_async(
-            learning_rate=self.config.learning_rate
-        )
-    
-    def _build_model_input(self, trajectory: Trajectory) -> ModelInput:
-        """
-        Build model input from trajectory.
-        
-        Args:
-            trajectory: Trajectory with observation and action tokens.
-            
-        Returns:
-            ModelInput for Tinker's forward_backward.
-        """
-        # Concatenate prompt and completion tokens
-        all_tokens = trajectory.observation_tokens + trajectory.action_tokens
-        return ModelInput(
-            tokens=all_tokens,
-            length=len(all_tokens),
-        )
-    
     def _log_step_metrics(self, step_metrics: Dict[str, Any], step: int) -> None:
-        """
-        Log training metrics for a step.
-        
-        Implements Requirement 5.6.
-        
-        Args:
-            step_metrics: Dictionary of metrics from _train_step.
-            step: Current step number.
-        """
+        """Log training metrics for a step."""
         self.metrics.log_training_step(
             step=step,
             reward_mean=step_metrics["reward_mean"],
@@ -464,34 +401,17 @@ class CISPOTrainingLoop:
             pass_rate=step_metrics["pass_rate"],
         )
         
-        # Log pass rate by curriculum level
-        mask_ratio = step_metrics.get("mask_ratio")
-        if mask_ratio is not None:
-            for reward in step_metrics["rewards"]:
-                self.metrics.log_pass_rate_by_level(
-                    level=mask_ratio,
-                    success=reward > 0.5,
-                )
-        
         # Log to console
         logger.info(
             f"Step {step}: "
-            f"reward={step_metrics['reward_mean']:.3f}±{step_metrics['reward_std']:.3f}, "
+            f"reward={step_metrics['reward_mean']:.3f}+/-{step_metrics['reward_std']:.3f}, "
             f"pass_rate={step_metrics['pass_rate']:.1%}, "
             f"theorem={step_metrics.get('theorem_id', 'N/A')}, "
             f"mask_ratio={step_metrics.get('mask_ratio', 'N/A')}"
         )
     
     async def _save_checkpoint(self, step: int, emergency: bool = False) -> None:
-        """
-        Save training checkpoint.
-        
-        Implements Requirement 5.7.
-        
-        Args:
-            step: Current step number.
-            emergency: If True, this is an emergency checkpoint after an error.
-        """
+        """Save training checkpoint."""
         checkpoint_type = "emergency" if emergency else "regular"
         logger.info(f"Saving {checkpoint_type} checkpoint at step {step}")
         
@@ -510,12 +430,7 @@ class CISPOTrainingLoop:
                 raise
     
     def _get_training_summary(self) -> Dict[str, Any]:
-        """
-        Get summary statistics for the training run.
-        
-        Returns:
-            Dictionary containing training summary.
-        """
+        """Get summary statistics for the training run."""
         return {
             "final_step": self.step_count,
             "total_tokens_generated": self._total_tokens_generated,
@@ -529,11 +444,7 @@ class CISPOTrainingLoop:
         }
     
     def stop(self) -> None:
-        """
-        Request graceful stop of training.
-        
-        The training loop will complete the current step and then stop.
-        """
+        """Request graceful stop of training."""
         logger.info("Stop requested - will stop after current step")
         self._should_stop = True
     
@@ -543,12 +454,7 @@ class CISPOTrainingLoop:
         return self._running
     
     def get_stats(self) -> Dict[str, Any]:
-        """
-        Get current training statistics.
-        
-        Returns:
-            Dictionary containing current statistics.
-        """
+        """Get current training statistics."""
         return {
             "step_count": self.step_count,
             "total_tokens_generated": self._total_tokens_generated,
@@ -556,65 +462,3 @@ class CISPOTrainingLoop:
             "total_successes": self._total_successes,
             "is_running": self._running,
         }
-
-
-async def run_training(
-    training_client: Any,
-    env_group_builder: "CurriculumEnvGroupBuilder",
-    config: "TrainingConfig",
-    metrics_logger: "MetricsLogger",
-    checkpoint_manager: "CheckpointManager",
-    error_handler: Optional["ErrorHandler"] = None,
-    resume_from: Optional[str] = None,
-) -> Dict[str, Any]:
-    """
-    Convenience function to run CISPO training.
-    
-    Sets up signal handlers for graceful shutdown and runs the training loop.
-    
-    Args:
-        training_client: Tinker TrainingClient.
-        env_group_builder: CurriculumEnvGroupBuilder.
-        config: TrainingConfig.
-        metrics_logger: MetricsLogger.
-        checkpoint_manager: CheckpointManager.
-        error_handler: Optional ErrorHandler.
-        resume_from: Optional checkpoint name to resume from.
-        
-    Returns:
-        Training summary dictionary.
-    """
-    start_step = 0
-    
-    # Resume from checkpoint if specified
-    if resume_from:
-        logger.info(f"Resuming from checkpoint: {resume_from}")
-        start_step = await checkpoint_manager.load(resume_from)
-        logger.info(f"Resumed at step {start_step}")
-    
-    # Create training loop
-    loop = CISPOTrainingLoop(
-        training_client=training_client,
-        env_group_builder=env_group_builder,
-        config=config,
-        metrics_logger=metrics_logger,
-        checkpoint_manager=checkpoint_manager,
-        error_handler=error_handler,
-        start_step=start_step,
-    )
-    
-    # Set up signal handlers for graceful shutdown
-    def signal_handler(signum, frame):
-        logger.info(f"Received signal {signum}, requesting graceful stop")
-        loop.stop()
-    
-    # Register signal handlers (Unix only)
-    try:
-        signal.signal(signal.SIGINT, signal_handler)
-        signal.signal(signal.SIGTERM, signal_handler)
-    except (ValueError, OSError):
-        # Signal handling may not work in all environments
-        pass
-    
-    # Run training
-    return await loop.train()

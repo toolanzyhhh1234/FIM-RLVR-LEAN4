@@ -448,6 +448,22 @@ class CurriculumEnvGroupBuilder:
             self.curriculum.update_outcome(self._current_theorem_id, success)
             self._outcomes_updated += 1
     
+    def update_outcomes_from_list(self, outcomes: List[bool]):
+        """
+        Update curriculum based on boolean outcomes.
+        
+        Convenience method that accepts a list of booleans instead of StepResults.
+        
+        Args:
+            outcomes: List of booleans (True for success, False for failure).
+        """
+        if self._current_theorem_id is None:
+            return
+        
+        for success in outcomes:
+            self.curriculum.update_outcome(self._current_theorem_id, success)
+            self._outcomes_updated += 1
+    
     def get_current_theorem_id(self) -> Optional[str]:
         """
         Get the ID of the current theorem being trained on.

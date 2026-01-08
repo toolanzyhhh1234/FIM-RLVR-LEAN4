@@ -301,48 +301,46 @@ async def main_async(args: argparse.Namespace) -> int:
         logger.error(f"Failed to load dataset: {e}")
         return 1
     
-    # 7. Tokenizer (placeholder - Tinker provides tokenizer)
-    # For now, use a simple placeholder that will be replaced by Tinker's tokenizer
-    class PlaceholderTokenizer:
-        """Placeholder tokenizer - Tinker API provides the actual tokenizer."""
-        def encode(self, text: str):
-            # Simple byte-level encoding as placeholder
-            return list(text.encode('utf-8'))
+    # 9. Training client - use Tinker SDK directly
+    logger.info(f"Initializing Tinker training client for {config.model_name}...")
+    import tinker
+    
+    try:
+        # Create ServiceClient
+        service_client = tinker.ServiceClient()
+        logger.info("ServiceClient created")
         
-        def decode(self, tokens, skip_special_tokens=True):
-            # Simple byte-level decoding as placeholder
-            return bytes(tokens).decode('utf-8', errors='replace')
+        # Create TrainingClient with LoRA
+        training_client = await service_client.create_lora_training_client_async(
+            base_model=config.model_name,
+            rank=config.lora_rank,
+        )
+        logger.info(f"Training client initialized with model: {config.model_name}")
+        
+        # Get tokenizer from training client
+        tokenizer = training_client.get_tokenizer()
+        logger.info(f"Tokenizer loaded: {type(tokenizer).__name__}")
+        
+    except tinker.AuthenticationError as e:
+        logger.error(f"Authentication failed: {e}")
+        return 1
+    except Exception as e:
+        logger.error(f"Failed to initialize training client: {e}")
+        import traceback
+        traceback.print_exc()
+        return 1
     
-    tokenizer = PlaceholderTokenizer()
-    
-    # 8. Environment group builder
+    # 10. Environment group builder - now with real tokenizer
     env_builder = CurriculumEnvGroupBuilder(
         dataset=dataset,
         curriculum_manager=curriculum,
-        verifier=async_verifier,
+        verifier=lean_verifier,  # Use sync verifier, training loop handles async
         tokenizer=tokenizer,
         group_size=config.group_size,
         max_tokens=512,
     )
     
-    # 9. Training client
-    logger.info(f"Initializing Tinker training client for {config.model_name}...")
-    try:
-        training_client = await create_training_client(
-            model_name=config.model_name,
-            fallback_model=config.fallback_model,
-            lora_rank=config.lora_rank,
-            api_key=config.api_key,
-        )
-        logger.info(f"Training client initialized with model: {training_client.model_name}")
-    except TinkerAuthenticationError as e:
-        logger.error(f"Authentication failed: {e}")
-        return 1
-    except Exception as e:
-        logger.error(f"Failed to initialize training client: {e}")
-        return 1
-    
-    # 10. Checkpoint manager
+    # 11. Checkpoint manager
     checkpoint_manager = CheckpointManager(
         checkpoint_dir=config.checkpoint_dir,
         training_client=training_client,
@@ -367,9 +365,11 @@ async def main_async(args: argparse.Namespace) -> int:
         else:
             logger.warning("No checkpoint found to resume from, starting fresh")
     
-    # 11. Training loop
+    # 12. Training loop
     training_loop = CISPOTrainingLoop(
+        service_client=service_client,
         training_client=training_client,
+        tokenizer=tokenizer,
         env_group_builder=env_builder,
         config=config,
         metrics_logger=metrics,
