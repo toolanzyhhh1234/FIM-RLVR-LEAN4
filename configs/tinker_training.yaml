@@ -1,0 +1,160 @@
+# Tinker API Training Configuration for Lean4 FIM + RLVR
+# ======================================================
+#
+# This configuration file defines settings for training large MoE models
+# on Lean4 proof infilling tasks using Tinker API with CISPO loss.
+#
+# Usage:
+#   python train_tinker_fim.py --config configs/tinker_training.yaml
+#
+# Environment Variable Overrides:
+#   Most settings can be overridden via environment variables:
+#   - TINKER_API_KEY: API key (required, not stored in config for security)
+#   - FIM_MODEL_NAME: Override model_name
+#   - FIM_MAX_STEPS: Override max_steps
+#   - FIM_LEARNING_RATE: Override learning_rate
+#   - FIM_CHECKPOINT_DIR: Override checkpoint_dir
+#   - FIM_LOG_DIR: Override log_dir
+#   - FIM_DATASET_PATH: Override dataset_path
+#   - WANDB_PROJECT: Override wandb_project
+#
+# Requirements:
+#   - Tinker API key set via TINKER_API_KEY environment variable
+#   - Dataset in Parquet format with theorem data
+#   - Lean4 verification environment (verification_env/)
+
+# =============================================================================
+# Model Configuration
+# =============================================================================
+
+# Primary model to use for training
+# Recommended: openai/gpt-oss-120b (ultra-sparse MoE, best for Lean4 FIM)
+# Alternative: Qwen/Qwen3-235B-A22B (large capacity MoE)
+model_name: "openai/gpt-oss-120b"
+
+# Fallback model if primary is unavailable
+# Set to null to disable fallback
+fallback_model: "Qwen/Qwen3-235B-A22B"
+
+# LoRA fine-tuning rank
+# Higher rank = more parameters = better capacity but higher cost
+# Recommended: 16 for most tasks, 32 for complex proofs
+lora_rank: 16
+
+# =============================================================================
+# Training Configuration
+# =============================================================================
+
+# Maximum number of training steps
+# Each step processes one group of completions for one theorem
+max_steps: 1000
+
+# Learning rate for LoRA weight updates
+# Recommended: 0.00005 for stable training, 0.0001 for faster convergence
+learning_rate: 0.00005
+
+# Temperature for sampling completions
+# Higher = more diverse, Lower = more deterministic
+# Recommended: 0.7-0.9 for exploration, 0.3-0.5 for exploitation
+temperature: 0.8
+
+# Number of completions to sample per theorem (group size for CISPO)
+# Higher = better advantage estimation but higher cost
+# Recommended: 4-8 for most tasks
+group_size: 4
+
+# =============================================================================
+# Verification Configuration
+# =============================================================================
+
+# Maximum concurrent Lean4 verifications
+# Higher = faster throughput but more resource usage
+# Recommended: 4-8 depending on available CPU cores
+max_concurrent_verifications: 8
+
+# Timeout per verification in seconds
+# Proofs taking longer are considered failed
+# Recommended: 60-120 seconds for complex proofs
+verification_timeout: 60.0
+
+# =============================================================================
+# Curriculum Configuration
+# =============================================================================
+
+# Mask ratio levels for curriculum learning
+# Each level represents the fraction of the proof to mask (hide)
+# Training progresses from easier (low mask) to harder (high mask)
+curriculum_levels:
+  - 0.1   # Level 1: 10% masked (easiest)
+  - 0.2   # Level 2: 20% masked
+  - 0.3   # Level 3: 30% masked
+  - 0.4   # Level 4: 40% masked
+  - 0.5   # Level 5: 50% masked
+  - 0.6   # Level 6: 60% masked
+  - 0.7   # Level 7: 70% masked
+  - 0.8   # Level 8: 80% masked
+  - 0.9   # Level 9: 90% masked
+  - 1.0   # Level 10: 100% masked (hardest - full proof generation)
+
+# Number of successes required to promote to next level
+# Higher = more conservative promotion
+promotion_threshold: 5
+
+# Window size for tracking recent outcomes
+# Used for promotion decision
+window_size: 8
+
+# =============================================================================
+# Logging and Checkpointing
+# =============================================================================
+
+# How often to log training metrics (every N steps)
+logging_steps: 10
+
+# How often to save checkpoints (every N steps)
+# Checkpoints include LoRA weights and curriculum state
+checkpoint_interval: 100
+
+# Directory for saving checkpoints
+# Supports local filesystem paths
+checkpoint_dir: "checkpoints/tinker_fim"
+
+# Directory for log files (metrics.jsonl, verification.jsonl)
+log_dir: "logs/tinker_fim"
+
+# =============================================================================
+# Dataset Configuration
+# =============================================================================
+
+# Path to the theorem dataset (Parquet format)
+# Required fields: theorem_id (or id), prefix, suffix, middle
+# Optional fields: difficulty, source, metadata
+#
+# Example datasets:
+#   - data/NuminaMath-LEAN/data/train-00000-of-00001.parquet
+#   - data/LeanDojoBench/data/train-00000-of-00001.parquet
+dataset_path: "data/NuminaMath-LEAN/data/train-00000-of-00001.parquet"
+
+# =============================================================================
+# Weights & Biases Integration (Optional)
+# =============================================================================
+
+# W&B project name for logging
+# Set to null to disable W&B integration
+# Can also be set via WANDB_PROJECT environment variable
+wandb_project: null
+
+# W&B run name (auto-generated if not specified)
+wandb_run_name: null
+
+# =============================================================================
+# Advanced Configuration
+# =============================================================================
+
+# S3 bucket for remote checkpoint storage (optional)
+# Set to null to use local filesystem only
+s3_bucket: null
+
+# API key is intentionally NOT stored in this file for security
+# Set via TINKER_API_KEY environment variable
+# api_key: null  # DO NOT SET HERE - use environment variable

@@ -159,18 +159,18 @@ This implementation plan adapts the existing Lean4 FIM + RLVR project to use Tin
     - Test advantage calculation (group-relative baseline)
     - _Requirements: 5.1, 5.2_
 
-- [ ] 14. Checkpoint - Ensure all tests pass
+- [x] 14. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 15. Create main training entrypoint
-  - [ ] 15.1 Create `train_tinker_fim.py`
+- [x] 15. Create main training entrypoint
+  - [x] 15.1 Create `train_tinker_fim.py`
     - Load configuration from YAML
     - Initialize all components
     - Run training loop
     - Handle graceful shutdown
     - _Requirements: All_
 
-  - [ ] 15.2 Create example configuration file
+  - [x] 15.2 Create example configuration file
     - Create `configs/tinker_training.yaml` with documented options
     - Include sensible defaults for Lean4 FIM task
     - _Requirements: 10.1, 10.4_
