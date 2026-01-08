@@ -18,12 +18,57 @@ Requirements covered:
 - 7.5: Apply dynamic masking using existing apply_dynamic_mask() function
 """
 
+import os
+import re
 import random
 from dataclasses import dataclass
 from typing import Any, Callable, Dict, List, Optional, TYPE_CHECKING
 
 # Import existing masking utility
 from fim_rlvr_lean4.masking import apply_dynamic_mask
+
+
+def _bool_env(name: str, default: bool) -> bool:
+    """Parse boolean environment variable."""
+    val = os.environ.get(name, "")
+    if val.strip() == "":
+        return default
+    return val.strip().lower() in {"1", "true", "yes", "y", "on"}
+
+
+# Environment variables for filtering (matching Unsloth pipeline)
+FIM_EXCLUDE_SORRY = _bool_env("FIM_EXCLUDE_SORRY", True)
+
+
+def is_valid_lean_sample(text: str, exclude_sorry: bool = True) -> bool:
+    """
+    Check if a Lean code sample is valid for training.
+    
+    Filters out:
+    - Samples shorter than 50 characters
+    - Samples containing 'sorry' or 'admit' (if exclude_sorry=True)
+    - Samples without 'theorem', 'lemma', or 'def' keywords
+    
+    This matches the filtering logic in train_gspo_fim_qwen3-vl-8b.py
+    to ensure consistent dataset quality between Unsloth and Tinker pipelines.
+    
+    Args:
+        text: The Lean code text to validate.
+        exclude_sorry: If True, exclude samples with sorry/admit (default: True).
+                      Controlled by FIM_EXCLUDE_SORRY env var.
+    
+    Returns:
+        True if the sample is valid for training, False otherwise.
+    """
+    if not text or len(text.strip()) < 50:
+        return False
+    
+    if exclude_sorry:
+        if re.search(r"\bsorry\b", text) or re.search(r"\badmit\b", text):
+            return False
+    
+    # Must contain theorem, lemma, or def
+    return ("theorem" in text) or ("lemma" in text) or ("def" in text)
 
 if TYPE_CHECKING:
     from fim_rlvr_lean4.curriculum import CurriculumManager
@@ -95,6 +140,8 @@ class TheoremDataset:
         parquet_path: str,
         filter_fn: Optional[Callable[[Dict[str, Any]], bool]] = None,
         id_column: Optional[str] = None,
+        exclude_sorry: Optional[bool] = None,
+        apply_lean_filter: Optional[bool] = None,
     ):
         """
         Initialize the dataset from a Parquet file.
@@ -105,10 +152,16 @@ class TheoremDataset:
                       returns True to include, False to exclude.
             id_column: Optional explicit column name for theorem IDs.
                       If None, auto-detects from common column names.
+            exclude_sorry: If True, exclude samples with sorry/admit.
+                          If None, uses FIM_EXCLUDE_SORRY env var (default: True).
+            apply_lean_filter: If True, apply standard Lean filtering.
+                              If None, auto-detects based on filename:
+                              - Files with 'filtered' in name: skip filtering
+                              - Other files: apply filtering
         
         Raises:
             FileNotFoundError: If parquet_path doesn't exist.
-            ValueError: If required columns are missing.
+            ValueError: If required columns are missing or all samples filtered.
         """
         import polars as pl
         
@@ -119,9 +172,22 @@ class TheoremDataset:
         self._column_map = self._detect_columns()
         self._id_column = id_column or self._column_map.get("theorem_id", "theorem_id")
         
-        # Apply filter if provided
+        # Determine exclude_sorry setting
+        if exclude_sorry is None:
+            exclude_sorry = FIM_EXCLUDE_SORRY
+        self._exclude_sorry = exclude_sorry
+        
+        # Auto-detect if filtering should be applied
+        # Skip filtering for pre-filtered datasets (filename contains 'filtered')
+        if apply_lean_filter is None:
+            apply_lean_filter = 'filtered' not in parquet_path.lower()
+        
+        # Apply standard Lean filtering (matching Unsloth pipeline)
+        if apply_lean_filter:
+            self._apply_lean_filter(exclude_sorry)
+        
+        # Apply custom filter if provided
         if filter_fn is not None:
-            # Convert to list of dicts for filtering
             rows = self.df.to_dicts()
             filtered_indices = [
                 i for i, row in enumerate(rows)
@@ -135,6 +201,56 @@ class TheoremDataset:
         else:
             # Generate synthetic IDs if not present
             self._theorem_ids = [f"theorem_{i}" for i in range(len(self.df))]
+        
+        # Log filtering results
+        filtered_count = self._original_len - len(self)
+        if apply_lean_filter:
+            print(f"TheoremDataset: {self._original_len} -> {len(self)} samples "
+                  f"({filtered_count} filtered, exclude_sorry={exclude_sorry})")
+        else:
+            print(f"TheoremDataset: loaded {len(self)} pre-filtered samples")
+        
+        if len(self) == 0:
+            raise ValueError(
+                f"All {self._original_len} samples were filtered out. "
+                "Check dataset format or filtering settings."
+            )
+    
+    def _apply_lean_filter(self, exclude_sorry: bool):
+        """
+        Apply standard Lean code filtering.
+        
+        Filters out:
+        - Samples shorter than 50 characters
+        - Samples containing 'sorry' or 'admit' (if exclude_sorry=True)
+        - Samples without 'theorem', 'lemma', or 'def' keywords
+        
+        This matches the filtering in train_gspo_fim_qwen3-vl-8b.py.
+        """
+        # Find the text column to filter on
+        text_col = None
+        for col_name in ["formal_ground_truth", "prompt", "full_code", "code"]:
+            if col_name in self.df.columns:
+                text_col = col_name
+                break
+        
+        if text_col is None:
+            # Try detected columns
+            text_col = self._column_map.get("prefix")
+            if text_col is None:
+                print("Warning: Could not find text column for filtering, skipping Lean filter")
+                return
+        
+        # Convert to list for filtering
+        rows = self.df.to_dicts()
+        filtered_indices = []
+        
+        for i, row in enumerate(rows):
+            text = row.get(text_col, "")
+            if is_valid_lean_sample(text, exclude_sorry=exclude_sorry):
+                filtered_indices.append(i)
+        
+        self.df = self.df[filtered_indices]
     
     def _detect_columns(self) -> Dict[str, str]:
         """
@@ -207,21 +323,29 @@ class TheoremDataset:
         
         row = self.df.row(idx, named=True)
         
-        # Extract fields using column mapping
-        prefix = self._get_column(row, "prefix") or ""
-        suffix = self._get_column(row, "suffix") or ""
-        middle = self._get_column(row, "middle") or ""
+        # Get theorem ID
         theorem_id = row.get(self._id_column, f"theorem_{idx}")
         
-        # Construct full code
-        full_code = prefix + middle + suffix
+        # Get full code from the appropriate column
+        # NuminaMath-LEAN uses 'formal_ground_truth' which contains the complete code
+        full_code = None
+        for col_name in ["formal_ground_truth", "full_code", "code", "prompt"]:
+            if col_name in row and row[col_name]:
+                full_code = row[col_name]
+                break
         
+        if not full_code:
+            full_code = ""
+        
+        # For this dataset, prefix/suffix/middle are not pre-computed
+        # They will be computed by apply_dynamic_mask in the env_group_builder
+        # We just return the full_code and let masking handle the rest
         return {
             "theorem_id": theorem_id,
             "full_code": full_code,
-            "prefix": prefix,
-            "suffix": suffix,
-            "middle": middle,
+            "prefix": "",  # Will be computed by masking
+            "suffix": "",  # Will be computed by masking
+            "middle": "",  # Will be computed by masking
         }
     
     def get_theorem_by_id(self, theorem_id: str) -> Optional[Dict[str, Any]]:
@@ -258,12 +382,14 @@ class TheoremDataset:
                 - total: Total number of theorems
                 - original: Original count before filtering
                 - filtered: Number filtered out
+                - exclude_sorry: Whether sorry/admit filtering is enabled
                 - columns: Available column names
         """
         return {
             "total": len(self),
             "original": self._original_len,
             "filtered": self._original_len - len(self),
+            "exclude_sorry": self._exclude_sorry,
             "columns": list(self.df.columns),
             "detected_mapping": self._column_map,
         }

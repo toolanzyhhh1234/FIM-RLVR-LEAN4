@@ -2,18 +2,23 @@
 FIM Prompt Formatter for Lean4 proof infilling.
 
 This module provides consistent prompt construction for Fill-in-the-Middle (FIM)
-tasks, handling both standard cases (with suffix) and 100% masking cases (no suffix).
+tasks, matching the format used in the Unsloth training pipeline.
 
 Requirements covered:
 - 2.1: Construct prompts in format {prefix}[MISSING_BLOCK]\n{suffix}
-- 2.2: Prepend system instruction for Lean 4 expert
-- 2.3: Handle empty suffix case (100% masking)
+- 2.2: Prepend system instruction for Lean 4 expert with examples
+- 2.3: Handle empty suffix case (100% masking / full solution)
 - 2.4: Configurable prompt templates for experimentation
 - 2.5: Preserve exact whitespace and newlines
 """
 
-from dataclasses import dataclass
-from typing import Optional
+from dataclasses import dataclass, field
+from typing import Optional, List, Dict, Any
+
+
+# Tag names matching the Unsloth pipeline
+FIM_CODE_TAG = "FIM_CODE"
+FULL_CODE_TAG = "FULL_CODE"
 
 
 @dataclass
@@ -21,22 +26,60 @@ class PromptTemplate:
     """
     Configurable prompt template for FIM tasks.
     
-    Allows experimentation with different prompt formats while maintaining
-    consistent structure across the codebase.
+    Matches the format used in train_gspo_fim_qwen3-vl-8b.py for consistency
+    between Unsloth and Tinker training pipelines.
     
     Attributes:
-        system_instruction: System prompt for standard FIM with suffix.
+        fim_code_tag: Tag for FIM completions (default: FIM_CODE).
+        full_code_tag: Tag for full solution completions (default: FULL_CODE).
         hole_marker: Marker indicating where the model should fill in code.
-        empty_suffix_instruction: System prompt for 100% masking (no suffix).
+        include_think_tags: Whether to instruct model to use [THINK] tags.
     """
-    system_instruction: str = (
-        "You are a Lean 4 expert. Complete the code at [MISSING_BLOCK]. "
-        "Output ONLY the missing code."
-    )
+    fim_code_tag: str = FIM_CODE_TAG
+    full_code_tag: str = FULL_CODE_TAG
     hole_marker: str = "[MISSING_BLOCK]"
-    empty_suffix_instruction: str = (
-        "You are a Lean 4 expert. Complete the proof after the theorem statement. "
-        "Output ONLY the proof tactics."
+    include_think_tags: bool = True
+
+
+def build_system_prompt(template: PromptTemplate) -> str:
+    """
+    Build the system prompt with examples, matching the Unsloth pipeline.
+    
+    This is the exact format from train_gspo_fim_qwen3-vl-8b.py to ensure
+    consistent model behavior between training pipelines.
+    """
+    return (
+        "You are a Lean 4 expert. Solve the task strictly following this format:\n"
+        "1) First write your reasoning inside [THINK]...[/THINK].\n"
+        f"2) Then output ONLY the code inside <{template.fim_code_tag}>...</{template.fim_code_tag}> "
+        f"for fill-in-the-middle tasks, or <{template.full_code_tag}>...</{template.full_code_tag}> "
+        "for full solutions.\n"
+        "3) Do NOT include markdown fences or extra text outside the tags.\n"
+        "4) The tagged code must be valid Lean 4.\n"
+        "If the user includes [FULL-SOLUTION-REQUIRED], output a full solution in <FULL_CODE>.\n\n"
+        "[USER]\n"
+        "theorem simple_add (n : ℕ) : 0 + n = n := by\n"
+        "  [MISSING_BLOCK]\n\n"
+        "[ASSISTANT]\n"
+        "[THINK]\n"
+        "The definition of addition recurses on the second argument, so 0+n requires induction or a lemma. \n"
+        "`simp` uses Nat.zero_add to solve this.\n"
+        "[/THINK]\n"
+        f"<{template.fim_code_tag}>\n"
+        "  simp\n"
+        f"</{template.fim_code_tag}>\n\n"
+        "Example (full):\n\n"
+        "[USER]\n"
+        "theorem add_zero_triv (n : ℕ) : n + 0 = n :=\n\n"
+        "[ASSISTANT]\n"
+        "[THINK]\n"
+        "Addition is defined by recursion on the second argument. \n"
+        "Therefore, `n + 0 = n` is true by definition (reflexivity).\n"
+        "[/THINK]\n"
+        f"<{template.full_code_tag}>\n"
+        "by\n"
+        "  rfl\n"
+        f"</{template.full_code_tag}>"
     )
 
 
@@ -45,11 +88,12 @@ class FIMPromptFormatter:
     Formats FIM prompts for Lean4 proof infilling.
     
     This class handles the construction of prompts for Fill-in-the-Middle tasks,
-    ensuring consistent formatting across all training and inference scenarios.
+    matching the format used in the Unsloth training pipeline for consistency.
     
     Key features:
+    - Uses detailed system prompt with examples (matching Unsloth)
     - Preserves exact whitespace and newlines from input segments
-    - Handles empty suffix case (100% masking) with adjusted instructions
+    - Handles empty suffix case (100% masking) with [FULL-SOLUTION-REQUIRED]
     - Supports configurable templates for experimentation
     
     Example:
@@ -61,96 +105,155 @@ class FIMPromptFormatter:
         >>> print(prompt)  # Contains system instruction + prefix + [MISSING_BLOCK] + suffix
     """
     
-    def __init__(self, template: Optional[PromptTemplate] = None):
+    def __init__(
+        self, 
+        template: Optional[PromptTemplate] = None,
+        tokenizer: Optional[Any] = None,
+    ):
         """
         Initialize the formatter with an optional custom template.
         
         Args:
             template: Custom PromptTemplate for experimentation.
                      If None, uses default template.
+            tokenizer: Optional tokenizer with apply_chat_template method.
+                      If provided, uses the tokenizer's chat template.
+                      If None, uses a simple text format.
         """
         self.template = template or PromptTemplate()
+        self.tokenizer = tokenizer
+        self._system_prompt = build_system_prompt(self.template)
     
     def format(self, prefix: str, suffix: str) -> str:
         """
         Construct FIM prompt from prefix and suffix.
         
         Preserves exact whitespace and handles empty suffix case.
-        The returned prompt follows the format:
-        - With suffix: {system_instruction} + {prefix}[MISSING_BLOCK]\\n{suffix}
-        - Without suffix: {empty_suffix_instruction} + {prefix}
+        The returned prompt follows the format from train_gspo_fim_qwen3-vl-8b.py.
         
         Args:
             prefix: The code before the hole. Whitespace is preserved exactly.
             suffix: The code after the hole. Whitespace is preserved exactly.
-                   If empty or whitespace-only, uses 100% masking format.
+                   If empty or whitespace-only, uses full solution format.
         
         Returns:
             Formatted prompt string ready for tokenization.
         """
         if not suffix.strip():
-            # 100% masking case - no suffix provided
-            return self._format_no_suffix(prefix)
+            # 100% masking case - full solution required
+            return self._format_full_solution(prefix)
         
-        return self._format_with_suffix(prefix, suffix)
+        return self._format_fim(prefix, suffix)
     
-    def _format_with_suffix(self, prefix: str, suffix: str) -> str:
+    def _format_fim(self, prefix: str, suffix: str) -> str:
         """
         Standard FIM format with hole marker.
         
         Format: {prefix}[MISSING_BLOCK]\\n{suffix}
         
-        Note: Whitespace in prefix and suffix is preserved exactly.
-        The newline after the hole marker is intentional to separate
-        the marker from the suffix content.
-        
-        Args:
-            prefix: Code before the hole (whitespace preserved).
-            suffix: Code after the hole (whitespace preserved).
-        
-        Returns:
-            Formatted user content wrapped with system instruction.
+        This matches the format in train_gspo_fim_qwen3-vl-8b.py.
         """
-        # Requirement 2.1: format is {prefix}[MISSING_BLOCK]\n{suffix}
-        # Requirement 2.5: preserve exact whitespace - no stripping
+        # User content: prefix + [MISSING_BLOCK] + newline + suffix
         user_content = f"{prefix}{self.template.hole_marker}\n{suffix}"
-        return self._wrap_with_system(
-            self.template.system_instruction,
-            user_content
+        return self._apply_chat_template(user_content)
+    
+    def _format_full_solution(self, prefix: str) -> str:
+        """
+        Format for 100% masking (full solution required).
+        
+        When the entire proof body needs to be generated, we mark it
+        with [FULL-SOLUTION-REQUIRED] so the model knows to output
+        a complete solution in <FULL_CODE> tags.
+        """
+        # For full solution, just provide the theorem statement
+        user_content = f"{prefix}\n[FULL-SOLUTION-REQUIRED]"
+        return self._apply_chat_template(user_content)
+    
+    def _apply_chat_template(self, user_content: str) -> str:
+        """
+        Apply chat template to format the prompt.
+        
+        If a tokenizer with apply_chat_template is available, uses it.
+        Otherwise, falls back to a simple text format.
+        """
+        messages = [
+            {"role": "system", "content": self._system_prompt},
+            {"role": "user", "content": user_content},
+        ]
+        
+        if self.tokenizer is not None and hasattr(self.tokenizer, 'apply_chat_template'):
+            try:
+                return self.tokenizer.apply_chat_template(
+                    messages,
+                    tokenize=False,
+                    add_generation_prompt=True,
+                )
+            except Exception:
+                # Fall back to simple format if chat template fails
+                pass
+        
+        # Simple text format fallback
+        return (
+            f"<|system|>\n{self._system_prompt}\n"
+            f"<|user|>\n{user_content}\n"
+            f"<|assistant|>\n"
         )
     
-    def _format_no_suffix(self, prefix: str) -> str:
-        """
-        Format for 100% masking (no suffix).
-        
-        When the entire proof body needs to be generated, we use a
-        different system instruction that doesn't reference the hole marker.
-        
-        Args:
-            prefix: Code before the hole (typically theorem statement).
-        
-        Returns:
-            Formatted prompt with empty-suffix-specific instruction.
-        """
-        # Requirement 2.3: adjust instruction for empty suffix
-        # Requirement 2.5: preserve exact whitespace in prefix
-        return self._wrap_with_system(
-            self.template.empty_suffix_instruction,
-            prefix
-        )
+    def get_system_prompt(self) -> str:
+        """Get the system prompt text."""
+        return self._system_prompt
     
-    def _wrap_with_system(self, system: str, user: str) -> str:
+    def extract_code_from_response(self, response: str, task_type: str = "fim") -> Optional[str]:
         """
-        Wrap content with system instruction using chat template format.
+        Extract code from model response based on task type.
         
-        Returns raw text with special tokens; the tokenizer's chat template
-        will handle final formatting for the specific model.
+        Looks for code inside the appropriate tags:
+        - FIM tasks: <FIM_CODE>...</FIM_CODE>
+        - Full solution tasks: <FULL_CODE>...</FULL_CODE>
+        
+        Uses the LAST occurrence of the tags since models often mention
+        the tags in their reasoning before outputting the actual code.
         
         Args:
-            system: System instruction text.
-            user: User content (prefix + hole marker + suffix).
+            response: The model's response text.
+            task_type: Either "fim" or "full".
         
         Returns:
-            Formatted prompt with system and user sections.
+            Extracted code string, or None if tags not found.
         """
-        return f"<|system|>\n{system}\n<|user|>\n{user}\n<|assistant|>\n"
+        if task_type == "fim":
+            tag = self.template.fim_code_tag
+        else:
+            tag = self.template.full_code_tag
+        
+        start_tag = f"<{tag}>"
+        end_tag = f"</{tag}>"
+        
+        # Find the LAST occurrence of the tags (model may mention tags in reasoning)
+        start_idx = response.rfind(start_tag)
+        if start_idx == -1:
+            return None
+        
+        start_idx += len(start_tag)
+        end_idx = response.find(end_tag, start_idx)
+        if end_idx == -1:
+            # No closing tag after the last opening tag - take rest of response
+            extracted = response[start_idx:].strip()
+        else:
+            extracted = response[start_idx:end_idx]
+        
+        # Preserve content but strip surrounding newlines
+        return extracted.strip("\n")
+    
+    def strip_markdown_fences(self, text: str) -> str:
+        """
+        Remove markdown code fences from text.
+        
+        Models sometimes wrap code in ```lean ... ``` even when instructed not to.
+        """
+        if not text:
+            return text
+        lines = text.splitlines()
+        cleaned = [line for line in lines if not line.strip().startswith("```")]
+        return "\n".join(cleaned).strip()
+

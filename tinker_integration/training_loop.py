@@ -116,6 +116,10 @@ class CISPOTrainingLoop:
         self._debug_log_file = None
         self._init_debug_log()
         
+        # Initialize prompt formatter with tokenizer for proper chat template
+        from .prompt_formatter import FIMPromptFormatter
+        self.prompt_formatter = FIMPromptFormatter(tokenizer=tokenizer)
+        
         # Track training state
         self._running = False
         self._should_stop = False
@@ -256,8 +260,10 @@ class CISPOTrainingLoop:
         all_rewards: List[float] = []
         
         for env in envs:
-            # Get the FIM prompt tokens
-            prompt_text = env.get_fim_prompt()
+            # Build FIM prompt using the formatter (matches Unsloth pipeline)
+            # Determine task type based on suffix
+            task_type = "full" if not env.suffix.strip() else "fim"
+            prompt_text = self.prompt_formatter.format(env.prefix, env.suffix)
             prompt_tokens = self.tokenizer.encode(prompt_text)
             
             # Sample G completions for this environment
@@ -277,34 +283,54 @@ class CISPOTrainingLoop:
                 
                 self._total_tokens_generated += len(completion_tokens)
                 
-                # Decode completion and verify with Lean
+                # Decode completion
                 completion_text = self.tokenizer.decode(completion_tokens, skip_special_tokens=True)
+                
+                # Extract code from response using proper tags
+                extracted_code = self.prompt_formatter.extract_code_from_response(
+                    completion_text, task_type=task_type
+                )
+                
+                # If extraction failed, try using raw completion (model may not have followed format)
+                if extracted_code is None:
+                    extracted_code = self.prompt_formatter.strip_markdown_fences(completion_text)
+                    tag_ok = False
+                else:
+                    extracted_code = self.prompt_formatter.strip_markdown_fences(extracted_code)
+                    tag_ok = True
                 
                 # Log sample for debugging (randomly sample ~10% to avoid spam)
                 import random
                 if random.random() < 0.1 or step < 3:  # Always log first 3 steps
-                    logger.info(f"[Step {step}] Sample ({len(completion_tokens)} tokens):")
-                    logger.info(f"  Prompt: {prompt_text[:100]}...")
-                    logger.info(f"  Completion: {completion_text[:200]}...")
+                    logger.debug(f"[Step {step}] Sample ({len(completion_tokens)} tokens):")
+                    logger.debug(f"  Task type: {task_type}")
+                    logger.debug(f"  Tag extraction: {'OK' if tag_ok else 'FAILED'}")
+                    logger.debug(f"  Prompt (last 200 chars): ...{prompt_text[-200:]}")
+                    logger.debug(f"  Raw completion: {completion_text[:300]}...")
+                    logger.debug(f"  Extracted code: {extracted_code[:200] if extracted_code else 'None'}...")
                 
-                # Run verification
+                # Run verification with extracted code
                 try:
-                    result = await self._verify_completion(env, completion_text)
+                    result, verification_output = await self._verify_completion_with_code(
+                        env, extracted_code or ""
+                    )
                     reward = result.reward
-                    verification_output = getattr(result, 'output', '')
                 except Exception as e:
                     logger.warning(f"Verification error: {e}")
                     reward = 0.0
                     verification_output = str(e)
                 
                 # Log full debug info to file
-                full_code = env.prefix + completion_text + env.suffix
+                full_code = env.prefix + (extracted_code or "") + env.suffix
                 self._log_debug({
                     "step": step,
                     "theorem_id": current_theorem_id,
                     "mask_ratio": current_mask_ratio,
+                    "task_type": task_type,
+                    "tag_extraction_ok": tag_ok,
                     "prompt": prompt_text,
-                    "completion": completion_text,
+                    "raw_completion": completion_text,
+                    "extracted_code": extracted_code,
                     "full_code_sent_to_lean": full_code,
                     "reward": reward,
                     "verification_success": reward > 0.5,
@@ -409,30 +435,30 @@ class CISPOTrainingLoop:
         }
 
     
-    async def _verify_completion(self, env: "Lean4FIMEnv", completion_text: str) -> "StepResult":
+    async def _verify_completion_with_code(
+        self, env: "Lean4FIMEnv", extracted_code: str
+    ) -> tuple["StepResult", str]:
         """
-        Verify a completion using the environment's verifier.
+        Verify extracted code using the environment's verifier.
         
         Args:
             env: The Lean4FIMEnv instance.
-            completion_text: The decoded completion text.
+            extracted_code: The extracted code from model response.
             
         Returns:
-            StepResult with reward and verification output.
+            Tuple of (StepResult, verification_output_string).
         """
         from .lean_env import StepResult
         
         try:
-            # Reconstruct full code
-            full_code = env.prefix + completion_text + env.suffix
+            # Reconstruct full code: prefix + extracted_code + suffix
+            full_code = env.prefix + extracted_code + env.suffix
             
             # Verify with Lean4
             success, output = env.verifier.verify(full_code)
             
-            # Create result with output attached
             result = StepResult(reward=1.0 if success else 0.0, episode_done=True)
-            result.output = output  # Attach verification output
-            return result
+            return result, output
             
         except asyncio.TimeoutError:
             logger.warning("Verification timed out")
@@ -441,8 +467,7 @@ class CISPOTrainingLoop:
                     self.env_builder.get_current_theorem_id()
                 )
             result = StepResult(reward=0.0, episode_done=True)
-            result.output = "TIMEOUT"
-            return result
+            return result, "TIMEOUT"
         except Exception as e:
             logger.error(f"Verification error: {e}")
             if self.error_handler:
@@ -451,8 +476,7 @@ class CISPOTrainingLoop:
                     str(e)
                 )
             result = StepResult(reward=0.0, episode_done=True)
-            result.output = f"ERROR: {e}"
-            return result
+            return result, f"ERROR: {e}"
     
     def _log_step_metrics(self, step_metrics: Dict[str, Any], step: int) -> None:
         """Log training metrics for a step."""

@@ -1,5 +1,6 @@
 import subprocess
 import os
+import re
 from typing import Tuple
 
 
@@ -10,13 +11,24 @@ class LeanVerifier:
 
         Args:
             project_dir: Path to the Lean 4 project directory (should contain lakefile.lean).
-            no_sorries: If True, fail verification when the file contains `sorry`.
+            no_sorries: If True, fail verification when the code contains `sorry` or `admit`.
+                       This is checked at the Python level since Lean 4.15+ doesn't have
+                       a --no-sorries flag.
         """
         self.project_dir = os.path.abspath(project_dir)
         self.no_sorries = bool(no_sorries)
         import uuid
 
         self.uuid_module = uuid  # Keep reference
+
+    def _contains_sorry_or_admit(self, code: str) -> bool:
+        """
+        Check if code contains sorry or admit keywords.
+        
+        Uses word boundary matching to avoid false positives like
+        variable names containing 'sorry'.
+        """
+        return bool(re.search(r'\bsorry\b', code) or re.search(r'\badmit\b', code))
 
     def verify(self, full_code: str) -> Tuple[bool, str]:
         """
@@ -31,6 +43,10 @@ class LeanVerifier:
                 success: True if compilation passed, False otherwise.
                 output: The stderr output from the compiler (contains error messages).
         """
+        # Check for sorry/admit if no_sorries is enabled
+        if self.no_sorries and self._contains_sorry_or_admit(full_code):
+            return False, "Verification failed: code contains 'sorry' or 'admit' (no_sorries=True)"
+        
         # Generate unique ID for this verification task
         unique_id = str(self.uuid_module.uuid4())
         filename = f"Verify_{unique_id}.lean"
@@ -44,14 +60,13 @@ class LeanVerifier:
         except IOError as e:
             return False, f"Failed to write to verification file: {e}"
 
-        # 2. Run 'lake env lean [--no-sorries] <file>'
+        # 2. Run 'lake env lean <file>'
         # This parses and checks the file using the project's environment (imports etc.)
         # but does not require the file to be listed in lakefile.lean.
+        # Note: --no-sorries flag was removed as it's not supported in Lean 4.15+
+        # We check for sorry/admit at the Python level instead.
         try:
-            cmd = ["lake", "env", "lean"]
-            if self.no_sorries:
-                cmd.append("--no-sorries")
-            cmd.append(file_path)
+            cmd = ["lake", "env", "lean", file_path]
             result = subprocess.run(
                 cmd,
                 cwd=self.project_dir,

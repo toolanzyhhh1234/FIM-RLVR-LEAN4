@@ -127,13 +127,13 @@ log_dir: "logs/tinker_fim"
 # =============================================================================
 
 # Path to the theorem dataset (Parquet format)
-# Required fields: theorem_id (or id), prefix, suffix, middle
-# Optional fields: difficulty, source, metadata
+# Use the pre-filtered dataset for faster loading:
+#   python data_pipeline/preprocess_lean_dataset.py
+# This filters out sorry/admit samples and invalid entries.
 #
-# Example datasets:
-#   - data/NuminaMath-LEAN/data/train-00000-of-00001.parquet
-#   - data/LeanDojoBench/data/train-00000-of-00001.parquet
-dataset_path: "data/NuminaMath-LEAN/data/train-00000-of-00001.parquet"
+# Pre-filtered (recommended): data/NuminaMath-LEAN-filtered.parquet (9445 samples)
+# Raw dataset: data/NuminaMath-LEAN/data/train-00000-of-00001.parquet (104155 samples)
+dataset_path: "data/NuminaMath-LEAN-filtered.parquet"
 
 # =============================================================================
 # Weights & Biases Integration (Optional)

@@ -141,10 +141,19 @@ def parse_args() -> argparse.Namespace:
         default="verification_env",
         help="Path to Lean4 verification environment",
     )
+    
+    # Default no_sorries based on FIM_NO_SORRIES env var (default True)
+    default_no_sorries = os.environ.get("FIM_NO_SORRIES", "1").strip().lower() in {"1", "true", "yes", "y", "on"}
     parser.add_argument(
         "--no-sorries",
         action="store_true",
-        help="Fail verification when file contains sorry",
+        default=default_no_sorries,
+        help="Fail verification when file contains sorry (default: True, set FIM_NO_SORRIES=0 to disable)",
+    )
+    parser.add_argument(
+        "--allow-sorries",
+        action="store_true",
+        help="Allow sorry in proofs (overrides --no-sorries and FIM_NO_SORRIES)",
     )
     
     # Logging
@@ -166,7 +175,13 @@ def parse_args() -> argparse.Namespace:
         help="Validate configuration without starting training",
     )
     
-    return parser.parse_args()
+    args = parser.parse_args()
+    
+    # Handle --allow-sorries override
+    if args.allow_sorries:
+        args.no_sorries = False
+    
+    return args
 
 
 def apply_cli_overrides(config, args: argparse.Namespace):
@@ -272,6 +287,7 @@ async def main_async(args: argparse.Namespace) -> int:
     
     # 3. Lean verifier
     logger.info(f"Initializing Lean verifier from {verification_env}...")
+    logger.info(f"  no_sorries={args.no_sorries} (FIM_NO_SORRIES env var or --no-sorries flag)")
     lean_verifier = LeanVerifier(
         str(verification_env),
         no_sorries=args.no_sorries,

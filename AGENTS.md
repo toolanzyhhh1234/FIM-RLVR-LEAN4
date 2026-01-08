@@ -3,6 +3,7 @@
 ## Project Structure & Module Organization
 - Core code: `fim_rlvr_lean4/` (Lean verifier, curriculum logic, masking utilities).
 - Training entrypoints (Unsloth + TRL GRPO): `train_gspo_fim_20b.py`, `train_gspo_fim_30b.py`, `train_gspo_fim_120b.py`, `train_gspo_fim_mistral3.py`, `train_gspo_fim_nemo.py`.
+- Tinker API training: `train_tinker_fim.py`, `tinker_integration/`, `configs/tinker_training.yaml`, `docs/tinker_api_integration_notes.md`.
 - Local/smoke trainer: `train_grpo_fim_local.py`.
 - Data pipeline and analyses: `data_pipeline/`, `dataset_analysis.md`, `dataset.md`.
 - Tests: `test/` for unit tests; additional smoke scripts in `data_pipeline/`.
@@ -18,10 +19,13 @@
 
 ## Build, Test, and Development Commands
 - Install deps: `pip install -r requirements.txt`.
+- Install Tinker deps: `pip install -r tinker_integration/requirements.txt`.
 - Unit tests (fast): `python -m pytest test`. Focused runs: `python -m pytest test/test_masking.py`.
 - Full pytest (avoids heavy dataset scripts): `python -m pytest`.
 - Train (Mistral3): `bash scripts/run_train_mistral3.sh` (creates a per-run `training_logs/run_*/` folder and tees stdout to `train.log`).
 - Train (20B/30B/120B): `python train_gspo_fim_20b.py`, `python train_gspo_fim_30b.py`, `python train_gspo_fim_120b.py`.
+- Train (Tinker API): `python train_tinker_fim.py --config configs/tinker_training.yaml`.
+- Tinker smoke checks: `python test_tinker_connection.py`, `python test_tinker_minimal.py`.
 
 ## Coding Style & Naming Conventions
 - Language: Python with 4-space indentation; prefer explicit imports.
@@ -45,6 +49,8 @@
   - Looks for a local parquet file in `FIM_DATA_DIR` (default `/data`).
   - If none found, downloads a parquet shard from Hugging Face (requires runtime network access).
   - Override path directly via `FIM_PARQUET_PATH` if needed.
+- Tinker API auth:
+  - `TINKER_API_KEY` is required for real Tinker API calls (can be set in `.env` or the shell).
 - Per-run logs:
   - Set `FIM_LOG_DIR` to isolate logs; `scripts/run_train_mistral3.sh` does this automatically.
   - `training_logs/` is ignored by git.
