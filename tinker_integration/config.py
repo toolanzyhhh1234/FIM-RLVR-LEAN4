@@ -56,6 +56,7 @@ class TrainingConfig:
     learning_rate: float = 5e-5
     temperature: float = 0.8
     group_size: int = 4
+    max_completion_tokens: int = 512
     
     # Verification settings
     max_concurrent_verifications: int = 8
@@ -128,6 +129,7 @@ class ConfigManager:
         "FIM_DATASET_PATH": "dataset_path",
         "FIM_VERIFICATION_TIMEOUT": "verification_timeout",
         "FIM_MAX_CONCURRENT_VERIFICATIONS": "max_concurrent_verifications",
+        "FIM_MAX_COMPLETION_TOKENS": "max_completion_tokens",
         "WANDB_PROJECT": "wandb_project",
         "WANDB_RUN_NAME": "wandb_run_name",
     }
@@ -136,7 +138,7 @@ class ConfigManager:
     INT_FIELDS = {
         "max_steps", "lora_rank", "group_size", "logging_steps",
         "checkpoint_interval", "promotion_threshold", "window_size",
-        "max_concurrent_verifications"
+        "max_concurrent_verifications", "max_completion_tokens"
     }
     
     # Fields that should be converted to floats

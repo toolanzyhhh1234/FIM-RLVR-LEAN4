@@ -63,6 +63,11 @@ temperature: 0.8
 # Recommended: 4-8 for most tasks
 group_size: 4
 
+# Maximum tokens to generate per completion
+# Higher = allows longer proofs but increases cost/time
+# Recommended: 512-1024 for most proofs, 2048 for complex proofs
+max_completion_tokens: 4096
+
 # =============================================================================
 # Verification Configuration
 # =============================================================================

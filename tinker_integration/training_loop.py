@@ -170,7 +170,7 @@ class CISPOTrainingLoop:
         
         # Sampling params
         sampling_params = tinker.SamplingParams(
-            max_tokens=512,
+            max_tokens=getattr(self.config, 'max_completion_tokens', 512),
             temperature=self.config.temperature,
             top_p=0.95,
             top_k=50,
