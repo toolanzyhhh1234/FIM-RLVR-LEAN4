@@ -148,12 +148,53 @@ tinker run info <session-id>
 ### Web Console
 https://console.tinker.thinkingmachines.ai
 
+## GPT-OSS / Harmony Response Format
+
+When using `openai/gpt-oss-120b` or similar models, responses use OpenAI's **Harmony format** with multiple channels:
+
+### Channel Structure
+```
+<|channel|>analysis<|message|>...chain-of-thought reasoning...<|end|>
+<|start|>assistant<|channel|>final<|message|>...actual answer...<|return|>
+```
+
+- **analysis**: Internal reasoning/CoT (not shown to end users in production)
+- **final**: The actual response intended for the user
+- **commentary**: Used for tool calls (less common in our use case)
+
+### Tokenizer Considerations
+
+- Use `skip_special_tokens=False` when decoding to preserve channel markers
+- With `skip_special_tokens=True`, markers are stripped but channel names (e.g., "analysis") remain as plain text
+
+### Code Extraction Quality
+
+When extracting `<FIM_CODE>` tags from Harmony responses:
+
+1. **Ideal case**: Tags appear in the `final` channel - this is the real answer
+2. **Problematic case**: Tags only appear in `analysis` channel - model is discussing format, not answering
+3. **Truncation case**: No `final` channel at all - model ran out of tokens during reasoning
+
+**Diagnostic tip**: Check if `<|channel|>final<|message|>` appears before the extracted code tags. If not, the model likely:
+- Spent too many tokens on reasoning (increase `max_tokens`)
+- Got stuck in analysis mode (try `Reasoning: low` in system prompt)
+
+### System Prompt Reasoning Control
+
+Control reasoning verbosity in the system message:
+```
+Reasoning: high   # Extensive CoT (may exceed token limits)
+Reasoning: medium # Balanced (default)
+Reasoning: low    # Minimal CoT (faster, less truncation risk)
+```
+
 ## References
 
 - [Tinker Docs](https://tinker-docs.thinkingmachines.ai/)
 - [Tinker Cookbook](https://github.com/thinking-machines-lab/tinker-cookbook)
 - [Loss Functions](https://tinker-docs.thinkingmachines.ai/losses)
 - [RL Training](https://tinker-docs.thinkingmachines.ai/rl)
+- [OpenAI Harmony Format](https://cookbook.openai.com/articles/openai-harmony)
 
 ## Example Training Script
 

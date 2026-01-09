@@ -220,6 +220,25 @@ class FIMPromptFormatter:
         
         Returns:
             Extracted code string, or None if tags not found.
+        
+        Note (GPT-OSS / Harmony format):
+            For models using OpenAI's Harmony response format (e.g., gpt-oss-120b),
+            responses contain multiple "channels":
+            - analysis: Chain-of-thought reasoning (may mention tags but not final answer)
+            - final: The actual response intended for the user (contains real code tags)
+            
+            The channel markers look like: <|channel|>analysis<|message|>...<|end|>
+            
+            TODO: For better extraction quality metrics, we could check whether the
+            extracted <FIM_CODE> tags appear in the 'analysis' channel vs 'final' channel.
+            Tags in 'analysis' are likely just the model discussing the format, while
+            tags in 'final' contain the actual answer. This could help diagnose:
+            - Model truncation (never reached 'final' channel)
+            - Extraction from wrong channel (grabbed analysis instead of final)
+            
+            Implementation hint: Look for <|channel|>final<|message|> marker and only
+            search for code tags after that position. If no 'final' channel exists,
+            the model likely ran out of tokens during reasoning.
         """
         if task_type == "fim":
             tag = self.template.fim_code_tag
