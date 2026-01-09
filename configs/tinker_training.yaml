@@ -66,7 +66,7 @@ group_size: 4
 # Maximum tokens to generate per completion
 # Higher = allows longer proofs but increases cost/time
 # Recommended: 512-1024 for most proofs, 2048 for complex proofs
-max_completion_tokens: 4096
+max_completion_tokens: 8192
 
 # =============================================================================
 # Verification Configuration

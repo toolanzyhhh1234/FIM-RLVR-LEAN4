@@ -236,8 +236,8 @@ class Lean4FIMEnv:
         # Mark episode as done
         self._episode_done = True
         
-        # Decode completion (Requirement 1.3)
-        completion = self.tokenizer.decode(action, skip_special_tokens=True)
+        # Decode completion (Requirement 1.3) - keep special tokens for Harmony format
+        completion = self.tokenizer.decode(action, skip_special_tokens=False)
         
         # Reconstruct full proof (Requirement 1.3)
         full_code = self.prefix + completion + self.suffix

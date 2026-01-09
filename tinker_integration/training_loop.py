@@ -283,8 +283,8 @@ class CISPOTrainingLoop:
                 
                 self._total_tokens_generated += len(completion_tokens)
                 
-                # Decode completion
-                completion_text = self.tokenizer.decode(completion_tokens, skip_special_tokens=True)
+                # Decode completion (keep special tokens for Harmony format parsing)
+                completion_text = self.tokenizer.decode(completion_tokens, skip_special_tokens=False)
                 
                 # Extract code from response using proper tags
                 extracted_code = self.prompt_formatter.extract_code_from_response(
