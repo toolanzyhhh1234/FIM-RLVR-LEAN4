@@ -3,7 +3,7 @@
 ## Project Structure & Module Organization
 - Core code: `fim_rlvr_lean4/` (Lean verifier, curriculum logic, masking utilities).
 - Training entrypoints (Unsloth + TRL GRPO): `train_gspo_fim_20b.py`, `train_gspo_fim_30b.py`, `train_gspo_fim_120b.py`, `train_gspo_fim_mistral3.py`, `train_gspo_fim_nemo.py`.
-- Tinker API training: `train_tinker_fim.py`, `tinker_integration/`, `configs/tinker_training.yaml`, `docs/tinker_api_integration_notes.md`.
+- Tinker API training: `train_tinker_fim.py`, `tinker_integration/` (see `tinker_integration/AGENTS.md`), `configs/tinker_training.yaml`, `docs/tinker_api_integration_notes.md`.
 - Local/smoke trainer: `train_grpo_fim_local.py`.
 - Data pipeline and analyses: `data_pipeline/`, `dataset_analysis.md`, `dataset.md`.
 - Tests: `test/` for unit tests; additional smoke scripts in `data_pipeline/`.
@@ -64,3 +64,7 @@
 - Keep API keys or tokens out of the repo; use environment variables or local config files ignored by git.
 - Codex-CLI note: running `datasets`/Polars/Unsloth may require full approval (disabling the default sandbox) so `/dev/shm` is writable; otherwise Intel OMP SHM errors can occur. In standard Docker hosts, use `--shm-size` or `--ipc=host` as an alternative.
 - Installation safety: prefer user-led installs for heavy or disruptive packages (e.g., `vllm`, `flash-attn`, `apex`). The assistant can suggest commands, but should not run them unless the user explicitly approves, since these installs can spike RAM/CPU and drop SSH sessions.
+
+## Performance & Context Management for AI Agents
+- **Context Preservation**: Avoid re-reading large dataset or log files repeatedly. Summarize key findings and maintain them in your active context.
+- **Efficient Log Access**: When reading large logs (especially `logs/tinker_fim/debug_samples.jsonl`), filter for specific fields using `jq` or `grep` rather than reading full entries. **Each JSON object is extremely long** (containing raw completions and verification outputs); avoid reading the full object for a line unless the specific task requires inspecting the raw model content.
