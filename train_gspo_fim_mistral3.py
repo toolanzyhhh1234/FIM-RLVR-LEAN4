@@ -213,14 +213,25 @@ def build_dynamic_transform(tokenizer, curriculum):
             ratio = curriculum.get_mask_ratio(th_name)
             
             # Apply dynamic masking (unless full solution is required)
-            cleaned_code = full_code.replace("[FULL-SOLUTION-REQUIRED]", "").strip()
+            # Preserve a trailing newline so the hole is always separated from suffix (FM-1 mitigation, Option A1).
+            cleaned_code = full_code.replace("[FULL-SOLUTION-REQUIRED]", "")
+            if not cleaned_code.endswith("\n"):
+                cleaned_code = cleaned_code + "\n"
+
             if full_solution_required:
                 new_pre, new_suf = "", ""
                 user_content = cleaned_code
                 task_type = "full"
             else:
                 new_pre, new_suf, _ = apply_dynamic_mask(cleaned_code, ratio)
-                user_content = f"{new_pre}[MISSING_BLOCK]\n{new_suf}"
+
+                # Ensure explicit separators around the hole (FM-1 Option A1). Always end prefix with a newline
+                # and begin suffix with a newline so the model output is never concatenated directly to context.
+                safe_prefix = new_pre if new_pre.endswith("\n") else new_pre + "\n"
+                safe_suffix = new_suf if new_suf.startswith("\n") else "\n" + new_suf
+
+                user_content = f"{safe_prefix}[MISSING_BLOCK]\n{safe_suffix}"
+                new_pre, new_suf = safe_prefix, safe_suffix
                 task_type = "fim"
             task_types.append(task_type)
 
@@ -232,6 +243,7 @@ def build_dynamic_transform(tokenizer, curriculum):
                 "for full solutions.\n"
                 "3) Do NOT include markdown fences or extra text outside the tags.\n"
                 "4) The tagged code must be valid Lean 4.\n"
+                "5) End FIM snippets with a separator (newline or `;`) so the next command parses correctly.\n"
                 "If the user includes [FULL-SOLUTION-REQUIRED], output a full solution in <FULL_CODE>.\n\n"
                 "[USER]\n"
                 "theorem simple_add (n : ℕ) : 0 + n = n := by\n"
@@ -526,6 +538,7 @@ def lean_validity_reward_factory(verifier, curriculum, tokenizer):
         verification_inputs = []
         tag_ok_list = []
         raw_logs = []
+        shaped_rewards: list[float] = []
         for idx, (generated_text, prefix, suffix) in enumerate(zip(decoded_completions, fim_prefix, fim_suffix)):
             task = None
             if task_type is not None and idx < len(task_type):
@@ -547,10 +560,14 @@ def lean_validity_reward_factory(verifier, curriculum, tokenizer):
             tag_ok = extracted is not None and extracted.strip() != ""
             tag_ok_list.append(tag_ok)
 
+            # Shaped reward: formatting bonus for correctly tagged completion (discourages empty / protocol errors).
+            shaped = FIM_TAG_REWARD if tag_ok else 0.0
+
             # If tags are missing (or empty), do NOT fall back to raw completion.
             # Treat it as invalid formatting and skip Lean verification.
             if not tag_ok:
                 verification_inputs.append(None)
+                shaped_rewards.append(shaped)
                 if LOG_RAW and len(raw_logs) <= LOG_RAW_LIMIT:
                     raw_logs[-1]["extracted_code"] = ""
                     raw_logs[-1]["verifier_input"] = "<skipped: missing/empty tag>"
@@ -567,6 +584,7 @@ def lean_validity_reward_factory(verifier, curriculum, tokenizer):
 
             full_code = _stitch_code(prefix, extracted, suffix)
             verification_inputs.append(full_code if full_code.strip() else None)
+            shaped_rewards.append(shaped)
 
             if LOG_RAW and len(raw_logs) <= LOG_RAW_LIMIT:
                 raw_logs[-1]["extracted_code"] = extracted
@@ -575,6 +593,7 @@ def lean_validity_reward_factory(verifier, curriculum, tokenizer):
         # Parallel verification
         def verify_single(code):
             if code is None:
+                # parser/elab failure already penalized via shaped reward only
                 return False
             success, _ = verifier.verify(code)
             return success
@@ -590,7 +609,15 @@ def lean_validity_reward_factory(verifier, curriculum, tokenizer):
         for idx, (success, th_id) in enumerate(zip(results, theorem_id)):
             curriculum.update_outcome(th_id, success)
             tag_bonus = FIM_TAG_REWARD if (idx < len(tag_ok_list) and tag_ok_list[idx]) else 0.0
-            scores.append((FIM_LEAN_SUCCESS_REWARD if success else 0.0) + tag_bonus)
+
+            # Shaped rewards (Option B):
+            # - parsing/formatting bonus already in shaped_rewards[idx]
+            # - add small reward for Lean elaboration success even if goal not solved (progress vs syntax failure)
+            partial_elab_bonus = 0.25 if verification_inputs[idx] is not None and not success else 0.0
+
+            base = (FIM_LEAN_SUCCESS_REWARD if success else 0.0) + tag_bonus
+            shaped = shaped_rewards[idx] if idx < len(shaped_rewards) else 0.0
+            scores.append(base + shaped + partial_elab_bonus)
 
             if LOG_VERIFICATION and len(logs) < LOG_VERIFICATION_LIMIT:
                 preview = verification_inputs[idx] or "<empty>"
