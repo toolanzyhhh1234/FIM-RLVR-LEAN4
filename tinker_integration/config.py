@@ -61,6 +61,11 @@ class TrainingConfig:
     # Verification settings
     max_concurrent_verifications: int = 8
     verification_timeout: float = 60.0
+
+    # Reward shaping (intermediate signals)
+    tag_reward: float = 0.05
+    success_reward: float = 1.0
+    unsolved_goals_reward: float = 0.0
     
     # Logging and checkpointing
     logging_steps: int = 10
@@ -130,6 +135,9 @@ class ConfigManager:
         "FIM_VERIFICATION_TIMEOUT": "verification_timeout",
         "FIM_MAX_CONCURRENT_VERIFICATIONS": "max_concurrent_verifications",
         "FIM_MAX_COMPLETION_TOKENS": "max_completion_tokens",
+        "FIM_TAG_REWARD": "tag_reward",
+        "FIM_LEAN_SUCCESS_REWARD": "success_reward",
+        "FIM_UNSOLVED_GOALS_REWARD": "unsolved_goals_reward",
         "WANDB_PROJECT": "wandb_project",
         "WANDB_RUN_NAME": "wandb_run_name",
     }
@@ -143,7 +151,8 @@ class ConfigManager:
     
     # Fields that should be converted to floats
     FLOAT_FIELDS = {
-        "learning_rate", "temperature", "verification_timeout"
+        "learning_rate", "temperature", "verification_timeout",
+        "tag_reward", "success_reward", "unsolved_goals_reward"
     }
     
     # Required fields (must be present after loading)
@@ -316,6 +325,21 @@ class ConfigManager:
             vt = config_dict["verification_timeout"]
             if not isinstance(vt, (int, float)) or vt <= 0:
                 errors.append("verification_timeout must be a positive number")
+
+        if "tag_reward" in config_dict:
+            tr = config_dict["tag_reward"]
+            if not isinstance(tr, (int, float)) or tr < 0:
+                errors.append("tag_reward must be a non-negative number")
+
+        if "success_reward" in config_dict:
+            sr = config_dict["success_reward"]
+            if not isinstance(sr, (int, float)) or sr < 0:
+                errors.append("success_reward must be a non-negative number")
+
+        if "unsolved_goals_reward" in config_dict:
+            ugr = config_dict["unsolved_goals_reward"]
+            if not isinstance(ugr, (int, float)) or ugr < 0:
+                errors.append("unsolved_goals_reward must be a non-negative number")
         
         if "max_concurrent_verifications" in config_dict:
             mcv = config_dict["max_concurrent_verifications"]

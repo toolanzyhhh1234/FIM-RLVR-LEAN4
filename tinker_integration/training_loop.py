@@ -263,7 +263,14 @@ class CISPOTrainingLoop:
             # Build FIM prompt using the formatter (matches Unsloth pipeline)
             # Determine task type based on suffix
             task_type = "full" if not env.suffix.strip() else "fim"
-            prompt_text = self.prompt_formatter.format(env.prefix, env.suffix)
+            if task_type == "fim":
+                safe_prefix, safe_suffix = self.prompt_formatter.normalize_boundaries(
+                    env.prefix, env.suffix
+                )
+            else:
+                safe_prefix, safe_suffix = env.prefix, env.suffix
+
+            prompt_text = self.prompt_formatter.format(safe_prefix, safe_suffix)
             prompt_tokens = self.tokenizer.encode(prompt_text)
             
             # Sample G completions for this environment
@@ -291,13 +298,11 @@ class CISPOTrainingLoop:
                     completion_text, task_type=task_type
                 )
                 
-                # If extraction failed, try using raw completion (model may not have followed format)
-                if extracted_code is None:
-                    extracted_code = self.prompt_formatter.strip_markdown_fences(completion_text)
-                    tag_ok = False
-                else:
+                tag_ok = extracted_code is not None and extracted_code.strip() != ""
+                if tag_ok:
                     extracted_code = self.prompt_formatter.strip_markdown_fences(extracted_code)
-                    tag_ok = True
+                else:
+                    extracted_code = None
                 
                 # Log sample for debugging (randomly sample ~10% to avoid spam)
                 import random
@@ -309,19 +314,28 @@ class CISPOTrainingLoop:
                     logger.debug(f"  Raw completion: {completion_text[:300]}...")
                     logger.debug(f"  Extracted code: {extracted_code[:200] if extracted_code else 'None'}...")
                 
-                # Run verification with extracted code
-                try:
-                    result, verification_output = await self._verify_completion_with_code(
-                        env, extracted_code or ""
-                    )
-                    reward = result.reward
-                except Exception as e:
-                    logger.warning(f"Verification error: {e}")
-                    reward = 0.0
-                    verification_output = str(e)
+                # Run verification with extracted code (skip if tags missing/empty)
+                reward = self.config.tag_reward if tag_ok else 0.0
+                verification_output = "<skipped: missing/empty tag>"
+                verification_success = False
+                if tag_ok:
+                    try:
+                        result, verification_output = await self._verify_completion_with_code(
+                            env,
+                            extracted_code or "",
+                            prefix_override=safe_prefix,
+                            suffix_override=safe_suffix,
+                        )
+                        verification_success = result.reward > 0.5
+                        if verification_success:
+                            reward += self.config.success_reward
+                    except Exception as e:
+                        logger.warning(f"Verification error: {e}")
+                        reward = reward  # keep tag reward if any
+                        verification_output = str(e)
                 
                 # Log full debug info to file
-                full_code = env.prefix + (extracted_code or "") + env.suffix
+                full_code = safe_prefix + (extracted_code or "") + safe_suffix
                 self._log_debug({
                     "step": step,
                     "theorem_id": current_theorem_id,
@@ -333,13 +347,13 @@ class CISPOTrainingLoop:
                     "extracted_code": extracted_code,
                     "full_code_sent_to_lean": full_code,
                     "reward": reward,
-                    "verification_success": reward > 0.5,
+                    "verification_success": verification_success,
                     "verification_output": verification_output,
                     "num_completion_tokens": len(completion_tokens),
                 })
                 
                 self._total_verifications += 1
-                if reward > 0.5:
+                if verification_success:
                     self._total_successes += 1
                 
                 trajectory = Trajectory(
@@ -435,8 +449,17 @@ class CISPOTrainingLoop:
         }
 
     
+    def _has_unsolved_goals(self, output: str) -> bool:
+        if not output:
+            return False
+        return "unsolved goals" in output.lower()
+
     async def _verify_completion_with_code(
-        self, env: "Lean4FIMEnv", extracted_code: str
+        self,
+        env: "Lean4FIMEnv",
+        extracted_code: str,
+        prefix_override: Optional[str] = None,
+        suffix_override: Optional[str] = None,
     ) -> tuple["StepResult", str]:
         """
         Verify extracted code using the environment's verifier.
@@ -452,7 +475,9 @@ class CISPOTrainingLoop:
         
         try:
             # Reconstruct full code: prefix + extracted_code + suffix
-            full_code = env.prefix + extracted_code + env.suffix
+            prefix = prefix_override if prefix_override is not None else env.prefix
+            suffix = suffix_override if suffix_override is not None else env.suffix
+            full_code = prefix + extracted_code + suffix
             
             # Verify with Lean4
             success, output = env.verifier.verify(full_code)

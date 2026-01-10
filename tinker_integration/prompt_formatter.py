@@ -56,6 +56,7 @@ def build_system_prompt(template: PromptTemplate) -> str:
         "for full solutions.\n"
         "3) Do NOT include markdown fences or extra text outside the tags.\n"
         "4) The tagged code must be valid Lean 4.\n"
+        "5) End FIM snippets with a separator (newline or `;`) so the next command parses correctly.\n"
         "If the user includes [FULL-SOLUTION-REQUIRED], output a full solution in <FULL_CODE>.\n\n"
         "[USER]\n"
         "theorem simple_add (n : ℕ) : 0 + n = n := by\n"
@@ -144,7 +145,16 @@ class FIMPromptFormatter:
             return self._format_full_solution(prefix)
         
         return self._format_fim(prefix, suffix)
-    
+
+    def normalize_boundaries(self, prefix: str, suffix: str) -> tuple[str, str]:
+        """
+        Ensure separators around the hole so inserted code never concatenates
+        directly with prefix or suffix (FM-1 mitigation).
+        """
+        safe_prefix = prefix if prefix.endswith("\n") else prefix + "\n"
+        safe_suffix = suffix if suffix.startswith("\n") else "\n" + suffix
+        return safe_prefix, safe_suffix
+
     def _format_fim(self, prefix: str, suffix: str) -> str:
         """
         Standard FIM format with hole marker.
@@ -153,8 +163,10 @@ class FIMPromptFormatter:
         
         This matches the format in train_gspo_fim_qwen3-vl-8b.py.
         """
+        # Ensure explicit separators around the hole (FM-1 Option A1).
+        safe_prefix, safe_suffix = self.normalize_boundaries(prefix, suffix)
         # User content: prefix + [MISSING_BLOCK] + newline + suffix
-        user_content = f"{prefix}{self.template.hole_marker}\n{suffix}"
+        user_content = f"{safe_prefix}{self.template.hole_marker}{safe_suffix}"
         return self._apply_chat_template(user_content)
     
     def _format_full_solution(self, prefix: str) -> str:
@@ -275,4 +287,3 @@ class FIMPromptFormatter:
         lines = text.splitlines()
         cleaned = [line for line in lines if not line.strip().startswith("```")]
         return "\n".join(cleaned).strip()
-
