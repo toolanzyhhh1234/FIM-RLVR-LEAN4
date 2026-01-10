@@ -49,3 +49,4 @@ apex/
 .claude/.mcp.json
 docs/codex_session_dump/
 grpo_trainer_lora_model/adapter_config.json
+docs/debug_logs/2026011_model_constant_failure.md
