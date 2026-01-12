@@ -19,6 +19,7 @@ import asyncio
 import logging
 import signal
 from dataclasses import dataclass
+from difflib import SequenceMatcher
 from typing import Any, Dict, List, Optional, TYPE_CHECKING
 
 import numpy as np
@@ -263,14 +264,10 @@ class CISPOTrainingLoop:
             # Build FIM prompt using the formatter (matches Unsloth pipeline)
             # Determine task type based on suffix
             task_type = "full" if not env.suffix.strip() else "fim"
-            if task_type == "fim":
-                safe_prefix, safe_suffix = self.prompt_formatter.normalize_boundaries(
-                    env.prefix, env.suffix
-                )
-            else:
-                safe_prefix, safe_suffix = env.prefix, env.suffix
-
-            prompt_text = self.prompt_formatter.format(safe_prefix, safe_suffix)
+            # Keep prefix/suffix boundaries identical to dataset masking.
+            # We only normalize boundaries inside the prompt formatter, and we do
+            # NOT use normalized boundaries when reconstructing code for verification.
+            prompt_text = self.prompt_formatter.format(env.prefix, env.suffix)
             prompt_tokens = self.tokenizer.encode(prompt_text)
             
             # Sample G completions for this environment
@@ -323,8 +320,8 @@ class CISPOTrainingLoop:
                         result, verification_output = await self._verify_completion_with_code(
                             env,
                             extracted_code or "",
-                            prefix_override=safe_prefix,
-                            suffix_override=safe_suffix,
+                            prefix_override=env.prefix,
+                            suffix_override=env.suffix,
                         )
                         verification_success = result.reward > 0.5
                         if verification_success:
@@ -335,7 +332,15 @@ class CISPOTrainingLoop:
                         verification_output = str(e)
                 
                 # Log full debug info to file
-                full_code = safe_prefix + (extracted_code or "") + safe_suffix
+                full_code = env.prefix + (extracted_code or "") + env.suffix
+                ground_truth_middle = env.get_ground_truth() if hasattr(env, "get_ground_truth") else getattr(env, "ground_truth", "")
+                extracted_norm = (extracted_code or "").strip()
+                truth_norm = (ground_truth_middle or "").strip()
+                ground_truth_similarity = (
+                    SequenceMatcher(None, extracted_norm, truth_norm).ratio()
+                    if (tag_ok and extracted_norm and truth_norm)
+                    else None
+                )
                 self._log_debug({
                     "step": step,
                     "theorem_id": current_theorem_id,
@@ -345,6 +350,9 @@ class CISPOTrainingLoop:
                     "prompt": prompt_text,
                     "raw_completion": completion_text,
                     "extracted_code": extracted_code,
+                    "ground_truth_middle": ground_truth_middle,
+                    "ground_truth_similarity": ground_truth_similarity,
+                    "ground_truth_exact_match": (tag_ok and extracted_norm == truth_norm) if truth_norm else None,
                     "full_code_sent_to_lean": full_code,
                     "reward": reward,
                     "verification_success": verification_success,

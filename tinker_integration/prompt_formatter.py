@@ -151,7 +151,11 @@ class FIMPromptFormatter:
         Ensure separators around the hole so inserted code never concatenates
         directly with prefix or suffix (FM-1 mitigation).
         """
-        safe_prefix = prefix if prefix.endswith("\n") else prefix + "\n"
+        # IMPORTANT: do not force a newline after `prefix`.
+        # Many Lean proofs end the prefix with indentation spaces (e.g. `:= by\n  `).
+        # Adding an extra newline would drop indentation and can break parsing.
+        safe_prefix = prefix
+        # We do ensure that the suffix is separated from the hole marker.
         safe_suffix = suffix if suffix.startswith("\n") else "\n" + suffix
         return safe_prefix, safe_suffix
 

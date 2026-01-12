@@ -179,8 +179,19 @@ class TheoremDataset:
         
         # Auto-detect if filtering should be applied
         # Skip filtering for pre-filtered datasets (filename contains 'filtered')
+        # and for structured datasets that already provide prefix/middle/suffix.
         if apply_lean_filter is None:
-            apply_lean_filter = 'filtered' not in parquet_path.lower()
+            if 'filtered' in parquet_path.lower():
+                apply_lean_filter = False
+            else:
+                has_structured = (
+                    self._column_map.get("prefix") is not None
+                    and self._column_map.get("middle") is not None
+                    and self._column_map.get("suffix") is not None
+                )
+                # Structured datasets are assumed to be curated already; applying
+                # length-based filtering here can drop tiny-but-valid unit test fixtures.
+                apply_lean_filter = not has_structured
         
         # Apply standard Lean filtering (matching Unsloth pipeline)
         if apply_lean_filter:
@@ -210,7 +221,7 @@ class TheoremDataset:
         else:
             print(f"TheoremDataset: loaded {len(self)} pre-filtered samples")
         
-        if len(self) == 0:
+        if len(self) == 0 and self._original_len > 0:
             raise ValueError(
                 f"All {self._original_len} samples were filtered out. "
                 "Check dataset format or filtering settings."
@@ -227,29 +238,38 @@ class TheoremDataset:
         
         This matches the filtering in train_gspo_fim_qwen3-vl-8b.py.
         """
-        # Find the text column to filter on
+        # Prefer filtering on reconstructed full code if prefix/middle/suffix are present.
+        prefix_col = self._column_map.get("prefix")
+        middle_col = self._column_map.get("middle")
+        suffix_col = self._column_map.get("suffix")
+
+        rows = self.df.to_dicts()
+        filtered_indices: list[int] = []
+
+        if prefix_col and middle_col and suffix_col:
+            for i, row in enumerate(rows):
+                full = (row.get(prefix_col, "") or "") + (row.get(middle_col, "") or "") + (row.get(suffix_col, "") or "")
+                if is_valid_lean_sample(full, exclude_sorry=exclude_sorry):
+                    filtered_indices.append(i)
+            self.df = self.df[filtered_indices]
+            return
+
+        # Otherwise, find a single text column to filter on.
         text_col = None
         for col_name in ["formal_ground_truth", "prompt", "full_code", "code"]:
             if col_name in self.df.columns:
                 text_col = col_name
                 break
-        
+
         if text_col is None:
-            # Try detected columns
-            text_col = self._column_map.get("prefix")
-            if text_col is None:
-                print("Warning: Could not find text column for filtering, skipping Lean filter")
-                return
-        
-        # Convert to list for filtering
-        rows = self.df.to_dicts()
-        filtered_indices = []
-        
+            print("Warning: Could not find text column for filtering, skipping Lean filter")
+            return
+
         for i, row in enumerate(rows):
             text = row.get(text_col, "")
             if is_valid_lean_sample(text, exclude_sorry=exclude_sorry):
                 filtered_indices.append(i)
-        
+
         self.df = self.df[filtered_indices]
     
     def _detect_columns(self) -> Dict[str, str]:
@@ -326,26 +346,34 @@ class TheoremDataset:
         # Get theorem ID
         theorem_id = row.get(self._id_column, f"theorem_{idx}")
         
-        # Get full code from the appropriate column
-        # NuminaMath-LEAN uses 'formal_ground_truth' which contains the complete code
-        full_code = None
+        # Prefer structured datasets with explicit prefix/middle/suffix columns.
+        prefix = self._get_column(row, "prefix") or ""
+        suffix = self._get_column(row, "suffix") or ""
+        middle = self._get_column(row, "middle") or ""
+
+        if prefix or suffix or middle:
+            full_code = prefix + middle + suffix
+            return {
+                "theorem_id": theorem_id,
+                "full_code": full_code,
+                "prefix": prefix,
+                "suffix": suffix,
+                "middle": middle,
+            }
+
+        # Fallback: NuminaMath-LEAN-style datasets store the full Lean source in one column.
+        full_code = ""
         for col_name in ["formal_ground_truth", "full_code", "code", "prompt"]:
             if col_name in row and row[col_name]:
                 full_code = row[col_name]
                 break
-        
-        if not full_code:
-            full_code = ""
-        
-        # For this dataset, prefix/suffix/middle are not pre-computed
-        # They will be computed by apply_dynamic_mask in the env_group_builder
-        # We just return the full_code and let masking handle the rest
+
         return {
             "theorem_id": theorem_id,
-            "full_code": full_code,
-            "prefix": "",  # Will be computed by masking
-            "suffix": "",  # Will be computed by masking
-            "middle": "",  # Will be computed by masking
+            "full_code": full_code or "",
+            "prefix": "",
+            "suffix": "",
+            "middle": "",
         }
     
     def get_theorem_by_id(self, theorem_id: str) -> Optional[Dict[str, Any]]:
