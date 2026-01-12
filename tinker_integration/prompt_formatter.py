@@ -271,7 +271,9 @@ class FIMPromptFormatter:
             start_idx += len(start_tag)
             end_idx = text.find(end_tag, start_idx)
             if end_idx == -1:
-                extracted = text[start_idx:].strip()
+                # IMPORTANT: do not `.strip()` here; it can remove leading indentation
+                # that is syntactically meaningful inside Lean tactic blocks.
+                extracted = text[start_idx:].strip("\n")
             else:
                 extracted = text[start_idx:end_idx]
             return extracted.strip("\n")
@@ -297,4 +299,6 @@ class FIMPromptFormatter:
             return text
         lines = text.splitlines()
         cleaned = [line for line in lines if not line.strip().startswith("```")]
-        return "\n".join(cleaned).strip()
+        # Preserve leading indentation: many holes are inside indented tactic blocks.
+        # Only trim extra leading/trailing newlines introduced by tag extraction.
+        return "\n".join(cleaned).strip("\n")
