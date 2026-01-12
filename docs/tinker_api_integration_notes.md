@@ -4,6 +4,14 @@ This document captures key learnings from integrating the Tinker API for RL trai
 
 ## Installation
 
+
+## Quick Start: Launch Training
+
+```bash
+export TINKER_API_KEY=your_key
+python train_tinker_fim.py --config configs/tinker_training.yaml
+```
+
 ```bash
 pip install tinker
 ```
