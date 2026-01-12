@@ -20,6 +20,7 @@ import logging
 import signal
 from dataclasses import dataclass
 from difflib import SequenceMatcher
+import time
 from typing import Any, Dict, List, Optional, TYPE_CHECKING
 
 import numpy as np
@@ -194,10 +195,18 @@ class CISPOTrainingLoop:
                 
                 # Execute one training step
                 step_metrics = await self._train_step(step, adam_params, sampling_params)
-                
-                # Log metrics periodically (Requirement 5.6)
+
+                # Always log a per-step summary to console (steps can take a long time).
+                self._log_step_console(step_metrics, step)
+
+                # Write structured metrics periodically (Requirement 5.6)
                 if step % self.config.logging_steps == 0:
-                    self._log_step_metrics(step_metrics, step)
+                    self.metrics.log_training_step(
+                        step=step,
+                        reward_mean=step_metrics["reward_mean"],
+                        reward_std=step_metrics["reward_std"],
+                        pass_rate=step_metrics["pass_rate"],
+                    )
                 
                 # Checkpoint periodically (Requirement 5.7)
                 if step > 0 and step % self.config.checkpoint_interval == 0:
@@ -242,6 +251,14 @@ class CISPOTrainingLoop:
         current_theorem_id = self.env_builder.get_current_theorem_id()
         current_mask_ratio = self.env_builder.get_current_mask_ratio()
         logger.debug(f"Step {step}: theorem={current_theorem_id}, mask_ratio={current_mask_ratio}")
+
+        # Per-step counters for better observability
+        step_tag_ok = 0
+        step_tag_missing = 0
+        step_verifications_ran = 0
+        step_successes = 0
+        step_sampling_seconds = 0.0
+        step_verification_seconds = 0.0
         
         # 2. Save weights and create sampling client
         save_future = await self.training_client.save_weights_for_sampler_async(
@@ -264,10 +281,16 @@ class CISPOTrainingLoop:
             # Build FIM prompt using the formatter (matches Unsloth pipeline)
             # Determine task type based on suffix
             task_type = "full" if not env.suffix.strip() else "fim"
-            # Keep prefix/suffix boundaries identical to dataset masking.
-            # We only normalize boundaries inside the prompt formatter, and we do
-            # NOT use normalized boundaries when reconstructing code for verification.
-            prompt_text = self.prompt_formatter.format(env.prefix, env.suffix)
+            # IMPORTANT: keep prompt and verification stitching consistent.
+            # The formatter ensures the suffix is separated from the hole marker with a leading newline.
+            # We must apply the same suffix normalization when we later stitch prefix+completion+suffix
+            # for verification, otherwise the first suffix line can get concatenated onto the last tactic.
+            if task_type == "fim":
+                _, safe_suffix = self.prompt_formatter.normalize_boundaries(env.prefix, env.suffix)
+            else:
+                safe_suffix = env.suffix
+
+            prompt_text = self.prompt_formatter.format(env.prefix, safe_suffix)
             prompt_tokens = self.tokenizer.encode(prompt_text)
             
             # Sample G completions for this environment
@@ -278,7 +301,9 @@ class CISPOTrainingLoop:
                 num_samples=1,  # One sample per env, env_builder creates group_size envs
                 sampling_params=sampling_params,
             )
+            t_sample_start = time.monotonic()
             sample_result = sample_future.result()
+            step_sampling_seconds += time.monotonic() - t_sample_start
             
             # Process each sample
             for seq in sample_result.sequences:
@@ -298,8 +323,10 @@ class CISPOTrainingLoop:
                 tag_ok = extracted_code is not None and extracted_code.strip() != ""
                 if tag_ok:
                     extracted_code = self.prompt_formatter.strip_markdown_fences(extracted_code)
+                    step_tag_ok += 1
                 else:
                     extracted_code = None
+                    step_tag_missing += 1
                 
                 # Log sample for debugging (randomly sample ~10% to avoid spam)
                 import random
@@ -317,14 +344,18 @@ class CISPOTrainingLoop:
                 verification_success = False
                 if tag_ok:
                     try:
+                        step_verifications_ran += 1
+                        t_ver_start = time.monotonic()
                         result, verification_output = await self._verify_completion_with_code(
                             env,
                             extracted_code or "",
                             prefix_override=env.prefix,
-                            suffix_override=env.suffix,
+                            suffix_override=safe_suffix,
                         )
+                        step_verification_seconds += time.monotonic() - t_ver_start
                         verification_success = result.reward > 0.5
                         if verification_success:
+                            step_successes += 1
                             reward += self.config.success_reward
                     except Exception as e:
                         logger.warning(f"Verification error: {e}")
@@ -332,7 +363,7 @@ class CISPOTrainingLoop:
                         verification_output = str(e)
                 
                 # Log full debug info to file
-                full_code = env.prefix + (extracted_code or "") + env.suffix
+                full_code = env.prefix + (extracted_code or "") + safe_suffix
                 ground_truth_middle = env.get_ground_truth() if hasattr(env, "get_ground_truth") else getattr(env, "ground_truth", "")
                 extracted_norm = (extracted_code or "").strip()
                 truth_norm = (ground_truth_middle or "").strip()
@@ -390,6 +421,14 @@ class CISPOTrainingLoop:
                 "pass_rate": float((rewards_array > 0.5).mean()),
                 "reward_mean": float(mean_reward),
                 "reward_std": float(rewards_array.std()),
+                "theorem_id": current_theorem_id,
+                "mask_ratio": current_mask_ratio,
+                "tag_ok": step_tag_ok,
+                "tag_missing": step_tag_missing,
+                "verifications_ran": step_verifications_ran,
+                "successes": step_successes,
+                "sampling_seconds": step_sampling_seconds,
+                "verification_seconds": step_verification_seconds,
                 "skipped": True,
             }
         
@@ -453,6 +492,12 @@ class CISPOTrainingLoop:
             "loss": loss,
             "theorem_id": self.env_builder.get_current_theorem_id(),
             "mask_ratio": self.env_builder.get_current_mask_ratio(),
+            "tag_ok": step_tag_ok,
+            "tag_missing": step_tag_missing,
+            "verifications_ran": step_verifications_ran,
+            "successes": step_successes,
+            "sampling_seconds": step_sampling_seconds,
+            "verification_seconds": step_verification_seconds,
             "skipped": False,
         }
 
@@ -511,20 +556,18 @@ class CISPOTrainingLoop:
             result = StepResult(reward=0.0, episode_done=True)
             return result, f"ERROR: {e}"
     
-    def _log_step_metrics(self, step_metrics: Dict[str, Any], step: int) -> None:
-        """Log training metrics for a step."""
-        self.metrics.log_training_step(
-            step=step,
-            reward_mean=step_metrics["reward_mean"],
-            reward_std=step_metrics["reward_std"],
-            pass_rate=step_metrics["pass_rate"],
-        )
-        
-        # Log to console
+    def _log_step_console(self, step_metrics: Dict[str, Any], step: int) -> None:
+        """Log a concise per-step summary to console."""
+        verifications_ran = int(step_metrics.get("verifications_ran", 0) or 0)
+        successes = int(step_metrics.get("successes", 0) or 0)
+        verification_success_rate = (successes / verifications_ran) if verifications_ran > 0 else 0.0
+
         logger.info(
             f"Step {step}: "
             f"reward={step_metrics['reward_mean']:.3f}+/-{step_metrics['reward_std']:.3f}, "
             f"pass_rate={step_metrics['pass_rate']:.1%}, "
+            f"verif_success={verification_success_rate:.1%} ({successes}/{verifications_ran}), "
+            f"tag_ok={int(step_metrics.get('tag_ok', 0) or 0)}, "
             f"theorem={step_metrics.get('theorem_id', 'N/A')}, "
             f"mask_ratio={step_metrics.get('mask_ratio', 'N/A')}"
         )

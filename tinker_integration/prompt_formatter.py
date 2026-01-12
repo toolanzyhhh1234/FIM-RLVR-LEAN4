@@ -263,22 +263,29 @@ class FIMPromptFormatter:
         
         start_tag = f"<{tag}>"
         end_tag = f"</{tag}>"
-        
-        # Find the LAST occurrence of the tags (model may mention tags in reasoning)
-        start_idx = response.rfind(start_tag)
-        if start_idx == -1:
-            return None
-        
-        start_idx += len(start_tag)
-        end_idx = response.find(end_tag, start_idx)
-        if end_idx == -1:
-            # No closing tag after the last opening tag - take rest of response
-            extracted = response[start_idx:].strip()
-        else:
-            extracted = response[start_idx:end_idx]
-        
-        # Preserve content but strip surrounding newlines
-        return extracted.strip("\n")
+
+        def _extract_from(text: str) -> Optional[str]:
+            start_idx = text.rfind(start_tag)
+            if start_idx == -1:
+                return None
+            start_idx += len(start_tag)
+            end_idx = text.find(end_tag, start_idx)
+            if end_idx == -1:
+                extracted = text[start_idx:].strip()
+            else:
+                extracted = text[start_idx:end_idx]
+            return extracted.strip("\n")
+
+        # Prefer extracting from the Harmony "final" channel to avoid grabbing tags mentioned in analysis.
+        final_marker = "<|channel|>final<|message|>"
+        final_idx = response.find(final_marker)
+        if final_idx != -1:
+            extracted = _extract_from(response[final_idx + len(final_marker):])
+            if extracted is not None:
+                return extracted
+
+        # Fallback: search entire response (can recover cases where the model never reached final).
+        return _extract_from(response)
     
     def strip_markdown_fences(self, text: str) -> str:
         """

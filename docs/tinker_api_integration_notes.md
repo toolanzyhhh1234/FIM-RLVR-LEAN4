@@ -10,6 +10,7 @@ This document captures key learnings from integrating the Tinker API for RL trai
 ```bash
 export TINKER_API_KEY=your_key
 python train_tinker_fim.py --config configs/tinker_training.yaml
+python train_tinker_fim.py --config configs/tinker_training.yaml --max-steps 5
 ```
 
 ```bash
@@ -195,6 +196,59 @@ Reasoning: high   # Extensive CoT (may exceed token limits)
 Reasoning: medium # Balanced (default)
 Reasoning: low    # Minimal CoT (faster, less truncation risk)
 ```
+
+## FIM Boundary Normalization: Prompt/Verification Consistency
+
+We hit a subtle but important failure mode in Lean FIM: **prompt-time boundary formatting must match verification-time stitching**.
+
+### The underlying problem
+
+For FIM tasks we conceptually build:
+
+```
+prefix + <model output> + suffix
+```
+
+However, Lean is whitespace/indentation sensitive. If the first suffix line begins with an indented tactic block marker like `· ...` and the model output does not end with a newline, then naive concatenation can produce:
+
+```
+... constructor  · ...
+```
+
+which is invalid Lean (`·` must start a new tactic line / block).
+
+This was made worse by postprocessing: our tag extractor historically did `strip("\n")`, which removes trailing newlines the model might have emitted.
+
+### Option A (chosen for training): canonicalize the boundary
+
+**Goal:** avoid wasting reward signal on accidental formatting glitches.
+
+Approach:
+
+1. Ensure the prompt guarantees a separator between the hole and the suffix (suffix starts with `\n`).
+2. Use the **same normalized suffix** when reconstructing `prefix + extracted_code + suffix` for verification.
+3. Prefer extracting `<FIM_CODE>/<FULL_CODE>` from the Harmony **final** channel, falling back to whole response only if needed.
+
+This is what the current Tinker training loop does.
+
+### Option B (alternative / “raw”): fully raw concatenation
+
+**Goal:** model must infer whether to emit a newline/indent based on the raw suffix.
+
+Approach:
+
+1. Show the model the raw prompt with no inserted newline normalization.
+2. Verify using raw `prefix + extracted_code + raw_suffix`.
+3. To make this workable, you typically must also **preserve trailing newlines** from `<FIM_CODE>` (i.e., avoid stripping them), otherwise you can silently remove the exact newline the model used to separate from suffix.
+
+We are not using this for training right now because it increases variance and can collapse reward into formatting sensitivity.
+
+### Debugging support
+
+We log the ground-truth masked middle segment and a simple similarity score in `logs/tinker_fim/debug_samples.jsonl` to help distinguish:
+
+- “model is close / semantically right but formatting broke” vs
+- “model is genuinely wrong”.
 
 ## References
 
