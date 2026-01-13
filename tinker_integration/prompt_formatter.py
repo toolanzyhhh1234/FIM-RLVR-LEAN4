@@ -12,8 +12,13 @@ Requirements covered:
 - 2.5: Preserve exact whitespace and newlines
 """
 
+import re
 from dataclasses import dataclass, field
 from typing import Optional, List, Dict, Any
+
+
+# Regex to match Harmony special tokens like <|return|>, <|end|>, <|channel|>, etc.
+HARMONY_TOKEN_RE = re.compile(r"<\|[a-zA-Z_]+?\|>")
 
 
 # Tag names matching the Unsloth pipeline
@@ -302,3 +307,39 @@ class FIMPromptFormatter:
         # Preserve leading indentation: many holes are inside indented tactic blocks.
         # Only trim extra leading/trailing newlines introduced by tag extraction.
         return "\n".join(cleaned).strip("\n")
+
+    def strip_harmony_tokens(self, text: str) -> str:
+        """
+        Remove Harmony format special tokens from extracted code.
+        
+        Harmony-style models (e.g., gpt-oss-120b) use special tokens like:
+        - <|return|>: End of response marker
+        - <|end|>: End of channel marker
+        - <|channel|>, <|message|>, <|analysis|>, <|final|>: Channel markers
+        
+        These tokens break Lean parsing if left in the extracted code.
+        This is the root cause of the training vs OpenRouter test discrepancy
+        (5-8% vs 60% success rate).
+        
+        Args:
+            text: Text potentially containing Harmony tokens.
+        
+        Returns:
+            Text with Harmony tokens removed, preserving indentation.
+        """
+        if not text:
+            return text
+        
+        # 1) Truncate at the first <|return|> if present - everything after is control noise
+        return_idx = text.find("<|return|>")
+        if return_idx != -1:
+            text = text[:return_idx]
+        
+        # 2) Remove all standalone Harmony markers like <|analysis|>, <|final|>, <|end|>, etc.
+        text = HARMONY_TOKEN_RE.sub("", text)
+        
+        # 3) Strip markdown fences but preserve indentation
+        text = self.strip_markdown_fences(text)
+        
+        # Only strip leading/trailing newlines, not spaces (to preserve indentation)
+        return text.strip("\n")

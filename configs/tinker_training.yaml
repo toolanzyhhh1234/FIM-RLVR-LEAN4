@@ -114,11 +114,11 @@ window_size: 8
 # =============================================================================
 
 # How often to log training metrics (every N steps)
-logging_steps: 10
+logging_steps: 1
 
 # How often to save checkpoints (every N steps)
 # Checkpoints include LoRA weights and curriculum state
-checkpoint_interval: 100
+checkpoint_interval: 10
 
 # Directory for saving checkpoints
 # Supports local filesystem paths

@@ -38,6 +38,13 @@
 - New modules should ship with unit coverage; mock heavy deps (e.g., `unsloth`, `trl`, `datasets`) to keep tests lightweight.
 - Use `python -m pytest path/to/test_file.py -k pattern` for targeted debugging.
 
+### Test suite mapping / common skips
+
+- `test/test_train_gspo_fim_20b.py` is an **Unsloth/TRL trainer integration test** (imports `train_gspo_fim_20b.py` and `unsloth`). In environments where `unsloth` (or specific symbols like `PatchFastRL`) are not available, collection will fail.
+  - For **Tinker integration** changes, it is acceptable to run:
+    - `python -m pytest test --ignore test/test_train_gspo_fim_20b.py`
+  - The rest of `python -m pytest test` is framework-agnostic and includes shared utilities (masking, verifier wrappers, env grouping, metrics, etc.).
+
 ## Commit & Pull Request Guidelines
 - Commit messages: concise imperative summaries (e.g., “Add testable helpers and unit tests for GSPO FIM trainer”).
 - Include context in PR descriptions: what changed, why, risks, and how to verify (commands run).

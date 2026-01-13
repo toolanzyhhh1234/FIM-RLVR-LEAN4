@@ -322,7 +322,9 @@ class CISPOTrainingLoop:
                 
                 tag_ok = extracted_code is not None and extracted_code.strip() != ""
                 if tag_ok:
-                    extracted_code = self.prompt_formatter.strip_markdown_fences(extracted_code)
+                    # CRITICAL: Strip Harmony tokens (<|return|>, <|end|>, etc.) that break Lean parsing.
+                    # This was the root cause of 5-8% vs 60% success rate discrepancy with OpenRouter test.
+                    extracted_code = self.prompt_formatter.strip_harmony_tokens(extracted_code)
                     step_tag_ok += 1
                 else:
                     extracted_code = None
