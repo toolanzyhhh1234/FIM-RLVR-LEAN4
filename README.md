@@ -36,11 +36,12 @@ This repository implements a **FIM + GSPO** pipeline designed to bootstrap forma
 
 ## Status: Transitioning to Tinker API
 
-**The training pipeline is functional, but we've identified key scaling insights.**
+**The training pipeline is functional, with Tinker integration running cleanly, and we're digging into verification performance.**
 
 **What works:**
 - **Lean 4 Verification Pipeline**: Robust, thread-safe verifier with parallel verification (linear speedup with cpu core counts)
 - **GRPO Training Loop**: Integrated with Unsloth + TRL (`train_gspo_fim_mistral3.py`, `train_gspo_fim_qwen3-vl-8b.py` on `further-investigation-on-unsloth` branch)
+- **Tinker Integration**: No syntax errors and several successful trial runs
 
 **What we learned:**
 - **Dense models are inefficient**: High active parameters but performance similar to sparse MoE models of comparable size. Training cost scales poorly.
@@ -53,6 +54,8 @@ This repository implements a **FIM + GSPO** pipeline designed to bootstrap forma
 - Easier to iterate and debug without managing distributed training infrastructure
 
 **Current focus**: Applying for Tinker research grant to train `gpt-oss-120b` with CISPO.
+
+**In progress**: Lean 4 verification success rate is currently lower than expected; we are investigating the pipeline in depth to determine whether this is a model capability issue or a pipeline design issue.
 
 ## � Training SInfrastructure: Tinker API
 
