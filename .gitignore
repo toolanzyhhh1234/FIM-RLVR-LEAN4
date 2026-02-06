@@ -45,6 +45,8 @@ training_logs/
 .kiro/verl-investigation
 outputs_fim_grpo_mistral3/
 exports/
+logs/tinker_fim/exports/
+verification_env/VerificationEnv/tinker_debug_exports/
 
 # External libraries
 verl/
