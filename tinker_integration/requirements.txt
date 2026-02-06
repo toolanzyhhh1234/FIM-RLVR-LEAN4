@@ -2,9 +2,8 @@
 # Install with: pip install -r tinker_integration/requirements.txt
 
 # Tinker API client
-# Note: tinker-api is the official package from Thinking Machines Lab
-# Install from PyPI or their private index as per their documentation
-tinker-api>=0.1.0
+# Package name is `tinker` (see docs/tinker_api_integration_notes.md).
+tinker>=0.7.0
 
 # Core dependencies (may already be installed from main requirements)
 pyyaml>=6.0

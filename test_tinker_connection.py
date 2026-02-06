@@ -105,7 +105,7 @@ async def test_tinker_connection():
     print("\nNote: The client is running in mock mode since the 'tinker' package")
     print("is not installed. This is expected for local development.")
     print("\nTo run actual training with Tinker API:")
-    print("  pip install tinker-api")
+    print("  pip install tinker")
     print("  python train_tinker_fim.py --config configs/tinker_training.yaml")
     
     return True

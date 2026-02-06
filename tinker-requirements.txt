@@ -1,0 +1,11 @@
+# Tinker training dependencies for this repo.
+# Usage: pip install -r tinker-requirements.txt
+
+# Base Tinker integration dependencies
+-r tinker_integration/requirements.txt
+
+# Required by tinker_integration/training_loop.py and client tensor helpers
+numpy>=1.24.0
+
+# Optional experiment tracking (uncomment if needed)
+# wandb>=0.15.0

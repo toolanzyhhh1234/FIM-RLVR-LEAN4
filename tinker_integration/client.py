@@ -212,7 +212,7 @@ class TinkerTrainingClient:
             # Tinker package not installed - create a placeholder
             logger.warning(
                 "Tinker package not installed. Client will operate in mock mode. "
-                "Install with: pip install tinker-api"
+                "Install with: pip install tinker"
             )
             self._client = None
             self._initialized = True
