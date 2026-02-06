@@ -6,6 +6,9 @@ __pycache__/
 .venv-*/
 .venv-qwen3vl/
 env/
+venv/
+tinker_env/
+virtualenv/
 
 # Lean 4 / Lake
 verification_env/.lake/
