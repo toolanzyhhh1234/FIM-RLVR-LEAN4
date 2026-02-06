@@ -56,7 +56,7 @@ learning_rate: 0.00005
 # Temperature for sampling completions
 # Higher = more diverse, Lower = more deterministic
 # Recommended: 0.7-0.9 for exploration, 0.3-0.5 for exploitation
-temperature: 0.8
+temperature: 1
 
 # Number of completions to sample per theorem (group size for CISPO)
 # Higher = better advantage estimation but higher cost
