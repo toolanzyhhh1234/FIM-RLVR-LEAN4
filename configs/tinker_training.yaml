@@ -28,9 +28,9 @@
 # =============================================================================
 
 # Primary model to use for training
-# Recommended: openai/gpt-oss-120b (ultra-sparse MoE, best for Lean4 FIM)
+# Recommended: deepseek-ai/DeepSeek-V3.1, openai/gpt-oss-120b (ultra-sparse MoE, best for Lean4 FIM)
 # Alternative: Qwen/Qwen3-235B-A22B (large capacity MoE)
-model_name: "openai/gpt-oss-120b"
+model_name: "deepseek-ai/DeepSeek-V3.1"
 
 # Fallback model if primary is unavailable
 # Set to null to disable fallback
