@@ -180,7 +180,7 @@ The configuration file (`configs/tinker_training.yaml`) supports the following o
 | `group_size` | `4` | Completions per theorem (CISPO) |
 | `max_concurrent_verifications` | `8` | Parallel Lean4 verifications |
 | `verification_timeout` | `60.0` | Timeout per verification (seconds) |
-| `checkpoint_interval` | `100` | Steps between checkpoints |
+| `checkpoint_interval` | `10` | Steps between checkpoints |
 | `logging_steps` | `10` | Steps between metric logs |
 
 #### Environment Variable Overrides
@@ -192,6 +192,7 @@ export TINKER_API_KEY="your-api-key"      # Required
 export FIM_MODEL_NAME="Qwen/Qwen3-235B-A22B"
 export FIM_MAX_STEPS="500"
 export FIM_LEARNING_RATE="0.0001"
+export FIM_CHECKPOINT_INTERVAL="10"
 export FIM_CHECKPOINT_DIR="checkpoints/my_run"
 export FIM_LOG_DIR="logs/my_run"
 export FIM_DATASET_PATH="data/my_dataset.parquet"
@@ -202,7 +203,7 @@ export WANDB_PROJECT="my-project"         # Enable W&B logging
 
 ```
 usage: train_tinker_fim.py [-h] [--config CONFIG] [--resume] [--resume-from CHECKPOINT]
-                           [--max-steps N] [--checkpoint-dir DIR] [--log-dir DIR]
+                           [--max-steps N] [--checkpoint-dir DIR] [--checkpoint-interval N] [--log-dir DIR]
                            [--dataset PATH] [--model NAME] [--group-size N]
                            [--learning-rate LR] [--verification-env PATH]
                            [--no-sorries] [--verbose] [--quiet] [--dry-run]
@@ -213,6 +214,7 @@ Options:
   --resume-from         Resume from specific checkpoint (e.g., checkpoint_100)
   --max-steps           Override max training steps
   --checkpoint-dir      Override checkpoint directory
+  --checkpoint-interval Override checkpoint interval (in steps)
   --log-dir             Override log directory
   --dataset             Override dataset path
   --model               Override model name

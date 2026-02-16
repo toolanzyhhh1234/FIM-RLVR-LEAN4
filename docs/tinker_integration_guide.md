@@ -72,7 +72,7 @@ python train_tinker_fim.py --config configs/tinker_training.yaml
 Quick sanity run:
 
 ```bash
-python train_tinker_fim.py --config configs/tinker_training.yaml --max-steps 5
+python train_tinker_fim.py --config configs/tinker_training.yaml --max-steps 5 --checkpoint-interval 10
 ```
 
 Useful overrides:

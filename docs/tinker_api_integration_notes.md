@@ -10,7 +10,7 @@ This document captures key learnings from integrating the Tinker API for RL trai
 ```bash
 export TINKER_API_KEY=your_key
 python train_tinker_fim.py --config configs/tinker_training.yaml
-python train_tinker_fim.py --config configs/tinker_training.yaml --max-steps 5
+python train_tinker_fim.py --config configs/tinker_training.yaml --max-steps 5 --checkpoint-interval 10
 ```
 
 ```bash
