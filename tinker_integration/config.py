@@ -69,7 +69,7 @@ class TrainingConfig:
     
     # Logging and checkpointing
     logging_steps: int = 10
-    checkpoint_interval: int = 100
+    checkpoint_interval: int = 10
     checkpoint_dir: str = "checkpoints"
     log_dir: str = "logs"
     
@@ -126,6 +126,7 @@ class ConfigManager:
         "FIM_MODEL_NAME": "model_name",
         "FIM_MAX_STEPS": "max_steps",
         "FIM_LEARNING_RATE": "learning_rate",
+        "FIM_CHECKPOINT_INTERVAL": "checkpoint_interval",
         "FIM_CHECKPOINT_DIR": "checkpoint_dir",
         "FIM_LOG_DIR": "log_dir",
         "FIM_TEMPERATURE": "temperature",

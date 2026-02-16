@@ -19,6 +19,7 @@ Environment Variables:
     TINKER_API_KEY: Required. Your Tinker API key (can be set in .env file).
     FIM_MODEL_NAME: Override model name from config.
     FIM_MAX_STEPS: Override max training steps.
+    FIM_CHECKPOINT_INTERVAL: Override checkpoint interval (in steps).
     FIM_CHECKPOINT_DIR: Override checkpoint directory.
     FIM_LOG_DIR: Override log directory.
     FIM_DATASET_PATH: Override dataset path.
@@ -102,6 +103,12 @@ def parse_args() -> argparse.Namespace:
         type=str,
         default=None,
         help="Override checkpoint directory",
+    )
+    parser.add_argument(
+        "--checkpoint-interval",
+        type=int,
+        default=None,
+        help="Override checkpoint interval (in steps)",
     )
     parser.add_argument(
         "--log-dir",
@@ -190,6 +197,8 @@ def apply_cli_overrides(config, args: argparse.Namespace):
         config.max_steps = args.max_steps
     if args.checkpoint_dir is not None:
         config.checkpoint_dir = args.checkpoint_dir
+    if args.checkpoint_interval is not None:
+        config.checkpoint_interval = args.checkpoint_interval
     if args.log_dir is not None:
         config.log_dir = args.log_dir
     if args.dataset is not None:

@@ -13,6 +13,7 @@
 #   - FIM_MODEL_NAME: Override model_name
 #   - FIM_MAX_STEPS: Override max_steps
 #   - FIM_LEARNING_RATE: Override learning_rate
+#   - FIM_CHECKPOINT_INTERVAL: Override checkpoint_interval
 #   - FIM_CHECKPOINT_DIR: Override checkpoint_dir
 #   - FIM_LOG_DIR: Override log_dir
 #   - FIM_DATASET_PATH: Override dataset_path
