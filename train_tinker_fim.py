@@ -32,7 +32,8 @@ Requirements:
     - All requirements from requirements.md
     - Tinker API key (set via TINKER_API_KEY environment variable)
     - Dataset in Parquet format with theorem data
-    - Lean4 verification environment (verification_env/)
+    - Axle verification environment
+
 """
 
 import argparse
@@ -42,7 +43,6 @@ import os
 import signal
 import sys
 from pathlib import Path
-from typing import Optional
 
 # Load .env file before anything else
 try:
@@ -146,7 +146,7 @@ def parse_args() -> argparse.Namespace:
         "--verification-env",
         type=str,
         default="verification_env",
-        help="Path to Lean4 verification environment",
+        help="Path to Axle verification environment",
     )
     
     # Default no_sorries based on FIM_NO_SORRIES env var (default True)
@@ -220,16 +220,14 @@ async def main_async(args: argparse.Namespace) -> int:
         Exit code (0 for success, non-zero for failure)
     """
     # Import components
-    from tinker_integration.config import ConfigManager, TrainingConfig
-    from tinker_integration.client import create_training_client, TinkerAuthenticationError
+    from tinker_integration.config import ConfigManager
     from tinker_integration.metrics import MetricsLogger
     from tinker_integration.checkpoint import CheckpointManager
     from tinker_integration.error_handler import ErrorHandler
-    from tinker_integration.async_verifier import AsyncVerifier
+    from tinker_integration.axle_verifier import AxleLeanVerifier
     from tinker_integration.env_group_builder import CurriculumEnvGroupBuilder, TheoremDataset
     from tinker_integration.training_loop import CISPOTrainingLoop
     from fim_rlvr_lean4.curriculum import CurriculumManager
-    from fim_rlvr_lean4.lean_verifier import LeanVerifier
     
     # Load configuration
     logger.info("Loading configuration...")
@@ -256,12 +254,6 @@ async def main_async(args: argparse.Namespace) -> int:
     
     if not Path(config.dataset_path).exists():
         logger.error(f"Dataset not found: {config.dataset_path}")
-        return 1
-    
-    # Validate verification environment
-    verification_env = Path(args.verification_env)
-    if not verification_env.exists():
-        logger.error(f"Verification environment not found: {verification_env}")
         return 1
     
     # Log effective configuration
@@ -294,30 +286,26 @@ async def main_async(args: argparse.Namespace) -> int:
         critical_threshold=10,
     )
     
-    # 3. Lean verifier
-    logger.info(f"Initializing Lean verifier from {verification_env}...")
+    # 3. Axle verifier
+    logger.info(f"Initializing Axle verifier at {config.axle_api_url}...")
+    logger.info(f"  environment={config.axle_environment}")
     logger.info(f"  no_sorries={args.no_sorries} (FIM_NO_SORRIES env var or --no-sorries flag)")
-    lean_verifier = LeanVerifier(
-        str(verification_env),
+    verifier = AxleLeanVerifier(
+        api_key=config.axle_api_key,
+        base_url=config.axle_api_url,
+        environment=config.axle_environment,
         no_sorries=args.no_sorries,
-    )
-    
-    # 4. Async verifier
-    async_verifier = AsyncVerifier(
-        lean_verifier=lean_verifier,
-        max_concurrent=config.max_concurrent_verifications,
         timeout_seconds=config.verification_timeout,
-        metrics_logger=metrics,
     )
     
-    # 5. Curriculum manager
+    # 4. Curriculum manager
     curriculum = CurriculumManager(
         levels=config.curriculum_levels,
         window_size=config.window_size,
         promotion_threshold=config.promotion_threshold,
     )
     
-    # 6. Dataset
+    # 5. Dataset
     logger.info(f"Loading dataset from {config.dataset_path}...")
     try:
         dataset = TheoremDataset(config.dataset_path)
@@ -326,7 +314,7 @@ async def main_async(args: argparse.Namespace) -> int:
         logger.error(f"Failed to load dataset: {e}")
         return 1
     
-    # 9. Training client - use Tinker SDK directly
+    # 6. Training client - use Tinker SDK directly
     logger.info(f"Initializing Tinker training client for {config.model_name}...")
     import tinker
     
@@ -355,17 +343,17 @@ async def main_async(args: argparse.Namespace) -> int:
         traceback.print_exc()
         return 1
     
-    # 10. Environment group builder - now with real tokenizer
+    # 7. Environment group builder - now with real tokenizer
     env_builder = CurriculumEnvGroupBuilder(
         dataset=dataset,
         curriculum_manager=curriculum,
-        verifier=lean_verifier,  # Use sync verifier, training loop handles async
+        verifier=verifier,
         tokenizer=tokenizer,
         group_size=config.group_size,
         max_tokens=512,
     )
     
-    # 11. Checkpoint manager
+    # 8. Checkpoint manager
     checkpoint_manager = CheckpointManager(
         checkpoint_dir=config.checkpoint_dir,
         training_client=training_client,
@@ -390,7 +378,7 @@ async def main_async(args: argparse.Namespace) -> int:
         else:
             logger.warning("No checkpoint found to resume from, starting fresh")
     
-    # 12. Training loop
+    # 9. Training loop
     training_loop = CISPOTrainingLoop(
         service_client=service_client,
         training_client=training_client,
@@ -470,7 +458,6 @@ async def main_async(args: argparse.Namespace) -> int:
     finally:
         # Cleanup
         logger.info("Cleaning up...")
-        async_verifier.shutdown()
         metrics.close()
 
 

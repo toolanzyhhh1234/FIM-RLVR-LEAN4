@@ -45,6 +45,7 @@ class TrainingConfig:
     """
     # API settings
     api_key: Optional[str] = None
+    axle_api_key: Optional[str] = None
     
     # Model settings
     model_name: str = "openai/gpt-oss-120b"
@@ -61,7 +62,9 @@ class TrainingConfig:
     # Verification settings
     max_concurrent_verifications: int = 8
     verification_timeout: float = 60.0
-
+    axle_api_url: str = "https://axle.axiommath.ai/api/v1"
+    axle_environment: str = "lean-4.28.0"
+    
     # Reward shaping (intermediate signals)
     tag_reward: float = 0.05
     success_reward: float = 1.0
@@ -103,6 +106,8 @@ class TrainingConfig:
         result = asdict(self)
         if mask_sensitive and result.get("api_key"):
             result["api_key"] = "***MASKED***"
+        if mask_sensitive and result.get("axle_api_key"):
+            result["axle_api_key"] = "***MASKED***"
         return result
 
 
@@ -123,6 +128,9 @@ class ConfigManager:
     # Maps env var name -> config field name
     ENV_OVERRIDES: Dict[str, str] = {
         "TINKER_API_KEY": "api_key",
+        "AXLE_API_KEY": "axle_api_key",
+        "AXLE_API_URL": "axle_api_url",
+        "AXLE_ENVIRONMENT": "axle_environment",
         "FIM_MODEL_NAME": "model_name",
         "FIM_MAX_STEPS": "max_steps",
         "FIM_LEARNING_RATE": "learning_rate",

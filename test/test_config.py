@@ -8,7 +8,6 @@ validation, and defaults.
 import os
 import pytest
 import tempfile
-from pathlib import Path
 from unittest.mock import patch, MagicMock
 
 from tinker_integration.config import (
@@ -39,10 +38,12 @@ class TestTrainingConfig:
         # Verification settings
         assert config.max_concurrent_verifications == 8
         assert config.verification_timeout == 60.0
+        assert config.axle_api_url == "https://axle.axiommath.ai/api/v1"
+        assert config.axle_environment == "lean-4.28.0"
         
         # Logging and checkpointing
         assert config.logging_steps == 10
-        assert config.checkpoint_interval == 100
+        assert config.checkpoint_interval == 10
         assert config.checkpoint_dir == "checkpoints"
         
         # Curriculum settings
@@ -66,20 +67,22 @@ class TestTrainingConfig:
     
     def test_to_dict_masks_api_key(self):
         """Test that to_dict masks sensitive values."""
-        config = TrainingConfig(api_key="secret-key-123")
+        config = TrainingConfig(api_key="secret-key-123", axle_api_key="secret-axle-key")
         
         result = config.to_dict(mask_sensitive=True)
         
         assert result["api_key"] == "***MASKED***"
+        assert result["axle_api_key"] == "***MASKED***"
         assert result["model_name"] == "openai/gpt-oss-120b"
     
     def test_to_dict_no_masking(self):
         """Test that to_dict can expose sensitive values."""
-        config = TrainingConfig(api_key="secret-key-123")
+        config = TrainingConfig(api_key="secret-key-123", axle_api_key="secret-axle-key")
         
         result = config.to_dict(mask_sensitive=False)
         
         assert result["api_key"] == "secret-key-123"
+        assert result["axle_api_key"] == "secret-axle-key"
 
 
 class TestConfigManagerInit:
@@ -219,6 +222,22 @@ class TestConfigManagerEnvOverrides:
             assert isinstance(config.learning_rate, float)
             assert config.temperature == 0.5
             assert config.verification_timeout == 120.0
+
+    def test_axle_env_overrides(self):
+        """Test that Axle-specific env vars are applied."""
+        env_overrides = {
+            "TINKER_API_KEY": "test-key",
+            "AXLE_API_KEY": "axle-key",
+            "AXLE_API_URL": "https://example.test/api/v1",
+            "AXLE_ENVIRONMENT": "lean-4.29.0",
+        }
+        with patch.dict(os.environ, env_overrides, clear=False):
+            manager = ConfigManager()
+            config = manager.load()
+
+            assert config.axle_api_key == "axle-key"
+            assert config.axle_api_url == "https://example.test/api/v1"
+            assert config.axle_environment == "lean-4.29.0"
     
     def test_invalid_int_raises(self):
         """Test that invalid integer env var raises ConfigValidationError."""
@@ -310,11 +329,11 @@ class TestConfigManagerLogEffectiveConfig:
         """Test that effective config is logged correctly."""
         with patch.dict(os.environ, {"TINKER_API_KEY": "secret-key"}, clear=False):
             manager = ConfigManager()
-            config = manager.load()
-            
+            manager.load()
+             
             # Create mock metrics logger
             mock_logger = MagicMock()
-            
+             
             manager.log_effective_config(mock_logger)
             
             # Verify log_config was called
